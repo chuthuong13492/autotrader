@@ -11,7 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
-import { Route as AuthenticatedSearchResultIndexRouteImport } from './routes/_authenticated/search-result/index'
+import { Route as AuthenticatedSearchResultSearchResultPageRouteImport } from './routes/_authenticated/search-result/search-result-page'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
@@ -22,37 +22,37 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedSearchResultIndexRoute =
-  AuthenticatedSearchResultIndexRouteImport.update({
-    id: '/search-result/',
-    path: '/search-result/',
+const AuthenticatedSearchResultSearchResultPageRoute =
+  AuthenticatedSearchResultSearchResultPageRouteImport.update({
+    id: '/search-result/search-result-page',
+    path: '/search-result/search-result-page',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
-  '/search-result': typeof AuthenticatedSearchResultIndexRoute
+  '/search-result/search-result-page': typeof AuthenticatedSearchResultSearchResultPageRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
-  '/search-result': typeof AuthenticatedSearchResultIndexRoute
+  '/search-result/search-result-page': typeof AuthenticatedSearchResultSearchResultPageRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/_authenticated/': typeof AuthenticatedIndexRoute
-  '/_authenticated/search-result/': typeof AuthenticatedSearchResultIndexRoute
+  '/_authenticated/search-result/search-result-page': typeof AuthenticatedSearchResultSearchResultPageRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/search-result'
+  fullPaths: '/' | '/search-result/search-result-page'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/search-result'
+  to: '/' | '/search-result/search-result-page'
   id:
     | '__root__'
     | '/_authenticated'
     | '/_authenticated/'
-    | '/_authenticated/search-result/'
+    | '/_authenticated/search-result/search-result-page'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -75,11 +75,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/search-result/': {
-      id: '/_authenticated/search-result/'
-      path: '/search-result'
-      fullPath: '/search-result'
-      preLoaderRoute: typeof AuthenticatedSearchResultIndexRouteImport
+    '/_authenticated/search-result/search-result-page': {
+      id: '/_authenticated/search-result/search-result-page'
+      path: '/search-result/search-result-page'
+      fullPath: '/search-result/search-result-page'
+      preLoaderRoute: typeof AuthenticatedSearchResultSearchResultPageRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
   }
@@ -87,12 +87,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
-  AuthenticatedSearchResultIndexRoute: typeof AuthenticatedSearchResultIndexRoute
+  AuthenticatedSearchResultSearchResultPageRoute: typeof AuthenticatedSearchResultSearchResultPageRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
-  AuthenticatedSearchResultIndexRoute: AuthenticatedSearchResultIndexRoute,
+  AuthenticatedSearchResultSearchResultPageRoute:
+    AuthenticatedSearchResultSearchResultPageRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

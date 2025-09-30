@@ -1,0 +1,32 @@
+import { createFileRoute } from '@tanstack/react-router'
+import z from 'zod'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+
+const searchSchema = z.object({
+  type: z.enum(['all', 'connected', 'notConnected']).optional().catch(undefined),
+  filter: z.string().optional().catch(''),
+  sort: z.enum(['asc', 'desc']).optional().catch(undefined),
+})
+
+function SearchResultPage() {
+  return (
+    <div className="px-4 py-6 md:px-6 md:py-8">
+      <Card>
+        <CardHeader>
+          <CardTitle>Search Results</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            This is the search result page. Wire up filters and results here.
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+export const Route = createFileRoute('/_authenticated/search-result-page')({
+  validateSearch: searchSchema,
+  component: SearchResultPage,
+})
+

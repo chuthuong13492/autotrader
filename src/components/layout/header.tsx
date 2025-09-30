@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { Link } from '@tanstack/react-router'
 
 type HeaderProps = React.HTMLAttributes<HTMLElement> & {
   fixed?: boolean
@@ -41,11 +42,13 @@ export function Header({ className, fixed, children, ...props }: HeaderProps) {
         className={cn(
           'relative flex h-full items-center gap-3 px-4 sm:gap-4 @7xl/content:mx-auto @7xl/content:w-full @7xl/content:max-w-7xl',
           offset > 10 &&
-            fixed &&
-            'after:bg-background/20 after:absolute after:inset-0 after:-z-10 after:backdrop-blur-lg'
+          fixed &&
+          'after:bg-background/20 after:absolute after:inset-0 after:-z-10 after:backdrop-blur-lg'
         )}
-
       >
+        <Link className="header-brand" to="/" aria-label="Find Cars for Sale at Autotrader">
+          <img className="display-none display-lg-block" src="//www.autotrader.com/cm-api/content/static/img/icon/logos/atc-logo-blue.svg" width="139" height="38" title="Autotrader Used Cars For Sale - New Cars For Sale - SUVs And Trucks For Sale" alt="Autotrader Logo" loading="eager" />
+        </Link>
         {children}
       </div>
     </header>

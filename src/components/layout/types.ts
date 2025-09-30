@@ -41,4 +41,9 @@ type SidebarData = {
   navGroups: NavGroup[]
 }
 
-export type { SidebarData, NavGroup, NavItem, NavCollapsible, NavLink }
+type DashboardFilterData = {
+  title?: string
+  items: NavItem[]
+}
+
+export type { SidebarData, NavGroup, NavItem, NavCollapsible, NavLink, DashboardFilterData }
