@@ -17,52 +17,7 @@ export type Car = {
   badges?: string[]
 }
 
-export class Pagination<T> {
-  constructor(params: {
-    list: T[]
-    page: number
-    pageSize: number
-    pageCount: number
-    total: number
-    error?: string
-  }) {
-    this.list = params.list
-    this.page = params.page
-    this.pageSize = params.pageSize
-    this.pageCount = params.pageCount
-    this.total = params.total
-    this.error = params.error
-  }
 
-  static empty<U>(): Pagination<U> {
-    return new Pagination<U>({ list: [], page: 0, pageSize: 0, pageCount: 0, total: 0 })
-  }
-
-  list: T[]
-  page: number
-  pageSize: number
-  pageCount: number
-  total: number
-  get isLast(): boolean {
-    return this.page >= this.pageCount
-  }
-  error?: string
-
-  toString(): string {
-    return `Pagination(list: [${this.list.map((e) => String(e)).join(', ')}], page: ${this.page}, pageSize: ${this.pageSize}, pageCount: ${this.pageCount}, total: ${this.total})`
-  }
-
-  copyWith(params: Partial<Pagination<T>> & { list?: T[] }): Pagination<T> {
-    return new Pagination<T>({
-      list: params.list ?? this.list,
-      page: params.page ?? this.page,
-      pageSize: params.pageSize ?? this.pageSize,
-      pageCount: params.pageCount ?? this.pageCount,
-      total: params.total ?? this.total,
-      error: params.error ?? this.error,
-    })
-  }
-}
 
 // ---------- Mock Cars (30 items => 5 pages x 6 each) ----------
 const IMG = (seed: number) => `https://picsum.photos/seed/car-${seed}/408/306`
@@ -139,16 +94,16 @@ export const PAGE_SIZE = 20
 export const TOTAL = ALL_CARS.length
 export const PAGE_COUNT = Math.max(1, Math.ceil(TOTAL / PAGE_SIZE))
 
-export const MOCK_PAGES: Pagination<Car>[] = Array.from({ length: PAGE_COUNT }, (_, i) => {
-  const page = i + 1
-  const start = i * PAGE_SIZE
-  const end = start + PAGE_SIZE
-  const list = ALL_CARS.slice(start, end)
-  return new Pagination<Car>({ list, page, pageSize: PAGE_SIZE, pageCount: PAGE_COUNT, total: TOTAL })
-})
+// export const MOCK_PAGES: Pagination<Car>[] = Array.from({ length: PAGE_COUNT }, (_, i) => {
+//   const page = i + 1
+//   const start = i * PAGE_SIZE
+//   const end = start + PAGE_SIZE
+//   const list = ALL_CARS.slice(start, end)
+//   return new Pagination<Car>({ list, page, pageSize: PAGE_SIZE, pageCount: PAGE_COUNT, total: TOTAL })
+// })
 
-export function getMockPage(page: number): Pagination<Car> {
-  if (page < 1 || page > PAGE_COUNT) return Pagination.empty<Car>()
-  return MOCK_PAGES[page - 1]
-}
+// export function getMockPage(page: number): Pagination<Car> {
+//   if (page < 1 || page > PAGE_COUNT) return Pagination.empty<Car>()
+//   return MOCK_PAGES[page - 1]
+// }
 
