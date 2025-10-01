@@ -17,7 +17,7 @@ export const BaseImage = forwardRef<HTMLImageElement, BaseImageProps>(
                 <Img
                     ref={ref}
                     alt={alt}
-                    className={cn('h-full w-full object-cover')}
+                    className={cn('h-full w-full object-cover', className)}
                     loader={
                         <Skeleton className={
                             cn(

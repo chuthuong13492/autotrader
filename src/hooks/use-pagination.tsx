@@ -268,48 +268,36 @@ function PagedItemComponent<T>({
         setIndex(index);
     }, [index, setIndex]);
 
-    let item = renderItem({
+    const item = renderItem({
         index,
         data: itemData,
         key: itemKey(itemData),
     });
 
-    if (index === pagination.list.length - 1) {
-        switch (status) {
-            case PaginationStatus.LOADING_MORE:
-                item = (
-                    <>
-                        {item}
-                        {renderSeparator?.({ index, data: itemData })}
-                        {renderLoadingMore?.()}
-                    </>
-                );
-                break;
-            case PaginationStatus.SUBSEQUENT_PAGE_ERROR:
-                item = (
-                    <>
-                        {item}
-                        {renderSubsequentPageError?.({
-                            error: pagination.error ?? null,
-                            onRetry: onRetryLoadMore,
-                        })}
-                    </>
-                );
-                break;
-            case PaginationStatus.COMPLETED:
-                item = (
-                    <>
-                        {item}
-                        {renderEnd?.()}
-                    </>
-                );
-                break;
-        }
-    }
+
+    const isLastItem = index === pagination.list.length - 1;
 
     return (
         <div ref={ref} key={itemKey(itemData)}>
             {item}
+
+            {renderSeparator?.({ index, data: itemData })}
+
+            {isLastItem && (() => {
+                switch (status) {
+                    case PaginationStatus.LOADING_MORE:
+                        return renderLoadingMore?.();
+                    case PaginationStatus.SUBSEQUENT_PAGE_ERROR:
+                        return renderSubsequentPageError?.({
+                            error: pagination.error ?? null,
+                            onRetry: onRetryLoadMore,
+                        });
+                    case PaginationStatus.COMPLETED:
+                        return renderEnd?.();
+                    default:
+                        return null;
+                }
+            })()}
         </div>
     );
 };

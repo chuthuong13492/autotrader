@@ -3,6 +3,7 @@ import { Pagination } from '@/components/layout/data/pagination'
 import { BaseImage } from '@/components/ui/base-image'
 import { cn } from '@/lib/utils'
 import { ALL_CARS, PAGE_COUNT, PAGE_SIZE, TOTAL, type Car } from '@/features/dashboard/data/mock-data'
+import { Skeleton } from '@/components/ui/skeleton'
 
 function delay(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms))
@@ -33,17 +34,13 @@ export function CarList() {
             onLoadMore={(nextPage) => fetchPage(nextPage)}
             loadingFirstPageBuilder={() => (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                    {Array.from({ length: 6 }).map((_, idx) => (
-                        <div key={idx} className="rounded-md bg-muted/40 h-[306px]" />
+                    {Array.from({ length: 8 }).map((_, idx) => (
+                        <Skeleton key={idx} className="rounded-md h-[306px]" />
                     ))}
                 </div>
             )}
             loadingMoreBuilder={() => (
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 pt-4">
-                    {Array.from({ length: 4 }).map((_, idx) => (
-                        <div key={idx} className="rounded-md bg-muted/40 h-[306px]" />
-                    ))}
-                </div>
+                <Skeleton className="rounded-md h-[306px]" />
             )}
             firstPageErrorBuilder={(error, onRetry) => (
                 <div className="p-4 text-center">
@@ -56,12 +53,11 @@ export function CarList() {
                     {error ?? 'Tải thêm thất bại'} — <button className="underline" onClick={onRetry}>Thử lại</button>
                 </div>
             )}
-            endBuilder={() => (
-                <div className="py-3 text-center text-sm text-muted-foreground">Hết dữ liệu</div>
+            separatorBuilder={() => (
+                <div className="h-4" />
             )}
-            separatorBuilder={() => <div className="hidden" />}
             itemBuilder={(_, car) => (
-                <div className="rounded-md bg-muted/40">
+                <div className="rounded-md shadow">
                     <BaseImage src={car.imageUrl} alt={`${car.make} ${car.model}`} className="h-[306px] w-full rounded-md" />
                     <div className="p-3">
                         <div className={cn('font-semibold')}>{car.year} {car.make} {car.model}</div>
@@ -70,7 +66,7 @@ export function CarList() {
                     </div>
                 </div>
             )}
-            className="grid grid-cols-1 gap-4 w-full sm:grid-cols-2 xl:grid-cols-4"
+            className="grid grid-cols-1 gap-x-4 w-full sm:grid-cols-2 xl:grid-cols-4"
             hasScrollBar={false}
         />
     )
