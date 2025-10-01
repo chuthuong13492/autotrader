@@ -27,6 +27,7 @@ type PagedListProps<T> = {
   onInitial: UsePaginationOptions<T>['onInitial'];
   onRefresh: UsePaginationOptions<T>['onRefresh'];
   onLoadMore: UsePaginationOptions<T>['onLoadMore'];
+  hasScrollBar: boolean,
   invisibleItemsThreshold?: number;
 };
 
@@ -47,6 +48,7 @@ export function PagedList<T>(props: PagedListProps<T>) {
     onLoadMore,
     pagination,
     invisibleItemsThreshold,
+    hasScrollBar = false,
   } = props;
 
   const {
@@ -106,7 +108,7 @@ export function PagedList<T>(props: PagedListProps<T>) {
 
   // --- Build List ---
   return (
-    <ScrollArea className="h-full">
+    <ScrollArea className="h-full" hasScrollbar={hasScrollBar}>
       <div style={{ ...padding }}>
         {renderedItems}
       </div>
