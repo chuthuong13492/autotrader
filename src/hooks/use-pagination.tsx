@@ -261,7 +261,6 @@ function PagedItemComponent<T>({
     const itemData = pagination.list[index];
 
     const { ref, setIndex } = useItemVisibility((visibleIndex) => {
-        
         onCheckLoadMore(visibleIndex);
     });
 

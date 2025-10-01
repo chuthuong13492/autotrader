@@ -106,7 +106,6 @@ export const DashboardFilter = forwardRef<DashboardFilterRef, DashboardFilterPro
         (values: FormData) => {
             onFilterChange?.(values)
 
-            // Build flat query params (omit empty/nulls)
             const nextSearch: Partial<{
                 value: string
                 minPrice: number
@@ -153,7 +152,7 @@ export const DashboardFilter = forwardRef<DashboardFilterRef, DashboardFilterPro
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
                 {/* Search Filter */}
-                <SearchFilter    className="hidden lg:block w-full max-w-xs min-w-[16rem]" control={form.control} />
+                <SearchFilter className="hidden lg:block w-full max-w-xs min-w-[16rem]" control={form.control} />
 
                 <Card className="hidden w-full max-w-[16rem] shrink-0 self-start lg:block p-0">
                     {/* Price Filter */}

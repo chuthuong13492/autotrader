@@ -17,64 +17,48 @@ export function useIntersectionObserver(
   callback?: (entry: IntersectionObserverEntry) => void,
   options: UseIntersectionObserverOptions = {}
 ): UseIntersectionObserverReturn {
-  const {
-    threshold = 0,
-    root = null,
-    rootMargin = '0px',
-    triggerOnce = false,
-  } = options;
+  const { threshold = 0, root = null, rootMargin = '0px', triggerOnce = false } = options;
 
-  const ref = useRef<HTMLDivElement | null>(null);
+  const ref = useRef<HTMLDivElement>(null);
   const [isIntersecting, setIsIntersecting] = useState(false);
   const [entry, setEntry] = useState<IntersectionObserverEntry | null>(null);
   const hasTriggered = useRef(false);
-
-  const handleIntersection = useCallback(
-    (entries: IntersectionObserverEntry[]) => {
-      const [entry] = entries;
-      
-      if (entry) {
-        setEntry(entry);
-        setIsIntersecting(entry.isIntersecting);
-        
-        if (entry.isIntersecting && callback) {
-          if (!triggerOnce || !hasTriggered.current) {
-            callback(entry);
-            hasTriggered.current = true;
-          }
-        }
-      }
-    },
-    [callback, triggerOnce]
-  );
 
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
 
-    const observer = new IntersectionObserver(handleIntersection, {
-      threshold,
-      root,
-      rootMargin,
-    });
+    const observer = new IntersectionObserver((entries) => {
+      const [entry] = entries;
+      if (!entry) return;
+
+      setEntry(entry);
+      setIsIntersecting(entry.isIntersecting);
+
+      if (entry.isIntersecting && callback && (!triggerOnce || !hasTriggered.current)) {
+        callback(entry);
+        hasTriggered.current = true;
+
+        if (triggerOnce) {
+          observer.unobserve(entry.target);
+          observer.disconnect();
+        }
+      }
+    }, { threshold, root, rootMargin });
 
     observer.observe(element);
 
-
     return () => {
       observer.unobserve(element);
+      observer.disconnect();
     };
-  }, [handleIntersection, threshold, root, rootMargin]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [threshold, root, rootMargin, triggerOnce]);
 
-  return {
-    ref,
-    isIntersecting,
-    entry,
-  };
+  return { ref, isIntersecting, entry };
 }
 
-
-// Hook đơn giản hơn cho việc trigger callback khi item vào viewport
+// Hook đơn giản cho list items
 export function useItemVisibility(
   onVisible?: (index: number) => void,
   options: UseIntersectionObserverOptions = {}
@@ -90,16 +74,12 @@ export function useItemVisibility(
       },
       [onVisible]
     ),
-    options
+    { ...options, triggerOnce: true } // luôn trigger 1 lần cho item
   );
 
   const setIndex = useCallback((index: number) => {
     indexRef.current = index;
   }, []);
 
-  return {
-    ref,
-    setIndex,
-    isIntersecting,
-  };
+  return { ref, setIndex, isIntersecting };
 }
