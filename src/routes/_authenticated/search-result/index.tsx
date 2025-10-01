@@ -4,7 +4,15 @@ import { Dashboard } from '@/features/dashboard'
 
 const searchSchema = z.object({
   type: z.enum(['all', 'connected', 'notConnected']).optional().catch(undefined),
-  filter: z.string().optional().catch(''),
+  // Flat params only; no nested `filter`
+  value: z.string().optional().catch(''),
+  minPrice: z.coerce.number().optional().catch(undefined),
+  maxPrice: z.coerce.number().optional().catch(undefined),
+  selectedMakes: z.array(z.string()).optional().catch([]),
+  selectedModels: z.array(z.string()).optional().catch([]),
+  selectedTrims: z.array(z.string()).optional().catch([]),
+  selectedBodyTypes: z.array(z.string()).optional().catch([]),
+  selectedTransmission: z.string().optional().catch('All'),
   sort: z.enum(['asc', 'desc']).optional().catch(undefined),
 })
 

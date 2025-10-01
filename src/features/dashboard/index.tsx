@@ -1,5 +1,3 @@
-
-
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
@@ -44,6 +42,8 @@ export function Dashboard() {
         </section>
       </div>
     </Main>
+
+    {/* ===== Footer ===== */}
     <Footer />
   </>
   )
