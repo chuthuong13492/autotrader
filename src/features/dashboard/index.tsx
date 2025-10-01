@@ -3,6 +3,7 @@ import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { DashboardBadge } from './components/dashboard-badge'
 import { DashboardFilter } from './components/dashboard-filter'
+import { CarList } from './components/car-list/car-list'
 import { Footer } from '@/components/layout/footer'
 
 export function Dashboard() {
@@ -29,16 +30,7 @@ export function Dashboard() {
         <DashboardFilter />
         {/* Right: List */}
         <section className="min-w-0 grow">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            <div className="rounded-md bg-muted/40" style={{ height: "306px" }} />
-            <div className="rounded-md bg-muted/40" style={{ height: "306px" }} />
-            <div className="rounded-md bg-muted/40" style={{ height: "306px" }} />
-            <div className="rounded-md bg-muted/40" style={{ height: "306px" }} />
-            <div className="rounded-md bg-muted/40" style={{ height: "306px" }} />
-            <div className="rounded-md bg-muted/40" style={{ height: "306px" }} />
-            <div className="rounded-md bg-muted/40" style={{ height: "306px" }} />
-
-          </div>
+          <CarList />
         </section>
       </div>
     </Main>

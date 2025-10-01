@@ -23,7 +23,7 @@ export function BodyTypeFilter({ control, className }: BodyTypeFilterProps) {
                 name="selectedBodyTypes"
                 render={({ field }) => (
                     <FormItem>
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 gap-3">
                             {bodyTypeFilterData.map((bodyType) => (
                                 <div key={bodyType.value} className="flex items-center space-x-2">
                                     <Checkbox

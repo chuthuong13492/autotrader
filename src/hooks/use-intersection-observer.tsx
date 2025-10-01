@@ -8,7 +8,7 @@ interface UseIntersectionObserverOptions {
 }
 
 interface UseIntersectionObserverReturn {
-  ref: React.RefObject<HTMLElement | null>;
+  ref: React.RefObject<HTMLDivElement | null>;
   isIntersecting: boolean;
   entry: IntersectionObserverEntry | null;
 }
@@ -24,7 +24,7 @@ export function useIntersectionObserver(
     triggerOnce = false,
   } = options;
 
-  const ref = useRef<HTMLElement | null>(null);
+  const ref = useRef<HTMLDivElement | null>(null);
   const [isIntersecting, setIsIntersecting] = useState(false);
   const [entry, setEntry] = useState<IntersectionObserverEntry | null>(null);
   const hasTriggered = useRef(false);
@@ -60,6 +60,7 @@ export function useIntersectionObserver(
 
     observer.observe(element);
 
+
     return () => {
       observer.unobserve(element);
     };
@@ -72,19 +73,15 @@ export function useIntersectionObserver(
   };
 }
 
+
 // Hook đơn giản hơn cho việc trigger callback khi item vào viewport
 export function useItemVisibility(
   onVisible?: (index: number) => void,
   options: UseIntersectionObserverOptions = {}
 ) {
-  const ref = useRef<HTMLDivElement | null>(null);
   const indexRef = useRef<number>(-1);
 
-  const setIndex = useCallback((index: number) => {
-    indexRef.current = index;
-  }, []);
-
-  const { isIntersecting } = useIntersectionObserver(
+  const { ref, isIntersecting } = useIntersectionObserver(
     useCallback(
       (entry: IntersectionObserverEntry) => {
         if (entry.isIntersecting && onVisible && indexRef.current >= 0) {
@@ -95,6 +92,10 @@ export function useItemVisibility(
     ),
     options
   );
+
+  const setIndex = useCallback((index: number) => {
+    indexRef.current = index;
+  }, []);
 
   return {
     ref,

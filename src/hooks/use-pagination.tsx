@@ -180,6 +180,7 @@ export function usePagination<T>({
     // Trigger load more when scroll near end
     const checkLoadMore = useCallback(
         (index: number) => {
+
             if (status === PaginationStatus.ONGOING && !hasRequestedNextPage) {
                 const triggerIndex = Math.max(0, pagination.list.length - invisibleItemsThreshold);
                 if (!pagination.isLast && index === triggerIndex) {
@@ -260,6 +261,7 @@ function PagedItemComponent<T>({
     const itemData = pagination.list[index];
 
     const { ref, setIndex } = useItemVisibility((visibleIndex) => {
+        
         onCheckLoadMore(visibleIndex);
     });
 
