@@ -1,5 +1,7 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { type Pagination } from '@/components/layout/data/pagination'
+import isEqual from 'lodash/isEqual'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -57,4 +59,31 @@ export function getPageNumbers(currentPage: number, totalPages: number) {
   }
 
   return rangeWithDots
+}
+
+
+export function updatePage<T>(
+  pagination: Pagination<T> ,
+  newPagination: Pagination<T>
+): Pagination<T> {
+
+  const updatedList = [...pagination.list];
+
+  newPagination.list.forEach((item) => {
+    const index = updatedList.findIndex((e) => isEqual(e, item)); 
+    if (index >= 0) {
+      updatedList[index] = item; // update
+    } else {
+      updatedList.push(item); // add mới
+    }
+  });
+
+  return pagination.copyWith({
+    list: updatedList,
+    page: newPagination.page,
+    pageSize: newPagination.pageSize,
+    pageCount: newPagination.pageCount,
+    total: newPagination.total,
+    error: newPagination.error,
+  });
 }

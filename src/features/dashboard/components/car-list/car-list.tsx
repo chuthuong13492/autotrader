@@ -1,34 +1,47 @@
 import { PagedList } from '@/components/layout/pagination/paged-list'
 import { Pagination } from '@/components/layout/data/pagination'
 import { BaseImage } from '@/components/ui/base-image'
-import { cn } from '@/lib/utils'
+import { cn, updatePage } from '@/lib/utils'
 import { ALL_CARS, PAGE_COUNT, PAGE_SIZE, TOTAL, type Car } from '@/features/dashboard/data/mock-data'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useState } from 'react'
 
 function delay(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-async function fetchPage(page: number): Promise<Pagination<Car>> {
-    const safePage = Math.min(Math.max(page, 1), PAGE_COUNT)
-    const start = (safePage - 1) * PAGE_SIZE
-    const end = start + PAGE_SIZE
-    const list = ALL_CARS.slice(start, end)
-
-    await delay(1000)
-    return new Pagination<Car>({
-        list,
-        page: safePage,
-        pageSize: PAGE_SIZE,
-        pageCount: PAGE_COUNT,
-        total: TOTAL,
-    })
-}
 
 export function CarList() {
+    const [pagination, setPagination] = useState<Pagination<Car>>(Pagination.empty())
+
+    async function fetchPage(page: number): Promise<Pagination<Car>> {
+        const safePage = Math.min(Math.max(page, 1), PAGE_COUNT)
+        const start = (safePage - 1) * PAGE_SIZE
+        const end = start + PAGE_SIZE
+        const list = ALL_CARS.slice(start, end)
+
+        const result = new Pagination<Car>({
+            list,
+            page: safePage,
+            pageSize: PAGE_SIZE,
+            pageCount: PAGE_COUNT,
+            total: TOTAL,
+        })
+
+        setPagination(updatePage(pagination, result))
+
+        await delay(1000)
+
+        // eslint-disable-next-line no-console
+        console.log('pagination', updatePage(pagination, result))
+
+        return updatePage(pagination, result);
+    }
+
     return (
         <PagedList<Car>
             itemKey={(item) => item.id}
+            pagination={pagination}
             onInitial={() => fetchPage(1)}
             onRefresh={() => fetchPage(1)}
             onLoadMore={(nextPage) => fetchPage(nextPage)}
