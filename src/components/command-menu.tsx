@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { ArrowRight, ChevronRight } from 'lucide-react'
 import { useSearch } from '@/context/search-provider'
+import { useDebouncedCallback } from 'use-debounce'
 import { brandFilterData } from '@/features/dashboard/data/filter-data'
 import {
   CommandDialog,
@@ -15,8 +16,8 @@ import { ScrollArea } from './ui/scroll-area'
 
 export function CommandMenu() {
   const navigate = useNavigate()
-
   const { state, setOpen, setQuery } = useSearch()
+  const [text, setText] = useState("");
 
   const runCommand = React.useCallback(
     (command: () => unknown) => {
@@ -25,12 +26,25 @@ export function CommandMenu() {
     },
     [setOpen]
   )
+
+  useEffect(() => {
+    setText(state.query ?? "")
+  }, [state.query,],)
+
+  const onValueChange = useDebouncedCallback((e) => {
+    setQuery(e);
+  }, 300)
+
+
   return (
     <CommandDialog modal open={state.open} onOpenChange={setOpen}>
-      <CommandInput 
-        placeholder='Type vehicle brands/models or search...' 
-        // value={state.query}
-        // onValueChange={setQuery}
+      <CommandInput
+        placeholder='Type vehicle brands/models or search...'
+        value={text}
+        onValueChange={(e) => {
+          setText(e);
+          onValueChange(e)
+        }}
       />
       <CommandList>
         <ScrollArea type='hover' className='h-72 pe-1'>
@@ -44,7 +58,7 @@ export function CommandMenu() {
                 onSelect={() => {
                   setQuery(make)
                   runCommand(() =>
-                    navigate({ to: '/search-result', search: { value: make } })
+                    navigate({ to: '/search-result-page', search: { value: make } })
                   )
                 }}
               >
@@ -66,7 +80,7 @@ export function CommandMenu() {
                     const q = `${make} ${model}`
                     setQuery(q)
                     runCommand(() =>
-                      navigate({ to: '/search-result', search: { value: q } })
+                      navigate({ to: '/search-result-page', search: { value: q } })
                     )
                   }}
                 >
@@ -79,7 +93,7 @@ export function CommandMenu() {
             )}
           </CommandGroup>
 
-    
+
           {/* <CommandSeparator /> */}
           {/* <CommandGroup heading='Theme'>
             <CommandItem onSelect={() => runCommand(() => setTheme('light'))}>

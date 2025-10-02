@@ -1,17 +1,26 @@
 import { PagedList } from '@/components/layout/pagination/paged-list'
 import { Pagination } from '@/components/layout/data/pagination'
-import { BaseImage } from '@/components/ui/base-image'
-import { cn, updatePage } from '@/lib/utils'
+import { updatePage } from '@/lib/utils'
 import { ALL_CARS, PAGE_COUNT, PAGE_SIZE, TOTAL, type Car } from '@/features/dashboard/data/mock-data'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { type FieldErrors } from 'react-hook-form'
+import { type FormData } from '../dashboard-filter'
+import { CarCard } from '../car-card/car-card'
+import { CarCardLoading } from '../car-card/car-card-loading'
+import { FilterIcon, SearchIcon } from 'lucide-react'
+import { useSearch } from '@/context/search-provider'
+import { Separator } from '@/components/ui/separator'
 
 function delay(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+interface CarListProps {
+    onResetFilters?: () => void
+    formState?: { isDirty: boolean; errors: FieldErrors<FormData> } | null
+}
 
-export function CarList() {
+export function CarList({ onResetFilters, formState }: CarListProps) {
     const [pagination, setPagination] = useState<Pagination<Car>>(Pagination.empty())
 
     async function fetchPage(page: number): Promise<Pagination<Car>> {
@@ -38,51 +47,101 @@ export function CarList() {
         return updatePage(pagination, result);
     }
 
+
+
+
     return (
-        <PagedList<Car>
-            itemKey={(item) => item.id}
-            pagination={pagination}
-            onInitial={() => fetchPage(1)}
-            onRefresh={() => fetchPage(1)}
-            onLoadMore={(nextPage) => fetchPage(nextPage)}
-            loadingFirstPageBuilder={() => (
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                    {Array.from({ length: 8 }).map((_, idx) => (
-                        <Skeleton key={idx} className="rounded-md h-[306px]" />
-                    ))}
-                </div>
-            )}
-            loadingMoreBuilder={() => (
-                <Skeleton className="rounded-md h-[306px]" />
-            )}
-            firstPageErrorBuilder={(error, onRetry) => (
-                <div className="p-4 text-center">
-                    <div className="mb-2 text-destructive">{error ?? 'Có lỗi xảy ra'}</div>
-                    <button className="underline" onClick={onRetry}>Thử lại</button>
-                </div>
-            )}
-            subsequentPageErrorBuilder={(error, onRetry) => (
-                <div className="py-3 text-center text-sm text-destructive">
-                    {error ?? 'Tải thêm thất bại'} — <button className="underline" onClick={onRetry}>Thử lại</button>
-                </div>
-            )}
-            separatorBuilder={() => (
-                <div className="h-4" />
-            )}
-            itemBuilder={(_, car) => (
-                <div className="rounded-md shadow">
-                    <BaseImage src={car.imageUrl} alt={`${car.make} ${car.model}`} className="h-[306px] w-full rounded-md" />
-                    <div className="p-3">
-                        <div className={cn('font-semibold')}>{car.year} {car.make} {car.model}</div>
-                        <div className="text-sm text-muted-foreground">{car.trim} • {car.mileage.toLocaleString()} mi</div>
-                        <div className="mt-1 font-bold">${car.price.toLocaleString()}</div>
+        <div className=''>
+            <CarListFilter onResetFilters={onResetFilters} formState={formState} />
+
+            <PagedList<Car>
+                className="lg:pl-8 pr-2 pt-3 pb-2 grid grid-cols-1 gap-x-4 w-full md:grid-cols-2 lg:grid-cols-4"
+                itemKey={(item) => item.id}
+                pagination={pagination}
+                onInitial={() => fetchPage(1)}
+                onRefresh={() => fetchPage(1)}
+                onLoadMore={(nextPage) => fetchPage(nextPage)}
+                loadingFirstPageBuilder={() => (
+                    <div className="pl-8 pr-2 pt-3 grid grid-cols-1 gap-4 w-full md:grid-cols-2 lg:grid-cols-4">
+                        {Array.from({ length: 8 }).map((_, idx) => (
+                            <CarCardLoading key={idx} />
+                        ))}
                     </div>
-                </div>
-            )}
-            className="grid grid-cols-1 gap-x-4 w-full sm:grid-cols-2 xl:grid-cols-4"
-            hasScrollBar={false}
-        />
+                )}
+                loadingMoreBuilder={() => <CarCardLoading />}
+                firstPageErrorBuilder={(error, onRetry) => (
+                    <div className="p-4 text-center">
+                        <div className="mb-2 text-destructive">{error ?? 'Có lỗi xảy ra'}</div>
+                        <button className="underline" onClick={onRetry}>Thử lại</button>
+                    </div>
+                )}
+                subsequentPageErrorBuilder={(error, onRetry) => (
+                    <div className="py-3 text-center text-sm text-destructive">
+                        {error ?? 'Tải thêm thất bại'} — <button className="underline" onClick={onRetry}>Thử lại</button>
+                    </div>
+                )}
+                separatorBuilder={() => (
+                    <div className="h-4" />
+                )}
+                itemBuilder={(_, car) => (
+                    <CarCard car={car} />
+                )}
+
+                hasScrollBar={false}
+            />
+        </div>
     )
 }
 
+interface CarListFilterProps {
+    onResetFilters?: () => void
+    formState?: { isDirty: boolean; errors: FieldErrors<FormData> } | null
+}
 
+function CarListFilter({ onResetFilters, formState }: CarListFilterProps) {
+    const { setOpen } = useSearch();
+
+    const isClear = useMemo(() => {
+        return formState?.isDirty
+    }, [formState]);
+
+    return (
+        <div className="lg:pl-8 h-9 flex items-center justify-start">
+            <div className="flex lg:hidden space-x-4 h-full items-center gap-1 transition-all duration-200">
+                <SearchIcon
+                    aria-hidden="true"
+                    className="text-muted-foreground cursor-pointer"
+                    color="#ff821c"
+                    size={18}
+                    onClick={() => setOpen(true)}
+                />
+
+                <Separator
+                    className="bg-border h-full"
+                    orientation="vertical"
+                />
+                <button
+                    className="flex items-center gap-1"
+                >
+                    <FilterIcon color="#ff821c" aria-hidden="true" size={18} />
+                    <br />
+                    <span className="text-lg text-muted-foreground hover:underline transition-all duration-200">Filter</span>
+                </button>
+                
+                <Separator
+                    className="bg-border h-full mr-4"
+                    orientation="vertical"
+                />
+            </div>
+
+            {isClear && (
+                <button
+                    className="text-lg text-blue-400 hover:underline transition-all duration-200"
+                    onClick={() => onResetFilters?.()}
+                >
+                    Clear Filters
+                </button>
+            )}
+        </div>
+    )
+}

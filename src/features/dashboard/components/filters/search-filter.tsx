@@ -11,6 +11,7 @@ interface SearchFilterProps {
 }
 
 export function SearchFilter({ control, className }: SearchFilterProps) {
+    
     return (
         <div className={cn(
             "space-y-3",

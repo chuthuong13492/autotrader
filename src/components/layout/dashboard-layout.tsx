@@ -6,7 +6,7 @@ type AuthenticatedLayoutProps = {
   children?: React.ReactNode
 }
 
-export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
+export function DashboardLayout({ children }: AuthenticatedLayoutProps) {
   return (
     <SearchProvider>
       <SkipToMain />

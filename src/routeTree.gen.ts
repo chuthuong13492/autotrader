@@ -11,7 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as DashboardRouteRouteImport } from './routes/_dashboard/route'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
-import { Route as DashboardSearchResultIndexRouteImport } from './routes/_dashboard/search-result/index'
+import { Route as DashboardSearchResultPageIndexRouteImport } from './routes/_dashboard/search-result-page/index'
 
 const DashboardRouteRoute = DashboardRouteRouteImport.update({
   id: '/_dashboard',
@@ -22,33 +22,37 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
-const DashboardSearchResultIndexRoute =
-  DashboardSearchResultIndexRouteImport.update({
-    id: '/search-result/',
-    path: '/search-result/',
+const DashboardSearchResultPageIndexRoute =
+  DashboardSearchResultPageIndexRouteImport.update({
+    id: '/search-result-page/',
+    path: '/search-result-page/',
     getParentRoute: () => DashboardRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof DashboardIndexRoute
-  '/search-result': typeof DashboardSearchResultIndexRoute
+  '/search-result-page': typeof DashboardSearchResultPageIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof DashboardIndexRoute
-  '/search-result': typeof DashboardSearchResultIndexRoute
+  '/search-result-page': typeof DashboardSearchResultPageIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_dashboard': typeof DashboardRouteRouteWithChildren
   '/_dashboard/': typeof DashboardIndexRoute
-  '/_dashboard/search-result/': typeof DashboardSearchResultIndexRoute
+  '/_dashboard/search-result-page/': typeof DashboardSearchResultPageIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/search-result'
+  fullPaths: '/' | '/search-result-page'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/search-result'
-  id: '__root__' | '/_dashboard' | '/_dashboard/' | '/_dashboard/search-result/'
+  to: '/' | '/search-result-page'
+  id:
+    | '__root__'
+    | '/_dashboard'
+    | '/_dashboard/'
+    | '/_dashboard/search-result-page/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -71,11 +75,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
-    '/_dashboard/search-result/': {
-      id: '/_dashboard/search-result/'
-      path: '/search-result'
-      fullPath: '/search-result'
-      preLoaderRoute: typeof DashboardSearchResultIndexRouteImport
+    '/_dashboard/search-result-page/': {
+      id: '/_dashboard/search-result-page/'
+      path: '/search-result-page'
+      fullPath: '/search-result-page'
+      preLoaderRoute: typeof DashboardSearchResultPageIndexRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
   }
@@ -83,12 +87,12 @@ declare module '@tanstack/react-router' {
 
 interface DashboardRouteRouteChildren {
   DashboardIndexRoute: typeof DashboardIndexRoute
-  DashboardSearchResultIndexRoute: typeof DashboardSearchResultIndexRoute
+  DashboardSearchResultPageIndexRoute: typeof DashboardSearchResultPageIndexRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardIndexRoute: DashboardIndexRoute,
-  DashboardSearchResultIndexRoute: DashboardSearchResultIndexRoute,
+  DashboardSearchResultPageIndexRoute: DashboardSearchResultPageIndexRoute,
 }
 
 const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
