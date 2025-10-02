@@ -16,7 +16,7 @@ const searchSchema = z.object({
   sort: z.enum(['asc', 'desc']).optional().catch(undefined),
 })
 
-export const Route = createFileRoute('/_authenticated/search-result/')({
+export const Route = createFileRoute('/_dashboard/search-result/')({
   validateSearch: searchSchema,
   component: Dashboard,
 })

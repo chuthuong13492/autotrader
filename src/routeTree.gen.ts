@@ -9,97 +9,94 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
-import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
-import { Route as AuthenticatedSearchResultIndexRouteImport } from './routes/_authenticated/search-result/index'
+import { Route as DashboardRouteRouteImport } from './routes/_dashboard/route'
+import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
+import { Route as DashboardSearchResultIndexRouteImport } from './routes/_dashboard/search-result/index'
 
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
+const DashboardRouteRoute = DashboardRouteRouteImport.update({
+  id: '/_dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
-const AuthenticatedSearchResultIndexRoute =
-  AuthenticatedSearchResultIndexRouteImport.update({
+const DashboardSearchResultIndexRoute =
+  DashboardSearchResultIndexRouteImport.update({
     id: '/search-result/',
     path: '/search-result/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    getParentRoute: () => DashboardRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof AuthenticatedIndexRoute
-  '/search-result': typeof AuthenticatedSearchResultIndexRoute
+  '/': typeof DashboardIndexRoute
+  '/search-result': typeof DashboardSearchResultIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof AuthenticatedIndexRoute
-  '/search-result': typeof AuthenticatedSearchResultIndexRoute
+  '/': typeof DashboardIndexRoute
+  '/search-result': typeof DashboardSearchResultIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/_authenticated/': typeof AuthenticatedIndexRoute
-  '/_authenticated/search-result/': typeof AuthenticatedSearchResultIndexRoute
+  '/_dashboard': typeof DashboardRouteRouteWithChildren
+  '/_dashboard/': typeof DashboardIndexRoute
+  '/_dashboard/search-result/': typeof DashboardSearchResultIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths: '/' | '/search-result'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/search-result'
-  id:
-    | '__root__'
-    | '/_authenticated'
-    | '/_authenticated/'
-    | '/_authenticated/search-result/'
+  id: '__root__' | '/_dashboard' | '/_dashboard/' | '/_dashboard/search-result/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_authenticated': {
-      id: '/_authenticated'
+    '/_dashboard': {
+      id: '/_dashboard'
       path: ''
       fullPath: ''
-      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      preLoaderRoute: typeof DashboardRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/': {
-      id: '/_authenticated/'
+    '/_dashboard/': {
+      id: '/_dashboard/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
     }
-    '/_authenticated/search-result/': {
-      id: '/_authenticated/search-result/'
+    '/_dashboard/search-result/': {
+      id: '/_dashboard/search-result/'
       path: '/search-result'
       fullPath: '/search-result'
-      preLoaderRoute: typeof AuthenticatedSearchResultIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      preLoaderRoute: typeof DashboardSearchResultIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
     }
   }
 }
 
-interface AuthenticatedRouteRouteChildren {
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
-  AuthenticatedSearchResultIndexRoute: typeof AuthenticatedSearchResultIndexRoute
+interface DashboardRouteRouteChildren {
+  DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardSearchResultIndexRoute: typeof DashboardSearchResultIndexRoute
 }
 
-const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
-  AuthenticatedSearchResultIndexRoute: AuthenticatedSearchResultIndexRoute,
+const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
+  DashboardIndexRoute: DashboardIndexRoute,
+  DashboardSearchResultIndexRoute: DashboardSearchResultIndexRoute,
 }
 
-const AuthenticatedRouteRouteWithChildren =
-  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
+  DashboardRouteRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
-  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  DashboardRouteRoute: DashboardRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

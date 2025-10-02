@@ -58,7 +58,6 @@ export function useIntersectionObserver(
   return { ref, isIntersecting, entry };
 }
 
-// Hook đơn giản cho list items
 export function useItemVisibility(
   onVisible?: (index: number) => void,
   options: UseIntersectionObserverOptions = {}
