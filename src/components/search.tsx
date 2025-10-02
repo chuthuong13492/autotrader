@@ -2,6 +2,9 @@ import { SearchIcon, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useSearch } from '@/context/search-provider'
 import { Button } from './ui/button'
+import { useDispatch, useSelector } from 'react-redux'
+import { type DashboardDispatch, type DashboardRootState } from '@/stores/dashboard-store'
+import { setSearch } from '@/stores/dashboard-slice'
 
 type SearchProps = {
   className?: string
@@ -13,12 +16,15 @@ export function Search({
   className = '',
   placeholder = 'Search',
 }: SearchProps) {
-  const { state, setOpen, clearQuery } = useSearch()
-  const { query } = state
+  const {  setOpen } = useSearch()
+
+  const search = useSelector((state: DashboardRootState) => state.dashboard.search)
+
+  const dispatch = useDispatch<DashboardDispatch>()
 
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation()
-    clearQuery()
+    dispatch(setSearch(''))
   }
 
   return (
@@ -38,8 +44,8 @@ export function Search({
           color="#ff821c"
           size={16}
         />
-        <span className="ms-4">{query || placeholder}</span>
-        {query && (
+        <span className="ms-4">{search || placeholder}</span>
+        {search && (
           <Button
             variant="ghost"
             size="sm"

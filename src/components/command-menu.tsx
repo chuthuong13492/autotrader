@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { useEffect, useState } from 'react'
+import { useRouter } from '@tanstack/react-router'
 import { ArrowRight, ChevronRight } from 'lucide-react'
 import { useSearch } from '@/context/search-provider'
 import { useDebouncedCallback } from 'use-debounce'
@@ -13,28 +13,68 @@ import {
   CommandList,
 } from '@/components/ui/command'
 import { ScrollArea } from './ui/scroll-area'
+import { type DashboardDispatch, type DashboardRootState } from '@/stores/dashboard-store'
+import { useSelector, useDispatch } from 'react-redux'
+import { setSearch } from '@/stores/dashboard-slice'
+import { type FilterTransmissionType } from '@/features/dashboard/components/dashboard-filter'
 
 export function CommandMenu() {
-  const navigate = useNavigate()
-  const { state, setOpen, setQuery } = useSearch()
+  const router = useRouter()
+
+  const { state, setOpen } = useSearch()
+
   const [text, setText] = useState("");
 
-  const runCommand = React.useCallback(
-    (command: () => unknown) => {
-      setOpen(false)
-      command()
-    },
-    [setOpen]
-  )
+  const search = useSelector((state: DashboardRootState) => state.dashboard.search)
+
+  const values = useSelector((state: DashboardRootState) => state.dashboard.values)
+
+
+  const dispatch = useDispatch<DashboardDispatch>()
+
 
   useEffect(() => {
-    setText(state.query ?? "")
-  }, [state.query,],)
+    setText(search ?? "")
+  }, [search])
+
+  const setQuery = (e: string) => dispatch(setSearch(e));
 
   const onValueChange = useDebouncedCallback((e) => {
     setQuery(e);
   }, 300)
 
+  const onSelect = (e: string) => {
+    setQuery(e)
+    setOpen(false)
+
+    const nextSearch: Partial<{
+      value: string
+      minPrice: number
+      maxPrice: number
+      selectedMakes: string[]
+      selectedModels: string[]
+      selectedTrims: string[]
+      selectedBodyTypes: string[]
+      selectedTransmission: FilterTransmissionType
+    }> = {}
+    if (e) nextSearch.value = e
+    if (values.minPrice) nextSearch.minPrice = Number(values.minPrice)
+    if (values.maxPrice) nextSearch.maxPrice = Number(values.maxPrice)
+    if (values.selectedMakes?.length) nextSearch.selectedMakes = values.selectedMakes
+    if (values.selectedModels?.length) nextSearch.selectedModels = values.selectedModels
+    if (values.selectedTrims?.length) nextSearch.selectedTrims = values.selectedTrims
+    if (values.selectedBodyTypes?.length) nextSearch.selectedBodyTypes = values.selectedBodyTypes
+    if (values.selectedTransmission && values.selectedTransmission !== 'All') {
+      nextSearch.selectedTransmission = values.selectedTransmission
+    }
+
+    const nextLocation = router.buildLocation({
+      from: '/search-result-page',
+      to: '.',
+      search: nextSearch,
+    })
+    router.history.replace(nextLocation.href)
+  }
 
   return (
     <CommandDialog modal open={state.open} onOpenChange={setOpen}>
@@ -55,12 +95,7 @@ export function CommandMenu() {
               <CommandItem
                 key={`make-${make}`}
                 value={make}
-                onSelect={() => {
-                  setQuery(make)
-                  runCommand(() =>
-                    navigate({ to: '/search-result-page', search: { value: make } })
-                  )
-                }}
+                onSelect={() => onSelect(make)}
               >
                 <div className='flex size-4 items-center justify-center'>
                   <ArrowRight className='text-muted-foreground/80 size-2' />
@@ -76,13 +111,7 @@ export function CommandMenu() {
                 <CommandItem
                   key={`model-${make}-${model}`}
                   value={`${make} ${model}`}
-                  onSelect={() => {
-                    const q = `${make} ${model}`
-                    setQuery(q)
-                    runCommand(() =>
-                      navigate({ to: '/search-result-page', search: { value: q } })
-                    )
-                  }}
+                  onSelect={() => onSelect(`${make} ${model}`)}
                 >
                   <div className='flex size-4 items-center justify-center'>
                     <ArrowRight className='text-muted-foreground/80 size-2' />
@@ -113,3 +142,4 @@ export function CommandMenu() {
     </CommandDialog>
   )
 }
+

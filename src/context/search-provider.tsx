@@ -1,17 +1,20 @@
-import {  useContext, useEffect, useReducer } from 'react'
+import { useContext, useEffect, useReducer } from 'react'
 import { CommandMenu } from '@/components/command-menu'
 import { SearchContext } from './context'
+import { setForm, setSearch } from '@/stores/dashboard-slice'
+import { type DashboardDispatch } from '@/stores/dashboard-store'
+import { useDispatch } from 'react-redux'
+import { useSearch as useRouteSearch } from '@tanstack/react-router'
+import { type FilterTransmissionType, type FormData } from '@/features/dashboard/components/dashboard-filter'
+
 
 type SearchState = {
   open: boolean
-  query?: string
 }
 
 type SearchAction =
   | { type: 'SET_OPEN'; payload: boolean }
   | { type: 'TOGGLE_OPEN' }
-  | { type: 'SET_QUERY'; payload: string }
-  | { type: 'CLEAR_QUERY' }
 
 
 const searchReducer = (state: SearchState, action: SearchAction): SearchState => {
@@ -20,10 +23,6 @@ const searchReducer = (state: SearchState, action: SearchAction): SearchState =>
       return { ...state, open: action.payload }
     case 'TOGGLE_OPEN':
       return { ...state, open: !state.open }
-    case 'SET_QUERY':
-      return { ...state, query: action.payload }
-    case 'CLEAR_QUERY':
-      return { ...state, query: '' }
     default:
       return state
   }
@@ -35,9 +34,12 @@ type SearchProviderProps = {
 
 export function SearchProvider({ children }: SearchProviderProps) {
   const [state, dispatch] = useReducer(searchReducer, {
-    open: false,
-    query: ''
+    open: false
   })
+
+  const reduxDispatch = useDispatch<DashboardDispatch>()
+
+  const routeSearch = useRouteSearch({ from: '/_dashboard/search-result-page/' })
 
   const setOpen = (open: boolean) => {
     dispatch({ type: 'SET_OPEN', payload: open })
@@ -47,13 +49,6 @@ export function SearchProvider({ children }: SearchProviderProps) {
     dispatch({ type: 'TOGGLE_OPEN' })
   }
 
-  const setQuery = (query: string) => {
-    dispatch({ type: 'SET_QUERY', payload: query })
-  }
-
-  const clearQuery = () => {
-    dispatch({ type: 'CLEAR_QUERY' })
-  }
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -66,8 +61,43 @@ export function SearchProvider({ children }: SearchProviderProps) {
     return () => document.removeEventListener('keydown', down)
   }, [])
 
+  useEffect(() => {
+    const s = routeSearch ?? {}
+
+    if (s.value !== undefined) {
+      const v = String(s.value ?? '')
+      reduxDispatch(setSearch(v))
+    }
+    const initValues: Partial<FormData> = {
+      minPrice: '',
+      maxPrice: '',
+      selectedMakes: [],
+      selectedModels: [],
+      selectedTrims: [],
+      selectedBodyTypes: [],
+      selectedTransmission: 'All',
+    }
+
+    if (s.minPrice !== undefined) initValues.minPrice = String(s.minPrice)
+
+    if (s.maxPrice !== undefined) initValues.maxPrice = String(s.maxPrice)
+
+    if (s.selectedMakes?.length) initValues.selectedMakes = s.selectedMakes
+
+    if (s.selectedModels?.length) initValues.selectedModels = s.selectedModels
+
+    if (s.selectedTrims?.length) initValues.selectedTrims = s.selectedTrims
+
+    if (s.selectedBodyTypes?.length) initValues.selectedBodyTypes = s.selectedBodyTypes
+
+    if (s.selectedTransmission !== undefined) initValues.selectedTransmission = (s.selectedTransmission as FilterTransmissionType) ?? "All"
+
+    reduxDispatch(setForm({ ...initValues, isDirty: true }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
-    <SearchContext.Provider value={{ state, setOpen, toggleOpen, setQuery, clearQuery }}>
+    <SearchContext.Provider value={{ state, setOpen, toggleOpen }}>
       {children}
       <CommandMenu />
     </SearchContext.Provider>

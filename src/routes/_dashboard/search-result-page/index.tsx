@@ -3,8 +3,6 @@ import z from 'zod'
 import { Dashboard } from '@/features/dashboard'
 
 const searchSchema = z.object({
-  type: z.enum(['all', 'connected', 'notConnected']).optional().catch(undefined),
-  // Flat params only; no nested `filter`
   value: z.string().optional().catch(''),
   minPrice: z.coerce.number().optional().catch(undefined),
   maxPrice: z.coerce.number().optional().catch(undefined),

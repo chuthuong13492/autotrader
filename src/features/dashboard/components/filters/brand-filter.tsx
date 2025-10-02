@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import { type Control, useWatch, useController, useFormContext } from "react-hook-form"
+import { type Control, useWatch, useFormContext } from "react-hook-form"
 import { brandFilterData } from "../../data/filter-data"
 import { FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form"
 import {
@@ -19,14 +19,17 @@ interface BrandFilterProps {
 
 export function BrandFilter({ control, className }: BrandFilterProps) {
   const selectedMakes = useWatch({ control, name: "selectedMakes" })
+
   const selectedModels = useWatch({ control, name: "selectedModels" })
 
   const selectedMake = useMemo(
-    () => (selectedMakes?.length > 0 ? selectedMakes[0] : null),
+    () => {
+      return selectedMakes?.length > 0 ? selectedMakes[0] : null
+    },
     [selectedMakes]
   )
   const selectedModel = useMemo(
-    () => (selectedModels?.length > 0 ? selectedModels[0] : null),
+    () => selectedModels?.length > 0 ? selectedModels[0] : null,
     [selectedModels]
   )
 
@@ -36,57 +39,50 @@ export function BrandFilter({ control, className }: BrandFilterProps) {
       <div className="space-y-4">
         <MakeSelect control={control} />
         {selectedMake && <ModelSelect control={control} selectedMake={selectedMake} />}
-        {selectedModel && <TrimSelect control={control} selectedModel={selectedModel} />}
+        {(selectedMake && selectedModel) && <TrimSelect control={control} selectedModel={selectedModel} />}
       </div>
     </div>
   )
 }
 
 function MakeSelect({ control }: { control: Control<FormData> }) {
-  const { resetField } = useFormContext<FormData>()
+  const { reset, getValues } = useFormContext<FormData>()
 
-  const { field } = useController({ name: "selectedMakes", control })
-  const { field: modelsField } = useController({ name: "selectedModels", control })
-  const { field: trimsField } = useController({ name: "selectedTrims", control })
+  const selectedMakes = useWatch({ control, name: "selectedMakes" })
 
-  const selected = Array.isArray(field.value) && field.value.length > 0 ? field.value[0] : ""
+  const selectedModels = useWatch({ control, name: "selectedModels" })
+  const selectedTrims = useWatch({ control, name: "selectedTrims" })
+
+  const selected = selectedMakes?.length > 0 ? selectedMakes[0] : ""
 
   return (
     <FormField
       control={control}
       name="selectedMakes"
-      render={() => (
+      render={({ field }) => (
         <FormItem>
           <div className="flex items-center justify-between">
             <FormLabel className="text-xs text-muted-foreground">Make</FormLabel>
-            {(selected || modelsField.value?.length > 0 || trimsField.value?.length > 0) && (
-              <ClearButton
-                text="Clear All"
-                onClick={() => {
-                  resetField("selectedMakes")
-                  resetField("selectedModels")
-                  resetField("selectedTrims")
-                }}
-              />
-            )}
+            {(selectedMakes.length > 0 || selectedModels.length > 0 || selectedTrims.length > 0) && <ClearButton
+              text="Clear All"
+              onClick={() => {
+                field.onChange([])
+                reset({ ...getValues(), selectedMakes: [], selectedModels: [], selectedTrims: [] }, { keepDirty: true })
+              }}
+            />
+            }
           </div>
           <FormControl>
-            <Select
-              value={selected}
-              onValueChange={(value) => {
-                field.onChange(value ? [value] : [])
-                resetField("selectedModels")
-                resetField("selectedTrims")
-              }}
-            >
+            <Select value={selected} onValueChange={(value) => {
+              field.onChange(value ? [value] : [])
+              reset({ ...getValues(), selectedModels: [], selectedTrims: [] }, { keepDirty: true })
+            }}>
               <SelectTrigger>
                 <SelectValue placeholder="Select make" />
               </SelectTrigger>
               <SelectContent>
                 {brandFilterData.makes.map((make) => (
-                  <SelectItem key={make} value={make}>
-                    {make}
-                  </SelectItem>
+                  <SelectItem key={make} value={make}>{make}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -98,25 +94,24 @@ function MakeSelect({ control }: { control: Control<FormData> }) {
 }
 
 function ModelSelect({ control, selectedMake }: { control: Control<FormData>; selectedMake: string }) {
-  const { resetField } = useFormContext<FormData>()
+  const { reset, getValues } = useFormContext<FormData>()
 
-  const { field } = useController({ name: "selectedModels", control})
+  const selectedModels = useWatch({ control, name: "selectedModels" })
 
-  const selected = Array.isArray(field.value) && field.value.length > 0 ? field.value[0] : ""
+  const selected = selectedModels?.[0] ?? ""
 
   return (
     <FormField
       control={control}
       name="selectedModels"
-      render={() => (
+      render={({ field }) => (
         <FormItem>
           <div className="flex items-center justify-between">
             <FormLabel className="text-xs text-muted-foreground">Model</FormLabel>
-            {selected && (
+            {selectedModels.length > 0 && (
               <ClearButton
                 onClick={() => {
-                  resetField("selectedModels")
-                  resetField("selectedTrims")
+                  reset({ ...getValues(), selectedModels: [], selectedTrims: [] }, { keepDirty: true })
                 }}
               />
             )}
@@ -126,7 +121,7 @@ function ModelSelect({ control, selectedMake }: { control: Control<FormData>; se
               value={selected}
               onValueChange={(value) => {
                 field.onChange(value ? [value] : [])
-                resetField("selectedTrims")
+                reset({ ...getValues(), selectedTrims: [] }, { keepDirty: true })
               }}
             >
               <SelectTrigger>
@@ -150,20 +145,20 @@ function ModelSelect({ control, selectedMake }: { control: Control<FormData>; se
 }
 
 function TrimSelect({ control, selectedModel }: { control: Control<FormData>; selectedModel: string }) {
-  const { resetField } = useFormContext<FormData>()
-  const { field } = useController({ name: "selectedTrims", control })
+  const { reset, getValues } = useFormContext<FormData>()
 
-  const selected = Array.isArray(field.value) && field.value.length > 0 ? field.value[0] : ""
+  const selectedTrims = useWatch({ control, name: "selectedTrims" })
+  const selected = selectedTrims?.[0] ?? ""
 
   return (
     <FormField
       control={control}
       name="selectedTrims"
-      render={() => (
+      render={({ field }) => (
         <FormItem>
           <div className="flex items-center justify-between">
             <FormLabel className="text-xs text-muted-foreground">Trim</FormLabel>
-            {selected && <ClearButton onClick={() => resetField("selectedTrims")} />}
+            {selectedTrims.length > 0 && <ClearButton onClick={() => reset({ ...getValues(), selectedTrims: [] }, { keepDirty: true })} />}
           </div>
           <FormControl>
             <Select

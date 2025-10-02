@@ -13,33 +13,31 @@ export interface BaseImageProps
 export const BaseImage = forwardRef<HTMLImageElement, BaseImageProps>(
     ({ className, alt, ...imgProps }, ref) => {
         return (
-            <div className={className}>
-                <Img
-                    ref={ref}
-                    alt={alt}
-                    className={cn('h-full w-full object-cover', className)}
-                    loader={
-                        <Skeleton className={
-                            cn(
-                                "h-full w-full",
-                                className
-                            )
-                        } />
-                    }
-                    unloader={
-                        <div
-                            className={cn(
-                                'h-full w-full rounded bg-muted/40 text-muted-foreground',
-                                'flex items-center justify-center text-sm',
-                                className
-                            )}
-                        >
-                            <ImageOff />
-                        </div>
-                    }
-                    {...imgProps}
-                />
-            </div>
+            <Img
+            ref={ref}
+            alt={alt}
+            className={cn('w-full object-cover', className)}
+            loader={
+                <Skeleton className={
+                    cn(
+                        "w-full",
+                        className
+                    )
+                } />
+            }
+            unloader={
+                <div
+                    className={cn(
+                        'w-full rounded bg-muted/40 text-muted-foreground',
+                        'flex items-center justify-center text-sm',
+                        className
+                    )}
+                >
+                    <ImageOff />
+                </div>
+            }
+            {...imgProps}
+        />
         )
     }
 )
