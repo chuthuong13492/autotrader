@@ -1,46 +1,30 @@
-export class Pagination<T> {
-    constructor(params: {
-      list: T[]
-      page: number
-      pageSize: number
-      pageCount: number
-      total: number
-      error?: string | null
-    }) {
-      this.list = params.list
-      this.page = params.page
-      this.pageSize = params.pageSize
-      this.pageCount = params.pageCount
-      this.total = params.total
-      this.error = params.error
-    }
-  
-    static empty<U>(): Pagination<U> {
-      return new Pagination<U>({ list: [], page: 0, pageSize: 0, pageCount: 0, total: 0 })
-    }
-  
-    list: T[]
-    page: number
-    pageSize: number
-    pageCount: number
-    total: number
-    get isLast(): boolean {
-      return this.page >= this.pageCount
-    }
-    error?: string | null
-  
-    toString(): string {
-      return `Pagination(list: [${this.list.map((e) => String(e)).join(', ')}], page: ${this.page}, pageSize: ${this.pageSize}, pageCount: ${this.pageCount}, total: ${this.total})`
-    }
-  
-    copyWith(params: Partial<Pagination<T>> & { list?: T[] }): Pagination<T> {
-      return new Pagination<T>({
-        list: params.list ?? this.list,
-        page: params.page ?? this.page,
-        pageSize: params.pageSize ?? this.pageSize,
-        pageCount: params.pageCount ?? this.pageCount,
-        total: params.total ?? this.total,
-        error: params.error ?? this.error,
-      })
-    }
+export interface Pagination<T> {
+  list: T[]
+  page: number
+  pageSize: number
+  pageCount: number
+  total: number
+  error?: string | null
+}
+
+export function emptyPagination<T>(): Pagination<T> {
+  return { list: [], page: 0, pageSize: 0, pageCount: 0, total: 0 }
+}
+
+export function copyPagination<T>(
+  pagination: Pagination<T>,
+  updates: Partial<Pagination<T>> & { list?: T[] }
+): Pagination<T> {
+  return {
+    list: updates.list ?? pagination.list,
+    page: updates.page ?? pagination.page,
+    pageSize: updates.pageSize ?? pagination.pageSize,
+    pageCount: updates.pageCount ?? pagination.pageCount,
+    total: updates.total ?? pagination.total,
+    error: updates.error ?? pagination.error,
   }
+}
+
+export function isLastPage<T>(pagination: Pagination<T>): boolean {
+  return pagination.page >= pagination.pageCount
+}

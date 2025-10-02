@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useReducer } from "react";
-import { Pagination } from "@/components/layout/data/pagination";
+import { emptyPagination, isLastPage, type Pagination } from "@/components/layout/data/pagination";
 import { useItemVisibility } from "./use-intersection-observer";
 
 export enum PaginationStatus {
@@ -19,7 +19,7 @@ export function getStatus<T>(pagination: Pagination<T>): PaginationStatus {
             ? PaginationStatus.INITIAL
             : PaginationStatus.FIRST_PAGE_ERROR;
     }
-    if (pagination.list.length && pagination.isLast) {
+    if (pagination.list.length && isLastPage(pagination)) {
         return PaginationStatus.COMPLETED;
     }
     if (pagination.total < 1 || pagination.list.length === 0) {
@@ -142,8 +142,8 @@ export function usePagination<T>({
     }
 
     const [state, dispatch] = useReducer(reducer, {
-        pagination: initialPagination || Pagination.empty<T>(),
-        status: getStatus<T>(initialPagination || Pagination.empty<T>()),
+        pagination: initialPagination || emptyPagination<T>(),
+        status: getStatus<T>(initialPagination || emptyPagination<T>()),
         hasRequestedNextPage: false,
     });
 
@@ -182,7 +182,7 @@ export function usePagination<T>({
         (index: number) => {
             if (status === PaginationStatus.ONGOING && !hasRequestedNextPage) {
                 const triggerIndex = Math.max(0, pagination.list.length - invisibleItemsThreshold);
-                if (!pagination.isLast && index === triggerIndex) {
+                if (!isLastPage(pagination) && index === triggerIndex) {
                     dispatch({ type: "SET_HAS_REQUESTED_NEXT_PAGE", payload: true });
                     setTimeout(() => handleLoadMore(), 0);
                 }

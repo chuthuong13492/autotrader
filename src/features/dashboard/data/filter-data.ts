@@ -1,4 +1,4 @@
-import { type BodyType, type TransmissionType } from './mock-data'
+import { type Car, type TransmissionType } from './mock-data'
 
 // Filter State Interface
 export interface FilterState {
@@ -12,18 +12,18 @@ export interface FilterState {
   priceMax: number
   
   // Body types
-  selectedBodyTypes: BodyType[]
+  selectedBodyTypes: string[]
   
   // Transmission
   selectedTransmission: TransmissionType | null
   
   // Additional filters
-  selectedConditions: string[]
-  yearMin: number
-  yearMax: number
-  mileageMin: number
-  mileageMax: number
-  selectedBadges: string[]
+  // selectedConditions: string[]
+  // yearMin: number
+  // yearMax: number
+  // mileageMin: number
+  // mileageMax: number
+  // selectedBadges: string[]
   
   // Search
   searchQuery: string
@@ -74,7 +74,7 @@ export const priceRangeFilterData = {
 
 // Body Type Filter Data
 export const bodyTypeFilterData: Array<{
-  value: BodyType
+  value: string
   label: string
   icon: string
   description: string
@@ -158,66 +158,49 @@ export const additionalFilterData = {
 
 
 // Filter utility functions
-// export function applyFilters(cars: Car[], filters: FilterState): Car[] {
-//   return cars.filter(car => {
-//     // Brand filters
-//     if (filters.selectedMakes.length > 0 && !filters.selectedMakes.includes(car.make)) {
-//       return false
-//     }
-//     if (filters.selectedModels.length > 0 && !filters.selectedModels.includes(car.model)) {
-//       return false
-//     }
-//     if (filters.selectedTrims.length > 0 && !filters.selectedTrims.includes(car.trim)) {
-//       return false
-//     }
+export function applyFilters(cars: Car[], filters?: FilterState): Car[] {
+  if (!filters) return cars
+
+  return cars.filter(car => {
+    // Brand filters
+    if (filters.selectedMakes?.length && !filters.selectedMakes.includes(car.make)) {
+      return false
+    }
+    if (filters.selectedModels?.length && !filters.selectedModels.includes(car.model)) {
+      return false
+    }
+    if (filters.selectedTrims?.length && !filters.selectedTrims.includes(car.trim)) {
+      return false
+    }
     
-//     // Price range
-//     if (car.price < filters.priceMin || car.price > filters.priceMax) {
-//       return false
-//     }
+    // Price range
+    const minPrice = filters.priceMin ?? 0
+    const maxPrice = filters.priceMax ?? Number.MAX_SAFE_INTEGER
+    if (minPrice && car.price < minPrice) return false
+    if (maxPrice && car.price > maxPrice) return false
     
-//     // Body type
-//     if (filters.selectedBodyTypes.length > 0 && !filters.selectedBodyTypes.includes(car.bodyType)) {
-//       return false
-//     }
+    // Body type
+    if (filters.selectedBodyTypes?.length && !filters.selectedBodyTypes.includes(car.bodyType)) {
+      return false
+    }
     
-//     // Transmission
-//     if (filters.selectedTransmission && car.transmission !== filters.selectedTransmission) {
-//       return false
-//     }
+    // Transmission
+    if (filters.selectedTransmission && car.transmission !== filters.selectedTransmission) {
+      return false
+    }
     
-//     // Condition
-//     if (filters.selectedConditions.length > 0 && !filters.selectedConditions.includes(car.condition)) {
-//       return false
-//     }
+    // Search query
+    if (filters.searchQuery) {
+      const searchLower = filters.searchQuery.toLowerCase()
+      const carText = `${car.make} ${car.model} ${car.trim} ${car.dealer}`.toLowerCase()
+      if (!carText.includes(searchLower)) {
+        return false
+      }
+    }
     
-//     // Year range
-//     if (car.year < filters.yearMin || car.year > filters.yearMax) {
-//       return false
-//     }
-    
-//     // Mileage range
-//     if (car.mileage < filters.mileageMin || car.mileage > filters.mileageMax) {
-//       return false
-//     }
-    
-//     // Badges
-//     if (filters.selectedBadges.length > 0 && !filters.selectedBadges.some(badge => car.badges?.includes(badge))) {
-//       return false
-//     }
-    
-//     // Search query
-//     if (filters.searchQuery) {
-//       const searchLower = filters.searchQuery.toLowerCase()
-//       const carText = `${car.make} ${car.model} ${car.trim} ${car.dealer}`.toLowerCase()
-//       if (!carText.includes(searchLower)) {
-//         return false
-//       }
-//     }
-    
-//     return true
-//   })
-// }
+    return true
+  })
+}
 
 // // Get active filter count
 // export function getActiveFilterCount(filters: FilterState): number {

@@ -1,59 +1,37 @@
 import { PagedList, type PagedListRef } from '@/components/layout/pagination/paged-list'
-import { Pagination } from '@/components/layout/data/pagination'
-import { updatePage } from '@/lib/utils'
-import { ALL_CARS, PAGE_COUNT, PAGE_SIZE, TOTAL, type Car } from '@/features/dashboard/data/mock-data'
-import {  useRef, useState } from 'react'
+import { type Car } from '@/features/dashboard/data/mock-data'
+
 import { CarCard } from '../car-card/car-card'
 import { CarCardLoading } from '../car-card/car-card-loading'
 import { FilterIcon, SearchIcon } from 'lucide-react'
 import { useSearch } from '@/context/search-provider'
 import { Separator } from '@/components/ui/separator'
-import { useSelector } from 'react-redux'
-import { type DashboardRootState } from '@/stores/dashboard-store'
-
-function delay(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms))
-}
+import { useDispatch, useSelector } from 'react-redux'
+import { type DashboardDispatch, type DashboardRootState } from '@/stores/dashboard-store'
+import { fetchPage } from '@/stores/dashboard-slice'
+import { useEffect, useRef } from 'react'
 
 export function CarList() {
-    const [pagination, setPagination] = useState<Pagination<Car>>(Pagination.empty())
+    const dispatch = useDispatch<DashboardDispatch>()
 
-    const pagedListRef = useRef<PagedListRef<Car>>(null);
+    const state = useSelector((state: DashboardRootState) => state.dashboard)
 
-    async function fetchPage(page: number): Promise<Pagination<Car>> {
-        const safePage = Math.min(Math.max(page, 1), PAGE_COUNT)
-        const start = (safePage - 1) * PAGE_SIZE
-        const end = start + PAGE_SIZE
-        const list = ALL_CARS.slice(start, end)
+    const pagedListRef = useRef<PagedListRef<Car>>(null)
 
-        const result = new Pagination<Car>({
-            list,
-            page: safePage,
-            pageSize: PAGE_SIZE,
-            pageCount: PAGE_COUNT,
-            total: TOTAL,
-        })
-
-        setPagination(updatePage(pagination, result))
-
-        await delay(1000)
-
-        // eslint-disable-next-line no-console
-        console.log('pagination', updatePage(pagination, result))
-
-        return updatePage(pagination, result);
-    }
-
+    useEffect(() => {
+        pagedListRef.current?.updatePagination(state.pagination)
+    }, [state.pagination])
 
     return (
-        <PagedList<Car>
-            className="lg:pl-4 pr-2 pt-3 pb-2 grid grid-cols-1 gap-x-4 w-full md:grid-cols-2 lg:grid-cols-3"
+        <div className='lg:pl-4 pr-2 pt-3 pb-2 '>
+            <PagedList<Car>
+            className="grid grid-cols-1 gap-x-4 w-full md:grid-cols-2 lg:grid-cols-3"
             ref={pagedListRef}
             itemKey={(item) => item.id}
-            pagination={pagination}
-            onInitial={() => fetchPage(1)}
-            onRefresh={() => fetchPage(1)}
-            onLoadMore={(nextPage) => fetchPage(nextPage)}
+            pagination={state.pagination}
+            onInitial={() => dispatch(fetchPage(1)).unwrap()}
+            onRefresh={() => dispatch(fetchPage(1)).unwrap()}
+            onLoadMore={(nextPage) => dispatch(fetchPage(nextPage)).unwrap()}
             loadingFirstPageBuilder={() => (
                 <div className="pl-4 pr-2 pt-3 grid grid-cols-1 gap-4 w-full md:grid-cols-2 lg:grid-cols-3">
                     {Array.from({ length: 8 }).map((_, idx) => (
@@ -82,6 +60,7 @@ export function CarList() {
 
             hasScrollBar={false}
         />
+        </div>
     )
 }
 

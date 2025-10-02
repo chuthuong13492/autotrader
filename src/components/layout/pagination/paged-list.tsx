@@ -66,10 +66,10 @@ function InnerPagedList<T>(
     renderPagedItem,
     updatePagination,
   } = usePagination<T>({
+    initialPagination: pagination,
     onInitial,
     onRefresh,
     onLoadMore,
-    initialPagination: pagination,
     itemKey,
     renderItem: ({ index, data }) => itemBuilder(index, data),
     renderSeparator: separatorBuilder
@@ -112,7 +112,7 @@ function InnerPagedList<T>(
   return (
     <ScrollArea hasScrollbar={hasScrollBar}>
       <div className={className}>
-        {statePagination.list.map((item, index) => (
+        {statePagination.list.map((item: T, index: number) => (
           <React.Fragment key={itemKey(item)}>
             {renderPagedItem(index)}
           </React.Fragment>

@@ -7,7 +7,7 @@ import { Search } from "@/components/search"
 import { useRouter } from "@tanstack/react-router"
 import { type DashboardRootState, type DashboardDispatch } from "@/stores/dashboard-store"
 import { useDispatch, useSelector } from "react-redux"
-import { setForm } from "@/stores/dashboard-slice"
+import { filterPage, setForm } from "@/stores/dashboard-slice"
 
 
 export function DashboardMain() {
@@ -49,9 +49,12 @@ export function DashboardMain() {
             search: nextSearch,
         })
         router.history.replace(nextLocation.href)
+        
+        dispatch(filterPage(1))
     }
 
     const onResetFilters = () => dashboardFilterRef.current?.reset();
+
 
     return (
         <Main className="px-2">

@@ -1,5 +1,4 @@
 export type TransmissionType = 'Automatic' | 'Manual'
-export type BodyType = 'Sedan' | 'SUV' | 'Hatchback' | 'Coupe' | 'Truck' | 'Wagon'
 
 export type Car = {
   id: string
@@ -11,7 +10,7 @@ export type Car = {
   price: number // USD
   imageUrl: string
   condition: 'New' | 'Used'
-  bodyType: BodyType
+  bodyType:  'Sedan' | 'SUV' | 'Hatchback' | 'Coupe' | 'Truck' | 'Wagon'
   transmission: TransmissionType
   dealer: string
   badges?: string[]
