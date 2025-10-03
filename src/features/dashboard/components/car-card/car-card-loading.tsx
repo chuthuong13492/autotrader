@@ -4,7 +4,7 @@ import { SkeletonParagraph } from "@/components/ui/skeleton-paragraph";
 export function CarCardLoading() {
     return (
       <div className="rounded-md shadow">
-           <Skeleton className="h-[306px] w-full rounded-md" />
+           <Skeleton className="aspect-[408/306] rounded-md" />
             <div className="p-3">
                 <SkeletonParagraph className="font-semibold" lines={1}/>
 
