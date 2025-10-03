@@ -64,6 +64,8 @@ export function getPageNumbers(currentPage: number, totalPages: number) {
   return rangeWithDots;
 }
 
+export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export function updatePage<T>(
   pagination: Pagination<T>,
   newPagination: Pagination<T>

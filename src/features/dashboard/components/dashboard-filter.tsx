@@ -52,13 +52,21 @@ export const DashboardFilter = forwardRef<DashboardFilterRef, DashboardFilterPro
         const states = useSelector((state: DashboardRootState) => state.dashboard.values)
 
         useEffect(() => {
-    
             const currentValues = form.getValues()
 
             const isReset = !isEqual(currentValues, states)
 
             if (isReset) {
-                form.reset({ ...states }, { keepDirty: false })
+    
+                form.reset({
+                    minPrice: states.minPrice,
+                    maxPrice: states.maxPrice,
+                    selectedMakes: states.selectedMakes,
+                    selectedModels: states.selectedModels,
+                    selectedTrims: states.selectedTrims,
+                    selectedBodyTypes: states.selectedBodyTypes,
+                    selectedTransmission: states.selectedTransmission,
+                })
             }
         }, [states, form])
 
@@ -109,7 +117,7 @@ export const DashboardFilter = forwardRef<DashboardFilterRef, DashboardFilterPro
             if (form.formState.isDirty) {
                 debouncedFilterChange(form.getValues())
             }
-        }, [values, debouncedFilterChange, form.formState.isDirty])
+        }, [values, debouncedFilterChange])
 
 
         return (

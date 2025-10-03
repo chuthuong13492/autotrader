@@ -3,8 +3,6 @@ import { Input } from '@/components/ui/input'
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
 import type { FormData } from '../dashboard-filter'
 import { cn } from '@/lib/utils'
-
-
 interface PriceFilterProps {
     control: Control<FormData>,
     className?: string

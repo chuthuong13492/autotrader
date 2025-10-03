@@ -1,6 +1,7 @@
 import { Main } from "@/components/layout/main"
 import { DashboardFilter, type FormData, type DashboardFilterRef, type FilterTransmissionType } from "./dashboard-filter"
-import { CarList, CarListFilter } from "./car-list/car-list"
+import { CarList } from "./car-list/car-list"
+import { CarListFilter } from "./car-list/car-list-filter"
 import { useRef } from "react"
 import { Search } from "@/components/search"
 import { useRouter } from "@tanstack/react-router"
@@ -49,6 +50,7 @@ export function DashboardMain() {
             search: nextSearch,
         })
         router.history.replace(nextLocation.href)
+
         
         dispatch(filterPage(1))
     }
@@ -72,7 +74,6 @@ export function DashboardMain() {
                 </div>
                 <section className="min-w-0 grow">
                     <CarListFilter onResetFilters={onResetFilters} />
-
                     <CarList />
                 </section>
             </div>

@@ -14,26 +14,26 @@ type EndBuilder = () => React.ReactNode;
 type ItemBuilder<T> = (index: number, item: T) => React.ReactNode;
 
 export interface PagedListRef<T> {
-    updatePagination: (pagination: Pagination<T>) => void;
+  updatePagination: (pagination: Pagination<T>, options?: { setLoadingFirstPage?: boolean; delayMs?: number }) => void;
 }
 
 type PagedListProps<T> = {
-    itemKey: (item: T) => string;
-    itemBuilder: ItemBuilder<T>;
-    pagination?: UsePaginationOptions<T>['initialPagination'];
-    className?: string;
-    emptyBuilder?: EmptyBuilder;
-    loadingFirstPageBuilder?: LoadingFirstPageBuilder;
-    loadingMoreBuilder?: LoadingMoreBuilder;
-    separatorBuilder?: SeparatorBuilder<T>;
-    firstPageErrorBuilder?: FirstPageErrorBuilder;
-    subsequentPageErrorBuilder?: SubsequentPageErrorBuilder;
-    endBuilder?: EndBuilder;
-    onInitial: UsePaginationOptions<T>['onInitial'];
-    onRefresh: UsePaginationOptions<T>['onRefresh'];
-    onLoadMore: UsePaginationOptions<T>['onLoadMore'];
-    hasScrollBar: boolean,
-    invisibleItemsThreshold?: number;
+  itemKey: (item: T) => string;
+  itemBuilder: ItemBuilder<T>;
+  pagination?: UsePaginationOptions<T>['initialPagination'];
+  className?: string;
+  emptyBuilder?: EmptyBuilder;
+  loadingFirstPageBuilder?: LoadingFirstPageBuilder;
+  loadingMoreBuilder?: LoadingMoreBuilder;
+  separatorBuilder?: SeparatorBuilder<T>;
+  firstPageErrorBuilder?: FirstPageErrorBuilder;
+  subsequentPageErrorBuilder?: SubsequentPageErrorBuilder;
+  endBuilder?: EndBuilder;
+  onInitial: UsePaginationOptions<T>['onInitial'];
+  onRefresh: UsePaginationOptions<T>['onRefresh'];
+  onLoadMore: UsePaginationOptions<T>['onLoadMore'];
+  hasScrollBar: boolean,
+  invisibleItemsThreshold?: number;
 };
 
 function InnerPagedList<T>(
@@ -101,12 +101,12 @@ function InnerPagedList<T>(
       <>
         {firstPageErrorBuilder
           ? firstPageErrorBuilder(statePagination.error ?? null, handleInitial)
-          : <div>Error! <button onClick={handleInitial}>Thử lại</button></div>}
+          : <div>Error! <button onClick={handleInitial}>Retry</button></div>}
       </>
     );
   }
   if (status === PaginationStatus.NO_ITEMS_FOUND || statePagination.list.length === 0) {
-    return <>{emptyBuilder ? emptyBuilder() : <div>Không có dữ liệu</div>}</>;
+    return <>{emptyBuilder ? emptyBuilder() : <div>Empty</div>}</>;
   }
 
   return (

@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback, useReducer } from "react";
 import { emptyPagination, isLastPage, type Pagination } from "@/components/layout/data/pagination";
 import { useItemVisibility } from "./use-intersection-observer";
+import { delay } from "@/lib/utils";
 
 export enum PaginationStatus {
     INITIAL = "initial",
@@ -131,7 +132,7 @@ export function usePagination<T>({
                 const newPagination = action.payload;
                 const nextStatus = getStatus(newPagination);
                 const updatedStatus = updateStatus(state, nextStatus, true);
-            
+
                 return {
                     ...state,
                     pagination: newPagination, // cập nhật pagination thực tế
@@ -161,7 +162,14 @@ export function usePagination<T>({
         // eslint-disable-next-line
     }, []);
 
-    function updatePagination(newPagination: Pagination<T>) {
+    async function updatePagination(
+        newPagination: Pagination<T>,
+        options?: { setLoadingFirstPage?: boolean; delayMs?: number }
+    ) {
+        if (options?.setLoadingFirstPage) {
+            await delay(options.delayMs ?? 300)
+        }
+
         dispatch({ type: "SET_PAGINATION", payload: newPagination });
     }
 
@@ -171,17 +179,17 @@ export function usePagination<T>({
         forcedReload = false
     ): Pick<State, "status" | "hasRequestedNextPage"> {
         const hasChanged = state.status !== nextStatus || forcedReload;
-    
+
         const resetRequested =
             nextStatus === PaginationStatus.ONGOING ? false : state.hasRequestedNextPage;
-    
+
         if (hasChanged) {
             return {
                 status: nextStatus,
                 hasRequestedNextPage: resetRequested,
             };
         }
-    
+
         return { status: state.status, hasRequestedNextPage: state.hasRequestedNextPage };
     }
 
@@ -251,6 +259,7 @@ export function usePagination<T>({
         handleLoadMore,
         renderPagedItem,
         updatePagination,
+        updateStatus,
     };
 }
 
