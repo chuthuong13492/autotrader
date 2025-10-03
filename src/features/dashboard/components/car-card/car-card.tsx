@@ -10,7 +10,7 @@ interface CarCardProps {
 export function CarCard({ car, className }: CarCardProps) {
     return (
         <div className={cn(
-            "rounded-md shadow transition-transform duration-300 ease-in-out hover:shadow-md hover:-translate-y-1 hover:scale-[1.02] cursor-pointer",
+            "rounded-md shadow hover:shadow-md cursor-pointer",
             className,
         )}>
             <BaseImage src={car.imageUrl} alt={`${car.make} ${car.model}`} className="aspect-[408/306] rounded-md" />

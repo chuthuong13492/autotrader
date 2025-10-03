@@ -86,9 +86,14 @@ export const dashboardSlice = createSlice({
   }
 })
 
+// Delay function để tạo hiệu ứng loading
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
 export const fetchPage = createAsyncThunk(
   'dashboard/fetchPage',
   async (page: number, { getState }) => {
+    await delay(500)
+    
     const state = getState() as { dashboard: DashboardState }
     const filters = state.dashboard.values
 

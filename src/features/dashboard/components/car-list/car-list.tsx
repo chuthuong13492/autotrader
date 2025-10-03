@@ -9,8 +9,9 @@ import { Separator } from '@/components/ui/separator'
 import { useDispatch, useSelector } from 'react-redux'
 import { type DashboardDispatch, type DashboardRootState } from '@/stores/dashboard-store'
 import { fetchPage } from '@/stores/dashboard-slice'
-import { useEffect, useMemo, useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import isEqual from 'lodash/isEqual'
+import { useUpdateEffect } from '@/hooks/use-update-effect'
 
 export function CarList() {
     const dispatch = useDispatch<DashboardDispatch>()
@@ -19,17 +20,15 @@ export function CarList() {
 
     const pagedListRef = useRef<PagedListRef<Car>>(null)
 
-    useEffect(() => {
+    useUpdateEffect(() => {
         pagedListRef.current?.updatePagination(state.pagination)
     }, [state.pagination])
 
     return (
-        <div className='lg:pl-4 pr-2 pt-3 pb-2 '>
-            <PagedList<Car>
-            className="grid grid-cols-1 gap-x-4 w-full md:grid-cols-2 lg:grid-cols-3"
+        <PagedList<Car>
+            className="lg:pl-4 pr-2 pt-3 pb-2  grid grid-cols-1 gap-x-4 w-full md:grid-cols-2 lg:grid-cols-3"
             ref={pagedListRef}
             itemKey={(item) => item.id}
-            pagination={state.pagination}
             onInitial={() => dispatch(fetchPage(1)).unwrap()}
             onRefresh={() => dispatch(fetchPage(1)).unwrap()}
             onLoadMore={(nextPage) => dispatch(fetchPage(nextPage)).unwrap()}
@@ -61,7 +60,6 @@ export function CarList() {
 
             hasScrollBar={false}
         />
-        </div>
     )
 }
 
@@ -83,11 +81,11 @@ export function CarListFilter({ onResetFilters }: CarListFilterProps) {
             selectedTrims: [],
             selectedBodyTypes: [],
             selectedTransmission: 'All'
-          }
+        }
         return !isEqual(values, initialValues)
-      }, [values])
+    }, [values])
 
- 
+
     return (
         <div className="lg:pl-4 h-9 flex items-center justify-start">
             <div className="flex lg:hidden space-x-4 h-full items-center gap-1 transition-all duration-200">

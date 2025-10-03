@@ -1,6 +1,7 @@
 import { SearchIcon, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useSearch } from '@/context/search-provider'
+import { useRouter } from '@tanstack/react-router'
 import { Button } from './ui/button'
 import { useDispatch, useSelector } from 'react-redux'
 import { type DashboardDispatch, type DashboardRootState } from '@/stores/dashboard-store'
@@ -22,11 +23,25 @@ export function Search({
 
   const dispatch = useDispatch<DashboardDispatch>()
 
+  const router = useRouter()
+
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation()
     dispatch(setSearch(''))
     dispatch(filterPage(1))
 
+    const currentSearch = new URLSearchParams(window.location.search)
+
+    if (currentSearch.has('value')) {
+      currentSearch.delete('value')
+  
+      const nextLocation = router.buildLocation({
+        from: '/search-result-page',
+        to: '.',  
+        search: Object.fromEntries(currentSearch.entries())
+      })
+      router.history.replace(nextLocation.href)
+    }
   }
 
   return (
