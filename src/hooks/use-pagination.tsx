@@ -128,10 +128,15 @@ export function usePagination<T>({
                 return { pagination: action.payload, status: nextStatus, hasRequestedNextPage: false };
             }
             case "SET_PAGINATION": {
-                const nextStatus = getStatus(action.payload);
-                // Reset hasRequestedNextPage khi quay lại ONGOING
-                const resetRequested = nextStatus === PaginationStatus.ONGOING ? false : state.hasRequestedNextPage;
-                return { pagination: action.payload, status: nextStatus, hasRequestedNextPage: resetRequested };
+                const newPagination = action.payload;
+                const nextStatus = getStatus(newPagination);
+                const updatedStatus = updateStatus(state, nextStatus, true);
+            
+                return {
+                    ...state,
+                    pagination: newPagination, // cập nhật pagination thực tế
+                    ...updatedStatus,          // cập nhật status và hasRequestedNextPage
+                };
             }
             case "SET_HAS_REQUESTED_NEXT_PAGE": {
                 return { ...state, hasRequestedNextPage: action.payload };
@@ -159,6 +164,27 @@ export function usePagination<T>({
     function updatePagination(newPagination: Pagination<T>) {
         dispatch({ type: "SET_PAGINATION", payload: newPagination });
     }
+
+    function updateStatus(
+        state: State,
+        nextStatus: PaginationStatus,
+        forcedReload = false
+    ): Pick<State, "status" | "hasRequestedNextPage"> {
+        const hasChanged = state.status !== nextStatus || forcedReload;
+    
+        const resetRequested =
+            nextStatus === PaginationStatus.ONGOING ? false : state.hasRequestedNextPage;
+    
+        if (hasChanged) {
+            return {
+                status: nextStatus,
+                hasRequestedNextPage: resetRequested,
+            };
+        }
+    
+        return { status: state.status, hasRequestedNextPage: state.hasRequestedNextPage };
+    }
+
 
     async function handleInitial() {
         dispatch({ type: "INIT_REQUEST" });

@@ -92,7 +92,7 @@ export function SearchProvider({ children }: SearchProviderProps) {
 
     if (s.selectedTransmission !== undefined) initValues.selectedTransmission = (s.selectedTransmission as FilterTransmissionType) ?? "All"
 
-    reduxDispatch(setForm({ ...initValues, isDirty: true }))
+    reduxDispatch(setForm({ ...initValues}))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

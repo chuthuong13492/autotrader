@@ -4,7 +4,7 @@ import { useSearch } from '@/context/search-provider'
 import { Button } from './ui/button'
 import { useDispatch, useSelector } from 'react-redux'
 import { type DashboardDispatch, type DashboardRootState } from '@/stores/dashboard-store'
-import { setSearch } from '@/stores/dashboard-slice'
+import { setSearch, filterPage } from '@/stores/dashboard-slice'
 
 type SearchProps = {
   className?: string
@@ -25,6 +25,8 @@ export function Search({
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation()
     dispatch(setSearch(''))
+    dispatch(filterPage(1))
+
   }
 
   return (

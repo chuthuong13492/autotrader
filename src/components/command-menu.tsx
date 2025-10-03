@@ -15,7 +15,7 @@ import {
 import { ScrollArea } from './ui/scroll-area'
 import { type DashboardDispatch, type DashboardRootState } from '@/stores/dashboard-store'
 import { useSelector, useDispatch } from 'react-redux'
-import { setSearch } from '@/stores/dashboard-slice'
+import { setSearch, filterPage } from '@/stores/dashboard-slice'
 import { type FilterTransmissionType } from '@/features/dashboard/components/dashboard-filter'
 
 export function CommandMenu() {
@@ -41,11 +41,13 @@ export function CommandMenu() {
 
   const onValueChange = useDebouncedCallback((e) => {
     setQuery(e);
+    dispatch(filterPage(1))
   }, 300)
 
   const onSelect = (e: string) => {
     setQuery(e)
     setOpen(false)
+    dispatch(filterPage(1))
 
     const nextSearch: Partial<{
       value: string

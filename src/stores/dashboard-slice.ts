@@ -1,13 +1,13 @@
 import { createSlice, type PayloadAction , createAsyncThunk} from '@reduxjs/toolkit'
 import { type FormData } from '@/features/dashboard/components/dashboard-filter'
 import { applyFilters } from '@/features/dashboard/data/filter-data'
-import { ALL_CARS, PAGE_COUNT, PAGE_SIZE, TOTAL, type Car } from '@/features/dashboard/data/mock-data'
+import { ALL_CARS, type Car } from '@/features/dashboard/data/mock-data'
 import { type Pagination, emptyPagination } from '@/components/layout/data/pagination'
 import { updatePage } from '@/lib/utils'
 export type SortKey = 'relevance' | 'price-asc' | 'price-desc' | 'year-asc' | 'year-desc' | 'mileage-asc' | 'mileage-desc'
 
 interface DashboardState {
-  values: Partial<FormData> & { isDirty: boolean }
+  values: Partial<FormData>
   search?: string
   sort?: SortKey
   pagination: Pagination<Car>
@@ -24,7 +24,6 @@ const initialState: DashboardState = {
     selectedTrims: [],
     selectedBodyTypes: [],
     selectedTransmission: 'All',
-    isDirty: false,
   },
   pagination:  emptyPagination(),
 }
@@ -39,18 +38,14 @@ export const dashboardSlice = createSlice({
     setSearch(state, action: PayloadAction<string>) {
       state.search = action.payload
     },
-    setForm(state, action: PayloadAction<Partial<FormData> & { isDirty: boolean }>) {
+    setForm(state, action: PayloadAction<Partial<FormData>>) {
       state.values = { ...state.values, ...action.payload }
     },
     filterPage(state, action: PayloadAction<number | null>) {
       const page = action.payload ?? 1
       const filters = state.values
     
-      const safePage = Math.min(Math.max(page, 1), PAGE_COUNT)
-      const start = (safePage - 1) * PAGE_SIZE
-      const end = start + PAGE_SIZE
-    
-      const list = applyFilters(ALL_CARS.slice(start, end), {
+      const filteredCars = applyFilters(ALL_CARS, {
         selectedMakes: filters.selectedMakes ?? [],
         selectedModels: filters.selectedModels ?? [],
         selectedTrims: filters.selectedTrims ?? [],
@@ -61,18 +56,32 @@ export const dashboardSlice = createSlice({
         searchQuery: state.search ?? '',
       })
     
-      state.pagination = ({
+      const total = filteredCars.length
+      const pageSize = 20
+      const pageCount = Math.ceil(total / pageSize)
+    
+      const safePage = Math.min(Math.max(page, 1), pageCount)
+      const start = (safePage - 1) * pageSize
+      const end = start + pageSize
+      const list = filteredCars.slice(start, end)
+    
+      state.pagination = {
         list,
         page: safePage,
-        pageSize: PAGE_SIZE,
-        pageCount: PAGE_COUNT,
-        total: TOTAL,
-      })
+        pageSize,
+        pageCount,
+        total,
+      }
+    
+      // eslint-disable-next-line no-console
+      console.log("filterPage", state.pagination)
     }
   },
   extraReducers: (builder) => {
     builder.addCase(fetchPage.fulfilled, (state, action) => {
       state.pagination = action.payload
+      // eslint-disable-next-line no-console
+      console.log('fetchPage', action.payload)
     })
   }
 })
@@ -83,12 +92,7 @@ export const fetchPage = createAsyncThunk(
     const state = getState() as { dashboard: DashboardState }
     const filters = state.dashboard.values
 
-    const safePage = Math.min(Math.max(page, 1), PAGE_COUNT)
-    const start = (safePage - 1) * PAGE_SIZE
-    const end = start + PAGE_SIZE
-
-
-    const list = applyFilters(ALL_CARS.slice(start, end), {
+    const filteredCars = applyFilters(ALL_CARS, {
       selectedMakes: filters.selectedMakes ?? [],
       selectedModels: filters.selectedModels ?? [],
       selectedTrims: filters.selectedTrims ?? [],
@@ -99,12 +103,21 @@ export const fetchPage = createAsyncThunk(
       searchQuery: state.dashboard.search ?? '',
     })
 
+    const total = filteredCars.length
+    const pageSize = 20 
+    const pageCount = Math.ceil(total / pageSize)
+
+    const safePage = Math.min(Math.max(page, 1), pageCount)
+    const start = (safePage - 1) * pageSize
+    const end = start + pageSize
+    const list = filteredCars.slice(start, end)
+
     return updatePage(state.dashboard.pagination, {
       list,
       page: safePage,
-      pageSize: PAGE_SIZE,
-      pageCount: PAGE_COUNT,
-      total: TOTAL,
+      pageSize,
+      pageCount,
+      total,
     })
   }
 )

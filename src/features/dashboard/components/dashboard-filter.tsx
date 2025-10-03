@@ -1,5 +1,5 @@
 import { useImperativeHandle, forwardRef, useEffect } from 'react'
-import { useForm, useWatch, type FormState } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { useDebouncedCallback } from 'use-debounce'
 import { Form } from '@/components/ui/form'
 import { PriceFilter } from './filters/price-filter'
@@ -15,7 +15,7 @@ import { useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
 
 interface DashboardFilterProps {
-    onFilterChange?: (formData: Partial<FormData>, formState: FormState<FormData>) => void
+    onFilterChange?: (formData: Partial<FormData>) => void
 }
 
 export type FilterTransmissionType = TransmissionType | 'All'
@@ -52,13 +52,13 @@ export const DashboardFilter = forwardRef<DashboardFilterRef, DashboardFilterPro
         const states = useSelector((state: DashboardRootState) => state.dashboard.values)
 
         useEffect(() => {
-            const { isDirty, ...storeValues } = states
+    
             const currentValues = form.getValues()
 
-            const isReset = !isEqual(currentValues, storeValues)
+            const isReset = !isEqual(currentValues, states)
 
             if (isReset) {
-                form.reset({ ...storeValues}, { keepDirty: false })
+                form.reset({ ...states }, { keepDirty: false })
             }
         }, [states, form])
 
@@ -96,7 +96,7 @@ export const DashboardFilter = forwardRef<DashboardFilterRef, DashboardFilterPro
 
         const debouncedFilterChange = useDebouncedCallback(
             (values: Partial<FormData>) => {
-                onFilterChange?.(values, form.formState)
+                onFilterChange?.(values)
             },
             300
         )

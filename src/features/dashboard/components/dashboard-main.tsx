@@ -2,7 +2,6 @@ import { Main } from "@/components/layout/main"
 import { DashboardFilter, type FormData, type DashboardFilterRef, type FilterTransmissionType } from "./dashboard-filter"
 import { CarList, CarListFilter } from "./car-list/car-list"
 import { useRef } from "react"
-import { type FormState } from "react-hook-form"
 import { Search } from "@/components/search"
 import { useRouter } from "@tanstack/react-router"
 import { type DashboardRootState, type DashboardDispatch } from "@/stores/dashboard-store"
@@ -18,10 +17,11 @@ export function DashboardMain() {
 
     const router = useRouter()
 
-    const onFilterChange = (formData: Partial<FormData>, formState: FormState<FormData>) => {
+    const onFilterChange = (formData: Partial<FormData>) => {
         const { values, search } = state
 
-        dispatch(setForm({ ...values, ...formData, isDirty: formState.isDirty }))
+
+        dispatch(setForm({ ...values, ...formData}))
 
         const nextSearch: Partial<{
             value: string

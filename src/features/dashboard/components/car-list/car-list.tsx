@@ -9,7 +9,8 @@ import { Separator } from '@/components/ui/separator'
 import { useDispatch, useSelector } from 'react-redux'
 import { type DashboardDispatch, type DashboardRootState } from '@/stores/dashboard-store'
 import { fetchPage } from '@/stores/dashboard-slice'
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
+import isEqual from 'lodash/isEqual'
 
 export function CarList() {
     const dispatch = useDispatch<DashboardDispatch>()
@@ -70,8 +71,21 @@ interface CarListFilterProps {
 }
 
 export function CarListFilter({ onResetFilters }: CarListFilterProps) {
-    const isDirty = useSelector((state: DashboardRootState) => state.dashboard.values.isDirty)
+    const values = useSelector((state: DashboardRootState) => state.dashboard.values)
     const { setOpen } = useSearch();
+
+    const isClear = useMemo(() => {
+        const initialValues = {
+            minPrice: '',
+            maxPrice: '',
+            selectedMakes: [],
+            selectedModels: [],
+            selectedTrims: [],
+            selectedBodyTypes: [],
+            selectedTransmission: 'All'
+          }
+        return !isEqual(values, initialValues)
+      }, [values])
 
  
     return (
@@ -104,7 +118,7 @@ export function CarListFilter({ onResetFilters }: CarListFilterProps) {
                 />
             </div>
 
-            {isDirty && (
+            {isClear && (
                 <button
                     className="text-lg text-blue-400 hover:underline transition-all duration-200"
                     onClick={() => onResetFilters?.()}

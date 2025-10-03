@@ -1,4 +1,4 @@
-import type { Control } from 'react-hook-form'
+import { useFormContext, type Control } from 'react-hook-form'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { FormField, FormItem, FormLabel } from '@/components/ui/form'
@@ -12,6 +12,8 @@ interface BodyTypeFilterProps {
 }
 
 export function BodyTypeFilter({ control, className }: BodyTypeFilterProps) {
+  const { reset, getValues } = useFormContext<FormData>()
+
     return (
         <div className={cn(
             "space-y-3",
@@ -33,7 +35,9 @@ export function BodyTypeFilter({ control, className }: BodyTypeFilterProps) {
                                             const newBodyTypes = checked
                                                 ? [...field.value, bodyType.value]
                                                 : field.value.filter((type: string) => type !== bodyType.value);
+                                    
                                             field.onChange(newBodyTypes);
+                                            reset({...getValues(), selectedBodyTypes: newBodyTypes}, { keepDirty: true })
                                         }}
                                     />
                                     <Label htmlFor={bodyType.value} className="flex items-center gap-2 text-sm">

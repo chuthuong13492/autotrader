@@ -192,7 +192,7 @@ export function applyFilters(cars: Car[], filters?: FilterState): Car[] {
     // Search query
     if (filters.searchQuery) {
       const searchLower = filters.searchQuery.toLowerCase()
-      const carText = `${car.make} ${car.model} ${car.trim} ${car.dealer}`.toLowerCase()
+      const carText = `${car.make} ${car.model} ${car.trim}`.toLowerCase()
       if (!carText.includes(searchLower)) {
         return false
       }
