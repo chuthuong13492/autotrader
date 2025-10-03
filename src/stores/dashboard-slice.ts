@@ -106,7 +106,6 @@ export const dashboardSlice = createSlice({
   },
 });
 
-
 export const fetchPage = createAsyncThunk(
   "dashboard/fetchPage",
   async (page: number, { getState }) => {

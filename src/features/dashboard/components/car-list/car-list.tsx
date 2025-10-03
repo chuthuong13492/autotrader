@@ -16,7 +16,6 @@ export function CarList() {
     const pagedListRef = useRef<PagedListRef<Car>>(null)
 
     useUpdateEffect(() => {
-
         pagedListRef.current?.updatePagination(state.pagination, {
             setLoadingFirstPage: true,
         })
@@ -24,14 +23,14 @@ export function CarList() {
 
     return (
         <PagedList<Car>
-            className="lg:pl-4 pr-2 pt-3 pb-2 grid grid-cols-1 gap-x-4 w-full md:grid-cols-2 lg:grid-cols-3"
+            className="lg:pl-4 pr-2 pt-3 pb-2 grid grid-cols-1 gap-x-4 w-full md:grid-cols-2 lg:grid-cols-4"
             ref={pagedListRef}
             itemKey={(item) => item.id}
             onInitial={() => dispatch(fetchPage(1)).unwrap()}
             onRefresh={() => dispatch(fetchPage(1)).unwrap()}
             onLoadMore={(nextPage) => dispatch(fetchPage(nextPage)).unwrap()}
             loadingFirstPageBuilder={() => (
-                <div className="pl-4 pr-2 pt-3 grid grid-cols-1 gap-4 w-full md:grid-cols-2 lg:grid-cols-3">
+                <div className="pl-4 pr-2 pt-3 grid grid-cols-1 gap-4 w-full md:grid-cols-2 lg:grid-cols-4">
                     {Array.from({ length: 8 }).map((_, idx) => (
                         <CarCardLoading key={idx} />
                     ))}
