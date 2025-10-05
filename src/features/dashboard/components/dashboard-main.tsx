@@ -28,18 +28,18 @@ export function DashboardMain() {
             value: string
             minPrice: number
             maxPrice: number
-            selectedMakes: string[]
-            selectedModels: string[]
-            selectedTrims: string[]
+            selectedMakes: string
+            selectedModels: string
+            selectedTrims: string
             selectedBodyTypes: string[]
             selectedTransmission: FilterTransmissionType
         }> = {}
         if (search) nextSearch.value = search
         if (formData.minPrice) nextSearch.minPrice = Number(formData.minPrice)
         if (formData.maxPrice) nextSearch.maxPrice = Number(formData.maxPrice)
-        if (formData.selectedMakes?.length) nextSearch.selectedMakes = formData.selectedMakes
-        if (formData.selectedModels?.length) nextSearch.selectedModels = formData.selectedModels
-        if (formData.selectedTrims?.length) nextSearch.selectedTrims = formData.selectedTrims
+        if (formData.selectedMakes) nextSearch.selectedMakes = formData.selectedMakes
+        if (formData.selectedModels) nextSearch.selectedModels = formData.selectedModels
+        if (formData.selectedTrims) nextSearch.selectedTrims = formData.selectedTrims
         if (formData.selectedBodyTypes?.length) nextSearch.selectedBodyTypes = formData.selectedBodyTypes
         if (formData.selectedTransmission && formData.selectedTransmission !== 'All') {
             nextSearch.selectedTransmission = formData.selectedTransmission

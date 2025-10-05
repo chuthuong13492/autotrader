@@ -34,9 +34,9 @@ export const initialState: DashboardState = {
   values: {
     minPrice: "",
     maxPrice: "",
-    selectedMakes: [],
-    selectedModels: [],
-    selectedTrims: [],
+    selectedMakes: "",
+    selectedModels: "",
+    selectedTrims: "",
     selectedBodyTypes: [],
     selectedTransmission: "All",
   },
@@ -61,9 +61,9 @@ export const dashboardSlice = createSlice({
       const filters = state.values;
 
       const filteredCars = applyFilters(ALL_CARS, {
-        selectedMakes: filters.selectedMakes ?? [],
-        selectedModels: filters.selectedModels ?? [],
-        selectedTrims: filters.selectedTrims ?? [],
+        selectedMakes: filters.selectedMakes ?? "",
+        selectedModels: filters.selectedModels ?? "",
+        selectedTrims: filters.selectedTrims ?? "",
         priceMin: filters.minPrice ? Number(filters.minPrice) : 0,
         priceMax: filters.maxPrice
           ? Number(filters.maxPrice)
@@ -115,9 +115,9 @@ export const fetchPage = createAsyncThunk(
     const filters = state.dashboard.values;
 
     const filteredCars = applyFilters(ALL_CARS, {
-      selectedMakes: filters.selectedMakes ?? [],
-      selectedModels: filters.selectedModels ?? [],
-      selectedTrims: filters.selectedTrims ?? [],
+      selectedMakes: filters.selectedMakes ?? "",
+      selectedModels: filters.selectedModels ?? "",
+      selectedTrims: filters.selectedTrims ?? "",
       priceMin: filters.minPrice ? Number(filters.minPrice) : 0,
       priceMax: filters.maxPrice ? Number(filters.maxPrice) : 0,
       selectedBodyTypes: filters.selectedBodyTypes ?? [],

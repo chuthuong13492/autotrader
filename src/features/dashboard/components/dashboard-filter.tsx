@@ -1,4 +1,4 @@
-import { useImperativeHandle, forwardRef, useEffect } from 'react'
+import { useImperativeHandle, forwardRef} from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { useDebouncedCallback } from 'use-debounce'
 import { Form } from '@/components/ui/form'
@@ -12,7 +12,9 @@ import type { TransmissionType } from '../data/mock-data'
 import { useUpdateEffect } from '@/hooks/use-update-effect'
 import { type DashboardRootState } from '@/stores/dashboard-store'
 import { useSelector } from 'react-redux'
-import isEqual from 'lodash/isEqual'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+
 
 interface DashboardFilterProps {
     onFilterChange?: (formData: Partial<FormData>) => void
@@ -20,78 +22,48 @@ interface DashboardFilterProps {
 
 export type FilterTransmissionType = TransmissionType | 'All'
 
-export interface FormData {
-    minPrice: string
-    maxPrice: string
-    selectedMakes: string[]
-    selectedModels: string[]
-    selectedTrims: string[]
-    selectedBodyTypes: string[]
-    selectedTransmission: FilterTransmissionType
-}
+const filterFormSchema = z.object({
+    minPrice: z.string(),
+    maxPrice: z.string(),
+    selectedMakes: z.string(),
+    selectedModels: z.string(),
+    selectedTrims: z.string(),
+    selectedBodyTypes: z.array(z.string()),
+    selectedTransmission: z.enum(['All', 'Automatic', 'Manual'] as const),
+})
+
+export type FormData = z.infer<typeof filterFormSchema>
 
 export interface DashboardFilterRef {
     reset: () => void
     setValue: <K extends keyof FormData>(name: K, value: FormData[K]) => void
 }
 
+const initialValues: FormData = {
+    minPrice: '',
+    maxPrice: '',
+    selectedMakes: '',
+    selectedModels: '',
+    selectedTrims: '',
+    selectedBodyTypes: [],
+    selectedTransmission: 'All',
+}
+
+// schema defined above for typing
+
 export const DashboardFilter = forwardRef<DashboardFilterRef, DashboardFilterProps>(
     ({ onFilterChange }, ref) => {
-        const form = useForm<FormData>({
-            defaultValues: {
-                minPrice: '',
-                maxPrice: '',
-                selectedMakes: [],
-                selectedModels: [],
-                selectedTrims: [],
-                selectedBodyTypes: [],
-                selectedTransmission: 'All',
-            }
-        })
-
         const states = useSelector((state: DashboardRootState) => state.dashboard.values)
 
-        useEffect(() => {
-            const currentValues = form.getValues()
-
-            const isReset = !isEqual(currentValues, states)
-
-            if (isReset) {
-    
-                form.reset({
-                    minPrice: states.minPrice,
-                    maxPrice: states.maxPrice,
-                    selectedMakes: states.selectedMakes,
-                    selectedModels: states.selectedModels,
-                    selectedTrims: states.selectedTrims,
-                    selectedBodyTypes: states.selectedBodyTypes,
-                    selectedTransmission: states.selectedTransmission,
-                })
-            }
-        }, [states, form])
+        const form = useForm<FormData>({
+            resolver: zodResolver(filterFormSchema),
+            defaultValues: states,
+        })
 
         useImperativeHandle(ref, () => ({
             reset: () => {
-                form.reset({
-                    minPrice: '',
-                    maxPrice: '',
-                    selectedMakes: [],
-                    selectedModels: [],
-                    selectedTrims: [],
-                    selectedBodyTypes: [],
-                    selectedTransmission: 'All',
-                    ...values
-                }, { keepDirty: false })
-                debouncedFilterChange({
-                    minPrice: '',
-                    maxPrice: '',
-                    selectedMakes: [],
-                    selectedModels: [],
-                    selectedTrims: [],
-                    selectedBodyTypes: [],
-                    selectedTransmission: 'All',
-                    ...values
-                })
+                form.reset(initialValues, { keepDirty: false })
+                debouncedFilterChange(initialValues)
 
             },
             setValue: <K extends keyof FormData>(name: K, value: FormData[K]) => {
@@ -114,11 +86,8 @@ export const DashboardFilter = forwardRef<DashboardFilterRef, DashboardFilterPro
         })
 
         useUpdateEffect(() => {
-            if (form.formState.isDirty) {
-                debouncedFilterChange(form.getValues())
-            }
+            debouncedFilterChange(values)
         }, [values, debouncedFilterChange])
-
 
         return (
             <Form {...form}>

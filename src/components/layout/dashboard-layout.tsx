@@ -15,9 +15,9 @@ export function DashboardLayout({ children }: AuthenticatedLayoutProps) {
     formData: {
       minPrice?: number | undefined
       maxPrice?: number | undefined
-      selectedMakes?: string[] | undefined
-      selectedModels?: string[] | undefined
-      selectedTrims?: string[] | undefined
+      selectedMakes?: string | undefined
+      selectedModels?: string | undefined
+      selectedTrims?: string | undefined
       selectedBodyTypes?: string[] | undefined
       selectedTransmission?: string | undefined
     }
@@ -31,9 +31,9 @@ export function DashboardLayout({ children }: AuthenticatedLayoutProps) {
         values: {
           minPrice: loader?.formData?.minPrice !== undefined ? String(loader.formData.minPrice) : '',
           maxPrice: loader?.formData?.maxPrice !== undefined ? String(loader.formData.maxPrice) : '',
-          selectedMakes: loader?.formData?.selectedMakes ?? [],
-          selectedModels: loader?.formData?.selectedModels ?? [],
-          selectedTrims: loader?.formData?.selectedTrims ?? [],
+          selectedMakes: loader?.formData?.selectedMakes ?? '',
+          selectedModels: loader?.formData?.selectedModels ?? '',
+          selectedTrims: loader?.formData?.selectedTrims ?? '',
           selectedBodyTypes: loader?.formData?.selectedBodyTypes ?? [],
           selectedTransmission: (loader?.formData?.selectedTransmission as FilterTransmissionType) ?? 'All',
         },

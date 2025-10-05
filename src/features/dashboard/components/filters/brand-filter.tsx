@@ -1,16 +1,10 @@
 import { type Control, useWatch, useFormContext } from "react-hook-form"
 import { brandFilterData } from "../../data/filter-data"
 import { FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import type { FormData } from "../dashboard-filter"
 import { cn } from "@/lib/utils"
-import {  useMemo } from "react" 
+import { useMemo } from "react"
+import { SelectDropdown } from "@/components/select-dropdown"
 
 interface BrandFilterProps {
   control: Control<FormData>
@@ -37,7 +31,7 @@ function MakeSelect({ control }: { control: Control<FormData> }) {
     control: control,
   })
 
-  const {selectedMakes, selectedModels, selectedTrims} = values;
+  const { selectedMakes, selectedModels, selectedTrims } = values;
 
   return (
     <FormField
@@ -50,42 +44,30 @@ function MakeSelect({ control }: { control: Control<FormData> }) {
             {(selectedMakes && selectedMakes.length > 0 || selectedModels && selectedModels.length > 0 || selectedTrims && selectedTrims.length > 0) && <ClearButton
               text="Clear All"
               onClick={() => {
-                field.onChange([])
                 reset({
-                  selectedMakes: [],
-                  selectedModels: [],
-                  selectedTrims: [],
-                  minPrice: getValues('minPrice'),
-                  maxPrice: getValues('maxPrice'),
-                  selectedBodyTypes: getValues('selectedBodyTypes'),
-                  selectedTransmission: getValues('selectedTransmission')
-                }, { keepDirty: true })
+                  ...getValues(),
+                  selectedMakes: '',
+                  selectedModels: '',
+                  selectedTrims: '',
+                })
               }}
             />
             }
           </div>
           <FormControl>
-            <Select value={field.value[0] || ''} onValueChange={(value) => {
-              field.onChange(value ? [value] : [])
-              reset({
-                selectedModels: [],
-                selectedTrims: [],
-                selectedMakes: value ? [value] : [],
-                minPrice: getValues('minPrice'),
-                maxPrice: getValues('maxPrice'),
-                selectedBodyTypes: getValues('selectedBodyTypes'),
-                selectedTransmission: getValues('selectedTransmission')
-              }, { keepDirty: true })
-            }}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select make" />
-              </SelectTrigger>
-              <SelectContent>
-                {brandFilterData.makes.map((make) => (
-                  <SelectItem key={make} value={make}>{make}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SelectDropdown
+              defaultValue={field.value ?? ''}
+              onValueChange={(value) => {
+                field.onChange(value)
+                reset({
+                  ...getValues(),
+                  selectedModels: '',
+                  selectedTrims: '',
+                })
+              }}
+              placeholder='Select make'
+              items={brandFilterData.makes.map((make) => ({ label: make, value: make }))}
+            />
           </FormControl>
         </FormItem>
       )}
@@ -112,47 +94,30 @@ function ModelSelect({ control }: { control: Control<FormData> }) {
               <ClearButton
                 onClick={() => {
                   reset({
-                    selectedModels: [],
-                    selectedTrims: [],
-                    selectedMakes: getValues('selectedMakes'),
-                    minPrice: getValues('minPrice'),
-                    maxPrice: getValues('maxPrice'),
-                    selectedBodyTypes: getValues('selectedBodyTypes'),
-                    selectedTransmission: getValues('selectedTransmission')
-                  }, { keepDirty: true })
+                    ...getValues(),
+                    selectedModels: '',
+                    selectedTrims: '',
+                  })
                 }}
               />
             )}
           </div>
           <FormControl>
-            <Select
-              value={selectedModels?.[0] || ''}
+            <SelectDropdown
+              defaultValue={field.value ?? ''}
               onValueChange={(value) => {
-                field.onChange(value ? [value] : [])
+                field.onChange(value)
                 reset({
-                  selectedTrims: [],
-                  selectedMakes: getValues('selectedMakes'),
-                  selectedModels: value ? [value] : [],
-                  minPrice: getValues('minPrice'),
-                  maxPrice: getValues('maxPrice'),
-                  selectedBodyTypes: getValues('selectedBodyTypes'),
-                  selectedTransmission: getValues('selectedTransmission')
-                }, { keepDirty: true })
+                  ...getValues(),
+                  selectedTrims: '',
+                })
               }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select model" />
-              </SelectTrigger>
-              <SelectContent>
-                {brandFilterData.models[
-                  selectedMakes[0] as keyof typeof brandFilterData.models
-                ]?.map((model) => (
-                  <SelectItem key={model} value={model}>
-                    {model}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              placeholder='Select model'
+              items={(selectedMakes
+                  ? brandFilterData.models[selectedMakes as keyof typeof brandFilterData.models] ?? []
+                  : []
+                ).map((model) => ({ label: model, value: model }))}
+            />
           </FormControl>
         </FormItem>
       )}
@@ -179,28 +144,25 @@ function TrimSelect({ control }: { control: Control<FormData> }) {
         <FormItem>
           <div className="flex items-center justify-between">
             <FormLabel className="text-xs text-muted-foreground">Trim</FormLabel>
-            {selectedTrims && selectedTrims.length > 0 && <ClearButton onClick={() => reset({ ...getValues(), selectedTrims: [] }, { keepDirty: true })} />}
+              {selectedTrims && selectedTrims.length > 0 && <ClearButton onClick={() => {
+              reset({
+                ...getValues(),
+                selectedTrims: '',
+              })
+            }} />}
           </div>
           <FormControl>
-            <Select
-              value={selectedTrims?.[0] || ''}
+          <SelectDropdown
+              defaultValue={field.value ?? ''}
               onValueChange={(value) => {
-                field.onChange(value ? [value] : [])
+                field.onChange(value)
               }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select trim" />
-              </SelectTrigger>
-              <SelectContent>
-                {selectedModels && brandFilterData.trims[
-                  selectedModels[0] as keyof typeof brandFilterData.trims
-                ]?.map((trim) => (
-                  <SelectItem key={trim} value={trim}>
-                    {trim}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              placeholder='Select trim'
+              items={(selectedModels
+                  ? brandFilterData.trims[selectedModels as keyof typeof brandFilterData.trims] ?? []
+                  : []
+                ).map((trim) => ({ label: trim, value: trim }))}
+            />
           </FormControl>
         </FormItem>
       )}

@@ -19,9 +19,9 @@ export function CarListFilter({ onResetFilters }: CarListFilterProps) {
         const initialValues = {
             minPrice: '',
             maxPrice: '',
-            selectedMakes: [],
-            selectedModels: [],
-            selectedTrims: [],
+            selectedMakes: '',
+            selectedModels: '',
+            selectedTrims: '',
             selectedBodyTypes: [],
             selectedTransmission: 'All'
         }

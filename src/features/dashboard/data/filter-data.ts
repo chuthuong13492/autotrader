@@ -3,9 +3,9 @@ import { type Car, type TransmissionType } from './mock-data'
 // Filter State Interface
 export interface FilterState {
   // Brand filters
-  selectedMakes: string[]
-  selectedModels: string[]
-  selectedTrims: string[]
+  selectedMakes: string
+  selectedModels: string
+  selectedTrims: string
   
   // Price range
   priceMin: number
@@ -163,13 +163,13 @@ export function applyFilters(cars: Car[], filters?: FilterState): Car[] {
 
   return cars.filter(car => {
     // Brand filters
-    if (filters.selectedMakes?.length && !filters.selectedMakes.includes(car.make)) {
+    if (filters.selectedMakes && filters.selectedMakes !== car.make) {
       return false
     }
-    if (filters.selectedModels?.length && !filters.selectedModels.includes(car.model)) {
+    if (filters.selectedModels && filters.selectedModels !== car.model) {
       return false
     }
-    if (filters.selectedTrims?.length && !filters.selectedTrims.includes(car.trim)) {
+    if (filters.selectedTrims && filters.selectedTrims !== car.trim) {
       return false
     }
     
@@ -180,7 +180,7 @@ export function applyFilters(cars: Car[], filters?: FilterState): Car[] {
     if (maxPrice && car.price > maxPrice) return false
     
     // Body type
-    if (filters.selectedBodyTypes?.length && !filters.selectedBodyTypes.includes(car.bodyType)) {
+    if (filters.selectedBodyTypes && filters.selectedBodyTypes.length > 0 && !filters.selectedBodyTypes.includes(car.bodyType)) {
       return false
     }
     
