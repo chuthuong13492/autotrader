@@ -21,14 +21,14 @@ export type SortKey =
   | "mileage-asc"
   | "mileage-desc";
 
-interface DashboardState {
+export interface DashboardState {
   values: Partial<FormData>;
   search?: string;
   sort?: SortKey;
   pagination: Pagination<Car>;
 }
 
-const initialState: DashboardState = {
+export const initialState: DashboardState = {
   search: "",
   sort: "relevance",
   values: {

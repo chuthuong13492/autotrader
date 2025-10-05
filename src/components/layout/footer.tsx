@@ -16,17 +16,17 @@ export function Footer() {
             </h3>
             <ul className='space-y-3 text-sm'>
               <li>
-                <Link to='/search-result' className='hover:underline text-muted-foreground'>
+                <Link to='/search-result-page' className='hover:underline text-muted-foreground'>
                   Used Cars For Sale
                 </Link>
               </li>
               <li>
-                <Link to='/search-result' className='hover:underline text-muted-foreground'>
+                <Link to='/search-result-page' className='hover:underline text-muted-foreground'>
                   Certified Cars
                 </Link>
               </li>
               <li>
-                <Link to='/search-result' className='hover:underline text-muted-foreground'>
+                <Link to='/search-result-page' className='hover:underline text-muted-foreground'>
                   Car Deals
                 </Link>
               </li>

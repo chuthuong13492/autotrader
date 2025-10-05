@@ -167,6 +167,7 @@ export function usePagination<T>({
         options?: { setLoadingFirstPage?: boolean; delayMs?: number }
     ) {
         if (options?.setLoadingFirstPage) {
+            dispatch({ type: "INIT_REQUEST" });
             await delay(options.delayMs ?? 300)
         }
 

@@ -16,6 +16,21 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute('/_dashboard/search-result-page/')({
   validateSearch: searchSchema,
+  loaderDeps: ({ search }) => ({ search }),
+  loader: async ({ deps: { search } }) => {
+    return {
+      formData: {
+        minPrice: search.minPrice,
+        maxPrice: search.maxPrice,
+        selectedMakes: search.selectedMakes,
+        selectedModels: search.selectedModels,
+        selectedTrims: search.selectedTrims,
+        selectedBodyTypes: search.selectedBodyTypes,
+        selectedTransmission: search.selectedTransmission,
+      },
+      searchValue: search.value ?? '',
+    }
+  },
   component: Dashboard,
 })
 
