@@ -49,13 +49,9 @@ export function DashboardMain() {
             search: nextSearch,
         })
         router.history.replace(nextLocation.href)
-
-
-   
     }
 
     const onResetFilters = () => dashboardFilterRef.current?.reset();
-
 
     return (
         <Main className="px-2">

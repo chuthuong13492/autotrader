@@ -28,7 +28,7 @@ export function Search({
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation()
     dispatch(setSearch(''))
-    dispatch(filterPage(1))
+    dispatch(filterPage({}))
 
     const currentSearch = new URLSearchParams(window.location.search)
 

@@ -53,9 +53,9 @@ export const dashboardSlice = createSlice({
     setSearch(state, action: PayloadAction<string>) {
       state.search = action.payload;
     },
-    filterPage(state, action: PayloadAction<Partial<FormData>>) {
+    filterPage(state, action: PayloadAction<Partial<FormData>> ) {
       //SET FORM
-      state.values = { ...state.values, ...action.payload };
+      state.values = { ...state.values, ...action.payload }
 
       // FILTER PAGE
       const page = 1;
