@@ -53,11 +53,12 @@ export const dashboardSlice = createSlice({
     setSearch(state, action: PayloadAction<string>) {
       state.search = action.payload;
     },
-    setForm(state, action: PayloadAction<Partial<FormData>>) {
+    filterPage(state, action: PayloadAction<Partial<FormData>>) {
+      //SET FORM
       state.values = { ...state.values, ...action.payload };
-    },
-    filterPage(state, action: PayloadAction<number | null>) {
-      const page = action.payload ?? 1;
+
+      // FILTER PAGE
+      const page = 1;
       const filters = state.values;
 
       const filteredCars = applyFilters(ALL_CARS, {
@@ -147,6 +148,6 @@ export const fetchPage = createAsyncThunk(
   }
 );
 
-export const { setSort, setForm, setSearch, filterPage } =
+export const { setSort, setSearch, filterPage } =
   dashboardSlice.actions;
 export default dashboardSlice.reducer;

@@ -7,7 +7,7 @@ import { Search } from "@/components/search"
 import { useRouter } from "@tanstack/react-router"
 import { type DashboardRootState, type DashboardDispatch } from "@/stores/dashboard-store"
 import { useDispatch, useSelector } from "react-redux"
-import { filterPage, setForm } from "@/stores/dashboard-slice"
+import { filterPage } from "@/stores/dashboard-slice"
 
 
 export function DashboardMain() {
@@ -21,8 +21,7 @@ export function DashboardMain() {
     const onFilterChange = (formData: Partial<FormData>) => {
         const { values, search } = state
 
-
-        dispatch(setForm({ ...values, ...formData}))
+        dispatch(filterPage({ ...values, ...formData }))
 
         const nextSearch: Partial<{
             value: string
@@ -51,8 +50,8 @@ export function DashboardMain() {
         })
         router.history.replace(nextLocation.href)
 
-        
-        dispatch(filterPage(1))
+
+   
     }
 
     const onResetFilters = () => dashboardFilterRef.current?.reset();
@@ -70,7 +69,7 @@ export function DashboardMain() {
                         <Search className="hidden lg:block max-w-xs min-w-[16rem]" />
                     </div>
                     {/* Filter */}
-                    <DashboardFilter onFilterChange={onFilterChange} ref={dashboardFilterRef} />
+                    <DashboardFilter defaultValues={state.values} onFilterChange={onFilterChange} ref={dashboardFilterRef} />
                 </div>
                 <section className="min-w-0 grow">
                     <CarListFilter onResetFilters={onResetFilters} />
