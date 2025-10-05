@@ -1,6 +1,6 @@
 import type { Control } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
-import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import type { FormData } from '../dashboard-filter'
 import { cn } from '@/lib/utils'
 interface PriceFilterProps {
@@ -45,10 +45,23 @@ export function PriceFilter({ control, className }: PriceFilterProps) {
                                     onChange={field.onChange}
                                 />
                             </FormControl>
+
                         </FormItem>
                     )}
                 />
             </div>
+
+            <FormField
+                control={control}
+                name="maxPrice"
+                render={() => (
+                    <FormItem>
+
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+
         </div>
     )
 }

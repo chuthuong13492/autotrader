@@ -29,6 +29,18 @@ const filterFormSchema = z.object({
     selectedTrims: z.string(),
     selectedBodyTypes: z.array(z.string()),
     selectedTransmission: z.enum(['All', 'Automatic', 'Manual'] as const),
+}).refine((data) => {
+    if (!data.minPrice || !data.maxPrice) return true
+    
+    const minPrice = Number(data.minPrice)
+    const maxPrice = Number(data.maxPrice)
+    
+    if (isNaN(minPrice) || isNaN(maxPrice)) return true
+    
+    return maxPrice > minPrice
+}, {
+    message: "Max price must be greater than min price",
+    path: ["maxPrice"], // Lỗi sẽ hiển thị ở field maxPrice
 })
 
 export type FormData = z.infer<typeof filterFormSchema>
@@ -55,6 +67,7 @@ export const DashboardFilter = forwardRef<DashboardFilterRef, DashboardFilterPro
         const form = useForm<FormData>({
             resolver: zodResolver(filterFormSchema),
             defaultValues: defaultValues,
+            mode: "onChange", // Validate ngay khi user nhập liệu
         })
 
         useImperativeHandle(ref, () => ({
@@ -76,8 +89,10 @@ export const DashboardFilter = forwardRef<DashboardFilterRef, DashboardFilterPro
         })
 
         useUpdateEffect(() => {
+            // Trigger validation khi values thay đổi
+            form.trigger(['minPrice', 'maxPrice'])
             debouncedFilterChange(values)
-        }, [values, debouncedFilterChange])
+        }, [values, debouncedFilterChange, form])
 
         return (
             <Form {...form}>
