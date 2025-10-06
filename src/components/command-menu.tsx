@@ -41,30 +41,30 @@ export function CommandMenu() {
 
   const onValueChange = useDebouncedCallback((e) => {
     setQuery(e);
-    dispatch(filterPage(1))
+    dispatch(filterPage({}))
   }, 300)
 
   const onSelect = (e: string) => {
     setQuery(e)
     setOpen(false)
-    dispatch(filterPage(1))
+    dispatch(filterPage({}))
 
     const nextSearch: Partial<{
       value: string
       minPrice: number
       maxPrice: number
-      selectedMakes: string[]
-      selectedModels: string[]
-      selectedTrims: string[]
+      selectedMakes: string
+      selectedModels: string
+      selectedTrims: string
       selectedBodyTypes: string[]
       selectedTransmission: FilterTransmissionType
     }> = {}
     if (e) nextSearch.value = e
     if (values.minPrice) nextSearch.minPrice = Number(values.minPrice)
     if (values.maxPrice) nextSearch.maxPrice = Number(values.maxPrice)
-    if (values.selectedMakes?.length) nextSearch.selectedMakes = values.selectedMakes
-    if (values.selectedModels?.length) nextSearch.selectedModels = values.selectedModels
-    if (values.selectedTrims?.length) nextSearch.selectedTrims = values.selectedTrims
+    if (values.selectedMakes) nextSearch.selectedMakes = values.selectedMakes
+    if (values.selectedModels) nextSearch.selectedModels = values.selectedModels
+    if (values.selectedTrims) nextSearch.selectedTrims = values.selectedTrims
     if (values.selectedBodyTypes?.length) nextSearch.selectedBodyTypes = values.selectedBodyTypes
     if (values.selectedTransmission && values.selectedTransmission !== 'All') {
       nextSearch.selectedTransmission = values.selectedTransmission

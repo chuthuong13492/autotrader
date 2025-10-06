@@ -109,9 +109,24 @@ export const dashboardSlice = createSlice({
     setSearch(state, action: PayloadAction<string>) {
       state.search = action.payload;
     },
+    setState(state, action: PayloadAction<Partial<DashboardState>>) {
+      // Update state với data từ action
+      if (action.payload.search !== undefined) {
+        state.search = action.payload.search;
+      }
+      if (action.payload.values !== undefined) {
+        state.values = { ...state.values, ...action.payload.values };
+      }
+      if (action.payload.sort !== undefined) {
+        state.sort = action.payload.sort;
+      }
+    },
+    setForm(state, action: PayloadAction<Partial<FormData>>) {
+      state.values = action.payload;
+    },
     filterPage(state, action: PayloadAction<Partial<FormData>>) {
       //SET FORM
-      state.values = { ...state.values, ...action.payload };
+      state.values = action.payload;
 
       // Apply filters and pagination
       const paginationResult = getPagination(
@@ -159,5 +174,5 @@ export const fetchPage = createAsyncThunk(
   }
 );
 
-export const { setSort, setSearch, filterPage } = dashboardSlice.actions;
+export const { setSort, setSearch, setState, filterPage, setForm } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

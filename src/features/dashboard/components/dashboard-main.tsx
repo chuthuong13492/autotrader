@@ -1,5 +1,5 @@
 import { Main } from "@/components/layout/main"
-import { DashboardFilter, type FormData, type DashboardFilterRef, type FilterTransmissionType } from "./dashboard-filter"
+import { DashboardFilter, type FormData, type FilterTransmissionType, type FilterRef } from "./dashboard-filter"
 import { CarList } from "./car-list/car-list"
 import { CarListFilter } from "./car-list/car-list-filter"
 import { useRef } from "react"
@@ -8,6 +8,7 @@ import { useRouter } from "@tanstack/react-router"
 import { type DashboardRootState, type DashboardDispatch } from "@/stores/dashboard-store"
 import { useDispatch, useSelector } from "react-redux"
 import { filterPage } from "@/stores/dashboard-slice"
+import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb"
 
 type SearchParams = {
     value?: string
@@ -21,11 +22,11 @@ type SearchParams = {
 }
 
 function buildSearchParams(
-    formData: Partial<FormData>, 
+    formData: Partial<FormData>,
     search?: string
 ): SearchParams {
     const nextSearch: SearchParams = {}
-    
+
     if (search) nextSearch.value = search
     if (formData.minPrice) nextSearch.minPrice = Number(formData.minPrice)
     if (formData.maxPrice) nextSearch.maxPrice = Number(formData.maxPrice)
@@ -36,22 +37,22 @@ function buildSearchParams(
     if (formData.selectedTransmission && formData.selectedTransmission !== 'All') {
         nextSearch.selectedTransmission = formData.selectedTransmission
     }
-    
+
     return nextSearch
 }
 
 export function DashboardMain() {
-    const dashboardFilterRef = useRef<DashboardFilterRef>(null);
+    const dashboardFilterRef = useRef<FilterRef>(null);
 
     const dispatch = useDispatch<DashboardDispatch>()
     const state = useSelector((state: DashboardRootState) => state.dashboard)
 
+
     const router = useRouter()
 
     const onFilterChange = (formData: Partial<FormData>) => {
-        const { values, search } = state
-
-        dispatch(filterPage({ ...values, ...formData }))
+        const { search } = state
+        dispatch(filterPage(formData))
 
         const nextSearch = buildSearchParams(formData, search)
         const nextLocation = router.buildLocation({
@@ -62,12 +63,13 @@ export function DashboardMain() {
         router.history.replace(nextLocation.href)
     }
 
+
     const onResetFilters = () => dashboardFilterRef.current?.reset();
 
     return (
         <Main className="px-2">
             <div className='pl-2 mb-4 flex items-center justify-between space-y-2'>
-                <h1 className='text-2xl font-bold tracking-tight' style={{ color: "#012169" }}>Cars for Sale</h1>
+                <DynamicBreadcrumb />
             </div>
             <div className="pl-2 flex w-full">
                 <div className="space-y-2">
@@ -76,7 +78,7 @@ export function DashboardMain() {
                         <Search className="hidden lg:block max-w-xs min-w-[16rem]" />
                     </div>
                     {/* Filter */}
-                    <DashboardFilter defaultValues={state.values} onFilterChange={onFilterChange} ref={dashboardFilterRef} />
+                    <DashboardFilter onFilterChange={onFilterChange} ref={dashboardFilterRef} />
                 </div>
                 <section className="min-w-0 grow">
                     <CarListFilter onResetFilters={onResetFilters} />
