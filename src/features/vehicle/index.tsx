@@ -4,6 +4,7 @@ import { ALL_CARS } from '@/features/dashboard/data/mock-data'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft} from 'lucide-react'
 import { useNavigate, useParams } from '@tanstack/react-router'
+import { Footer } from "@/components/layout/footer";
 
 export function VehicleDetailPage() {
     const { id } = useParams({ from: '/_dashboard/vehicle/$id' })
@@ -39,6 +40,8 @@ export function VehicleDetailPage() {
                     Back to Search Results
                 </Button>
             </div>
+
+            <Footer />
         </>
     )
 }

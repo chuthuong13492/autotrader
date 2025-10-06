@@ -8,8 +8,8 @@ import { DashboardDataLoader } from './dashboard-provider'
 
 export function Dashboard() {
   return (
-    <DashboardDataLoader >
-      <SearchProvider >
+    <DashboardDataLoader>
+      <SearchProvider>
         <DashboardHeader />
         <DashboardBadge />
         <DashboardMain />
