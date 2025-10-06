@@ -9,6 +9,36 @@ import { type DashboardRootState, type DashboardDispatch } from "@/stores/dashbo
 import { useDispatch, useSelector } from "react-redux"
 import { filterPage } from "@/stores/dashboard-slice"
 
+type SearchParams = {
+    value?: string
+    minPrice?: number
+    maxPrice?: number
+    selectedMakes?: string
+    selectedModels?: string
+    selectedTrims?: string
+    selectedBodyTypes?: string[]
+    selectedTransmission?: FilterTransmissionType
+}
+
+function buildSearchParams(
+    formData: Partial<FormData>, 
+    search?: string
+): SearchParams {
+    const nextSearch: SearchParams = {}
+    
+    if (search) nextSearch.value = search
+    if (formData.minPrice) nextSearch.minPrice = Number(formData.minPrice)
+    if (formData.maxPrice) nextSearch.maxPrice = Number(formData.maxPrice)
+    if (formData.selectedMakes) nextSearch.selectedMakes = formData.selectedMakes
+    if (formData.selectedModels) nextSearch.selectedModels = formData.selectedModels
+    if (formData.selectedTrims) nextSearch.selectedTrims = formData.selectedTrims
+    if (formData.selectedBodyTypes?.length) nextSearch.selectedBodyTypes = formData.selectedBodyTypes
+    if (formData.selectedTransmission && formData.selectedTransmission !== 'All') {
+        nextSearch.selectedTransmission = formData.selectedTransmission
+    }
+    
+    return nextSearch
+}
 
 export function DashboardMain() {
     const dashboardFilterRef = useRef<DashboardFilterRef>(null);
@@ -23,26 +53,7 @@ export function DashboardMain() {
 
         dispatch(filterPage({ ...values, ...formData }))
 
-        const nextSearch: Partial<{
-            value: string
-            minPrice: number
-            maxPrice: number
-            selectedMakes: string
-            selectedModels: string
-            selectedTrims: string
-            selectedBodyTypes: string[]
-            selectedTransmission: FilterTransmissionType
-        }> = {}
-        if (search) nextSearch.value = search
-        if (formData.minPrice) nextSearch.minPrice = Number(formData.minPrice)
-        if (formData.maxPrice) nextSearch.maxPrice = Number(formData.maxPrice)
-        if (formData.selectedMakes) nextSearch.selectedMakes = formData.selectedMakes
-        if (formData.selectedModels) nextSearch.selectedModels = formData.selectedModels
-        if (formData.selectedTrims) nextSearch.selectedTrims = formData.selectedTrims
-        if (formData.selectedBodyTypes?.length) nextSearch.selectedBodyTypes = formData.selectedBodyTypes
-        if (formData.selectedTransmission && formData.selectedTransmission !== 'All') {
-            nextSearch.selectedTransmission = formData.selectedTransmission
-        }
+        const nextSearch = buildSearchParams(formData, search)
         const nextLocation = router.buildLocation({
             from: '/search-result-page',
             to: '.',

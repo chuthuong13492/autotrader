@@ -1,4 +1,5 @@
 import { type Car, type TransmissionType } from './mock-data'
+import { type SortKey } from '@/stores/dashboard-slice'
 
 // Filter State Interface
 export interface FilterState {
@@ -27,6 +28,9 @@ export interface FilterState {
   
   // Search
   searchQuery: string
+  
+  // Sort
+  sortKey?: SortKey
 }
 
 // Brand (Make, Model, Trim) Filter Data
@@ -158,10 +162,34 @@ export const additionalFilterData = {
 
 
 // Filter utility functions
+// Sort function
+function sortCars(cars: Car[], sortKey?: SortKey): Car[] {
+  if (!sortKey || sortKey === 'relevance') return cars
+
+  return [...cars].sort((a, b) => {
+    switch (sortKey) {
+      case 'price-asc':
+        return a.price - b.price
+      case 'price-desc':
+        return b.price - a.price
+      case 'year-asc':
+        return a.year - b.year
+      case 'year-desc':
+        return b.year - a.year
+      case 'mileage-asc':
+        return a.mileage - b.mileage
+      case 'mileage-desc':
+        return b.mileage - a.mileage
+      default:
+        return 0
+    }
+  })
+}
+
 export function applyFilters(cars: Car[], filters?: FilterState): Car[] {
   if (!filters) return cars
 
-  return cars.filter(car => {
+  const filteredCars = cars.filter(car => {
     // Brand filters
     if (filters.selectedMakes && filters.selectedMakes !== car.make) {
       return false
@@ -200,6 +228,9 @@ export function applyFilters(cars: Car[], filters?: FilterState): Car[] {
     
     return true
   })
+
+  // Apply sorting
+  return sortCars(filteredCars, filters.sortKey)
 }
 
 // // Get active filter count

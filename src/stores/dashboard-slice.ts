@@ -12,6 +12,48 @@ import {
 } from "@/components/layout/data/pagination";
 import { updatePage, delay } from "@/lib/utils";
 
+// Helper function to apply filters and pagination
+function getPagination(
+  cars: Car[],
+  filters: Partial<FormData>,
+  search: string,
+  sort: SortKey,
+  page: number = 1,
+  pageSize: number = 20
+) {
+  const filteredCars = applyFilters(cars, {
+    selectedMakes: filters.selectedMakes ?? "",
+    selectedModels: filters.selectedModels ?? "",
+    selectedTrims: filters.selectedTrims ?? "",
+    priceMin: filters.minPrice ? Number(filters.minPrice) : 0,
+    priceMax: filters.maxPrice
+      ? Number(filters.maxPrice)
+      : Number.MAX_SAFE_INTEGER,
+    selectedBodyTypes: filters.selectedBodyTypes ?? [],
+    selectedTransmission:
+      filters.selectedTransmission === "All"
+        ? null
+        : (filters.selectedTransmission ?? null),
+    searchQuery: search ?? "",
+    sortKey: sort,
+  });
+
+  const total = filteredCars.length;
+  const pageCount = Math.ceil(total / pageSize);
+  const safePage = Math.min(Math.max(page, 1), pageCount);
+  const start = (safePage - 1) * pageSize;
+  const end = start + pageSize;
+  const list = filteredCars.slice(start, end);
+
+  return {
+    list,
+    page: safePage,
+    pageSize,
+    pageCount,
+    total,
+  };
+}
+
 export type SortKey =
   | "relevance"
   | "price-asc"
@@ -24,7 +66,7 @@ export type SortKey =
 export interface DashboardState {
   values: Partial<FormData>;
   search?: string;
-  sort?: SortKey;
+  sort: SortKey;
   pagination: Pagination<Car>;
 }
 
@@ -49,50 +91,39 @@ export const dashboardSlice = createSlice({
   reducers: {
     setSort(state, action: PayloadAction<SortKey>) {
       state.sort = action.payload;
+      // Apply filters and pagination
+      const paginationResult = getPagination(
+        ALL_CARS,
+        state.values,
+        state.search ?? "",
+        state.sort,
+        1, // page
+        20 // pageSize
+      );
+
+      state.pagination = paginationResult;
+
+      // eslint-disable-next-line no-console
+      console.log("Set sort", state.pagination);
     },
     setSearch(state, action: PayloadAction<string>) {
       state.search = action.payload;
     },
-    filterPage(state, action: PayloadAction<Partial<FormData>> ) {
+    filterPage(state, action: PayloadAction<Partial<FormData>>) {
       //SET FORM
-      state.values = { ...state.values, ...action.payload }
+      state.values = { ...state.values, ...action.payload };
 
-      // FILTER PAGE
-      const page = 1;
-      const filters = state.values;
+      // Apply filters and pagination
+      const paginationResult = getPagination(
+        ALL_CARS,
+        state.values,
+        state.search ?? "",
+        state.sort,
+        1, // page
+        20 // pageSize
+      );
 
-      const filteredCars = applyFilters(ALL_CARS, {
-        selectedMakes: filters.selectedMakes ?? "",
-        selectedModels: filters.selectedModels ?? "",
-        selectedTrims: filters.selectedTrims ?? "",
-        priceMin: filters.minPrice ? Number(filters.minPrice) : 0,
-        priceMax: filters.maxPrice
-          ? Number(filters.maxPrice)
-          : Number.MAX_SAFE_INTEGER,
-        selectedBodyTypes: filters.selectedBodyTypes ?? [],
-        selectedTransmission:
-          filters.selectedTransmission === "All"
-            ? null
-            : (filters.selectedTransmission ?? null),
-        searchQuery: state.search ?? "",
-      });
-
-      const total = filteredCars.length;
-      const pageSize = 20;
-      const pageCount = Math.ceil(total / pageSize);
-
-      const safePage = Math.min(Math.max(page, 1), pageCount);
-      const start = (safePage - 1) * pageSize;
-      const end = start + pageSize;
-      const list = filteredCars.slice(start, end);
-
-      state.pagination = {
-        list,
-        page: safePage,
-        pageSize,
-        pageCount,
-        total,
-      };
+      state.pagination = paginationResult;
 
       // eslint-disable-next-line no-console
       console.log("filterPage", state.pagination);
@@ -113,41 +144,20 @@ export const fetchPage = createAsyncThunk(
     await delay(2000);
 
     const state = getState() as { dashboard: DashboardState };
-    const filters = state.dashboard.values;
 
-    const filteredCars = applyFilters(ALL_CARS, {
-      selectedMakes: filters.selectedMakes ?? "",
-      selectedModels: filters.selectedModels ?? "",
-      selectedTrims: filters.selectedTrims ?? "",
-      priceMin: filters.minPrice ? Number(filters.minPrice) : 0,
-      priceMax: filters.maxPrice ? Number(filters.maxPrice) : 0,
-      selectedBodyTypes: filters.selectedBodyTypes ?? [],
-      selectedTransmission:
-        filters.selectedTransmission === "All"
-          ? null
-          : (filters.selectedTransmission ?? null),
-      searchQuery: state.dashboard.search ?? "",
-    });
+    // Apply filters and pagination
+    const paginationResult = getPagination(
+      ALL_CARS,
+      state.dashboard.values,
+      state.dashboard.search ?? "",
+      state.dashboard.sort,
+      page,
+      20 // pageSize
+    );
 
-    const total = filteredCars.length;
-    const pageSize = 20;
-    const pageCount = Math.ceil(total / pageSize);
-
-    const safePage = Math.min(Math.max(page, 1), pageCount);
-    const start = (safePage - 1) * pageSize;
-    const end = start + pageSize;
-    const list = filteredCars.slice(start, end);
-
-    return updatePage(state.dashboard.pagination, {
-      list,
-      page: safePage,
-      pageSize,
-      pageCount,
-      total,
-    });
+    return updatePage(state.dashboard.pagination, paginationResult);
   }
 );
 
-export const { setSort, setSearch, filterPage } =
-  dashboardSlice.actions;
+export const { setSort, setSearch, filterPage } = dashboardSlice.actions;
 export default dashboardSlice.reducer;
