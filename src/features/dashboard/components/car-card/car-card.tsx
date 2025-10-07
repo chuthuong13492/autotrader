@@ -9,14 +9,14 @@ interface CarCardProps {
 }
 
 export function CarCard({ car, className }: CarCardProps) {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     const handleClick = () => {
         navigate({ 
             to: '/vehicle/$id', 
             params: { id: car.id },
         })
-    }
+    };
 
     return (
         <div 

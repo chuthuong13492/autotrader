@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { MobileNavigation } from './mobile-navigation'
-import { Link } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
 import { type DashboardDispatch } from '@/stores/dashboard-store'
 import { useDispatch } from 'react-redux'
 import { filterPage } from '@/stores/dashboard-slice'
