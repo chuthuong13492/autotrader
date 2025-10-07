@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { type DashboardDispatch, type DashboardRootState } from '@/stores/dashboard-store'
 import { fetchPage } from '@/stores/dashboard-slice'
 import { useRef } from 'react'
-import { useUpdateEffect } from '@/hooks/use-update-effect'
 import { PagedGrid, type PagedGridRef } from '@/components/layout/pagination/paged-grid'
 import { Loader } from 'lucide-react'
 import { SuggestionList } from './suggestion-list'
@@ -17,10 +16,6 @@ export function CarList() {
     const state = useSelector((state: DashboardRootState) => state.dashboard);
 
     const pagedListRef = useRef<PagedGridRef<Car>>(null);
-
-    useUpdateEffect(() => {
-        pagedListRef.current?.updatePagination(state.pagination)
-    }, [state.pagination]);
 
     if(state.isEmpty && state.isEmpty === true){
         return <SuggestionList/>
@@ -33,6 +28,7 @@ export function CarList() {
             hasScrollBar={false}
             rowCount={4}
             itemKey={(item) => item.id}
+            pagination={state.pagination}
             onInitial={() => dispatch(fetchPage(1)).unwrap()}
             onRefresh={() => dispatch(fetchPage(1)).unwrap()}
             onLoadMore={(nextPage) => dispatch(fetchPage(nextPage)).unwrap()}

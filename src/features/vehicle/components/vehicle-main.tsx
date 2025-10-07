@@ -55,8 +55,7 @@ export function VehicleMain() {
                         <div className="rounded-md overflow-hidden">
                             <BaseImage src={gallery[activeIndex]} alt={`${vehicle.make} ${vehicle.model}`} className="aspect-[16/10] rounded-md" />
                         </div>
-                        <div className="mt-2">
-                            <ScrollArea orientation="horizontal" className="w-full">
+                        <ScrollArea orientation="horizontal" className="w-full py-4">
                                 <div className="flex gap-2 w-max pr-2">
                                     {gallery.map((url, i) => (
                                         <button
@@ -73,7 +72,6 @@ export function VehicleMain() {
                                     ))}
                                 </div>
                             </ScrollArea>
-                        </div>
                     </div>
 
                     {/* Summary */}

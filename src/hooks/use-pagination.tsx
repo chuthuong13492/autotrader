@@ -2,6 +2,7 @@ import React, { useEffect, useCallback, useReducer } from "react";
 import { emptyPagination, isLastPage, type Pagination } from "@/components/layout/data/pagination";
 import { useItemVisibility } from "./use-intersection-observer";
 import { delay } from "@/lib/utils";
+import { useUpdateEffect } from "./use-update-effect";
 
 export enum PaginationStatus {
     INITIAL = "initial",
@@ -162,7 +163,7 @@ export function usePagination<T>({
         // eslint-disable-next-line
     }, []);
 
-    useEffect(() => {
+    useUpdateEffect(() => {
         if(initialPagination){
             dispatch({ type: "SET_PAGINATION", payload:  initialPagination });
         }

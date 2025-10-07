@@ -17,6 +17,8 @@ const searchSchema = z.object({
 export const Route = createFileRoute('/_dashboard/search-result-page/')({
   validateSearch: searchSchema,
   loaderDeps: ({ search }) => ({ search }),
+  staleTime: 5 * 60 * 1000, // 5 minutes: avoid flashing when navigating back
+  gcTime: 30 * 60 * 1000,   // keep in cache longer to improve back/forward UX
   loader: async ({ deps: { search } }) => {
     return {
       formData: {

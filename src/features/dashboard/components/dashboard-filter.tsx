@@ -1,4 +1,4 @@
-import React, { useImperativeHandle, forwardRef, useReducer, useEffect } from 'react'
+import React, { useImperativeHandle, forwardRef, useEffect, useRef } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { useDebouncedCallback } from 'use-debounce'
 import { ChevronDown } from 'lucide-react'
@@ -10,20 +10,20 @@ import { TransmissionFilter } from './filters/transmission-filter'
 import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
 } from '@/components/ui/collapsible'
 import type { TransmissionType } from '../data/mock-data'
 import { useUpdateEffect } from '@/hooks/use-update-effect'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useLoaderData } from '@tanstack/react-router'
-import { FilterLoading } from './filters/filter-loading'
 import isEqual from "lodash/isEqual"
 import { type DashboardRootState } from '@/stores/dashboard-store'
 import { useSelector } from 'react-redux'
 import { cn } from '@/lib/utils'
+import { FilterLoading } from './filters/filter-loading'
 interface DashboardFilterProps {
     onFilterChange?: (formData: Partial<FormData>) => void
     className?: string
@@ -68,30 +68,9 @@ export interface FilterRef {
     reset: () => void
 }
 
-type LoaderState = {
+type LoaderStateRef = {
     loading: boolean
     defaultValues: FormData
-}
-
-type LoaderAction =
-    | { type: 'start' }
-    | { type: 'success'; payload: Partial<FormData> }
-
-function loaderReducer(state: LoaderState, action: LoaderAction): LoaderState {
-    switch (action.type) {
-        case 'start':
-            return { ...state, loading: true }
-        case 'success':
-            return {
-                loading: false,
-                defaultValues: {
-                    ...state.defaultValues,
-                    ...action.payload,
-                } as FormData,
-            }
-        default:
-            return state
-    }
 }
 
 export const DashboardFilter = forwardRef<FilterRef, DashboardFilterProps>((props, ref) => {
@@ -106,17 +85,15 @@ export const DashboardFilter = forwardRef<FilterRef, DashboardFilterProps>((prop
             selectedTransmission?: string | undefined
         }
         searchValue: string
-    }
+    };
 
-    const [state, dispatch] = useReducer(loaderReducer, {
+    const stateRef = useRef<LoaderStateRef>({
         loading: true,
-        defaultValues: {
-            ...initialValues,
-        },
+        defaultValues: { ...initialValues },
     })
 
     useEffect(() => {
-        dispatch({ type: 'start' })
+        stateRef.current.loading = true
         const nextDefaults: Partial<FormData> = {
             minPrice: loader.formData?.minPrice !== undefined ? String(loader.formData.minPrice) : '',
             maxPrice: loader.formData?.maxPrice !== undefined ? String(loader.formData.maxPrice) : '',
@@ -126,15 +103,13 @@ export const DashboardFilter = forwardRef<FilterRef, DashboardFilterProps>((prop
             selectedBodyTypes: loader.formData?.selectedBodyTypes ?? [],
             selectedTransmission: (loader.formData?.selectedTransmission as FilterTransmissionType) ?? 'All',
         }
-        const timer = setTimeout(() => {
-            dispatch({ type: 'success', payload: nextDefaults })
-        }, 300)
-        return () => clearTimeout(timer)
+        stateRef.current.defaultValues = { ...stateRef.current.defaultValues, ...nextDefaults } as FormData
+        stateRef.current.loading = false
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
 
-    return state.loading ? (
+    return stateRef.current.loading ? (
         <Card className={cn("hidden w-full max-w-[16rem] shrink-0 self-start lg:block p-0", props.className)}>
             {Array.from({ length: 6 }).map((_, idx) => (
                 <React.Fragment key={idx}>
@@ -144,11 +119,11 @@ export const DashboardFilter = forwardRef<FilterRef, DashboardFilterProps>((prop
             ))}
         </Card>
     ) : (
-        <Filter 
-        className={props.className} 
-        defaultValues={state.defaultValues} 
-        onFilterChange={props.onFilterChange} 
-        ref={ref} />
+        <Filter
+            className={props.className}
+            defaultValues={stateRef.current.defaultValues}
+            onFilterChange={props.onFilterChange}
+            ref={ref} />
     )
 })
 
@@ -215,7 +190,7 @@ const Filter = forwardRef<FilterRef, InnerFilterProps>(
                             </CollapsibleContent>
                         </Collapsible>
                         <Separator orientation='horizontal' />
-                        
+
                         {/* Brand Filter */}
                         <Collapsible defaultOpen={true}>
                             <CollapsibleTrigger className="flex items-center justify-between w-full p-4 hover:bg-muted/50 transition-colors">
