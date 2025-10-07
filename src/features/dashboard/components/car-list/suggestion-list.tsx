@@ -1,41 +1,49 @@
 
-import { type Car } from '@/features/dashboard/data/mock-data'
-import { CarCard } from '../car-card/car-card'
+import { SUGGESTION, type Car } from '@/features/dashboard/data/mock-data'
 import { CarCardLoading } from '../car-card/car-card-loading'
-import { useDispatch, useSelector } from 'react-redux'
-import { type DashboardDispatch, type DashboardRootState } from '@/stores/dashboard-store'
-import { fetchPage } from '@/stores/dashboard-slice'
-import { useRef } from 'react'
-import { useUpdateEffect } from '@/hooks/use-update-effect'
-import { PagedGrid, type PagedGridRef } from '@/components/layout/pagination/paged-grid'
+import { PagedGrid } from '@/components/layout/pagination/paged-grid'
 import { Loader } from 'lucide-react'
-import { SuggestionList } from './suggestion-list'
+import { emptyPagination, type Pagination } from '@/components/layout/data/pagination'
+import { useState } from 'react'
+import { updatePage } from '@/lib/utils'
+import { SuggestionCard } from '../car-card/suggestion-card'
 
-export function CarList() {
-    const dispatch = useDispatch<DashboardDispatch>();
+export function SuggestionList() {
+    const [pagination, setPagination] = useState<Pagination<Car>>(emptyPagination())
 
-    const state = useSelector((state: DashboardRootState) => state.dashboard);
+    const fetchPage = async (page: number): Promise<Pagination<Car>> => {
+        const total = SUGGESTION.length;
+        const pageCount = Math.ceil(total / 10);
+        const safePage = Math.min(Math.max(page, 1), pageCount);
+        const start = (safePage - 1) * 10;
+        const end = start + 10;
+        const list = SUGGESTION.slice(start, end);
 
-    const pagedListRef = useRef<PagedGridRef<Car>>(null);
+        const result = {
+            list: list,
+            page: safePage,
+            pageSize: 10,
+            pageCount: pageCount,
+            total: total,
+        }
 
-    useUpdateEffect(() => {
-        pagedListRef.current?.updatePagination(state.pagination)
-    }, [state.pagination]);
 
-    if(state.isEmpty && state.isEmpty === true){
-        return <SuggestionList/>
-    }
+        const updatePagination = updatePage(pagination, result);
+
+        setPagination(updatePagination);
+
+        return updatePagination;
+    };
 
     return (
         <PagedGrid<Car>
             className="lg:pl-4 pr-2 pt-3 pb-2"
-            ref={pagedListRef}
             hasScrollBar={false}
             rowCount={4}
             itemKey={(item) => item.id}
-            onInitial={() => dispatch(fetchPage(1)).unwrap()}
-            onRefresh={() => dispatch(fetchPage(1)).unwrap()}
-            onLoadMore={(nextPage) => dispatch(fetchPage(nextPage)).unwrap()}
+            onInitial={() => fetchPage(1)}
+            onRefresh={() => fetchPage(1)}
+            onLoadMore={(nextPage) => fetchPage(nextPage)}
             loadingFirstPageBuilder={() => (
                 <div className="pl-4 pr-2 pt-3 grid grid-cols-1 gap-4 w-full md:grid-cols-2 lg:grid-cols-4">
                     {Array.from({ length: 12 }).map((_, idx) => (
@@ -74,7 +82,7 @@ export function CarList() {
                         animationFillMode: 'both'
                     }}
                 >
-                    <CarCard car={car} />
+                    <SuggestionCard car={car} />
                 </div>
             )}
         />

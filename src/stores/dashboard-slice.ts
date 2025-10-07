@@ -12,7 +12,6 @@ import {
 } from "@/components/layout/data/pagination";
 import { updatePage, delay } from "@/lib/utils";
 
-// Helper function to apply filters and pagination
 function getPagination(
   cars: Car[],
   filters: Partial<FormData>,
@@ -68,6 +67,7 @@ export interface DashboardState {
   search?: string;
   sort: SortKey;
   pagination: Pagination<Car>;
+  isEmpty: boolean | null;
 }
 
 export const initialState: DashboardState = {
@@ -83,6 +83,7 @@ export const initialState: DashboardState = {
     selectedTransmission: "All",
   },
   pagination: emptyPagination(),
+  isEmpty: null
 };
 
 export const dashboardSlice = createSlice({
@@ -102,6 +103,8 @@ export const dashboardSlice = createSlice({
       );
 
       state.pagination = paginationResult;
+
+      state.isEmpty = paginationResult.total === 0
 
       // eslint-disable-next-line no-console
       console.log("Set sort", state.pagination);
@@ -140,6 +143,8 @@ export const dashboardSlice = createSlice({
 
       state.pagination = paginationResult;
 
+      state.isEmpty = paginationResult.total === 0
+
       // eslint-disable-next-line no-console
       console.log("filterPage", state.pagination);
     },
@@ -147,6 +152,8 @@ export const dashboardSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchPage.fulfilled, (state, action) => {
       state.pagination = action.payload;
+
+      state.isEmpty = action.payload.total === 0
       // eslint-disable-next-line no-console
       console.log("fetchPage", action.payload);
     });

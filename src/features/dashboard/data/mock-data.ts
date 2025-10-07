@@ -10,7 +10,7 @@ export type Car = {
   price: number // USD
   imageUrl: string
   condition: 'New' | 'Used'
-  bodyType:  'Sedan' | 'SUV' | 'Hatchback' | 'Coupe' | 'Truck' | 'Wagon'
+  bodyType:  'Sedan' | 'SUV' | 'Hatchback' | 'Coupe' | 'Truck' | 'Wagon' | 'Convertible'
   transmission: TransmissionType
   dealer: string
   badges?: string[]
@@ -19,7 +19,8 @@ export type Car = {
 
 
 // ---------- Mock Cars (30 items => 5 pages x 6 each) ----------
-const IMG = (seed: number) => `https://picsum.photos/seed/car-${seed}/408/306`
+const IMG = (seed: number) => `https://picsum.photos/id/${seed}/306/408`
+
 
 export const ALL_CARS: Car[] = [
   { id: '1', year: 2017, make: 'Hyundai', model: 'Santa Fe', trim: 'Sport', mileage: 76000, price: 13588, imageUrl: IMG(1), condition: 'Used', bodyType: 'SUV', transmission: 'Automatic', dealer: 'San Francisco Toyota', badges: ['Great Price', 'No Accidents'] },
@@ -93,16 +94,26 @@ export const PAGE_SIZE = 20
 export const TOTAL = ALL_CARS.length
 export const PAGE_COUNT = Math.max(1, Math.ceil(TOTAL / PAGE_SIZE))
 
-// export const MOCK_PAGES: Pagination<Car>[] = Array.from({ length: PAGE_COUNT }, (_, i) => {
-//   const page = i + 1
-//   const start = i * PAGE_SIZE
-//   const end = start + PAGE_SIZE
-//   const list = ALL_CARS.slice(start, end)
-//   return new Pagination<Car>({ list, page, pageSize: PAGE_SIZE, pageCount: PAGE_COUNT, total: TOTAL })
-// })
-
-// export function getMockPage(page: number): Pagination<Car> {
-//   if (page < 1 || page > PAGE_COUNT) return Pagination.empty<Car>()
-//   return MOCK_PAGES[page - 1]
-// }
-
+export const SUGGESTION: Car[] = [
+  { id: '101', year: 2024, make: 'Ferrari', model: 'SF90 Stradale', trim: 'Hybrid', mileage: 1200, price: 520000, imageUrl: IMG(101), condition: 'Used', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'Exotic Motors SF', badges: ['Hybrid', 'No Accidents'] },
+  { id: '102', year: 2023, make: 'Lamborghini', model: 'Aventador', trim: 'SVJ', mileage: 2000, price: 610000, imageUrl: IMG(102), condition: 'Used', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'Luxury Garage', badges: ['Great Price'] },
+  { id: '103', year: 2025, make: 'McLaren', model: 'Artura', trim: 'V6 Hybrid', mileage: 500, price: 310000, imageUrl: IMG(103), condition: 'New', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'McLaren San Jose', badges: ['Hybrid'] },
+  { id: '104', year: 2022, make: 'Bugatti', model: 'Chiron', trim: 'Super Sport', mileage: 1500, price: 3100000, imageUrl: IMG(104), condition: 'Used', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'Elite Auto', badges: ['No Accidents'] },
+  { id: '105', year: 2023, make: 'Aston Martin', model: 'DBS', trim: 'Superleggera', mileage: 2200, price: 350000, imageUrl: IMG(99), condition: 'Used', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'British Luxury Cars', badges: [] },
+  { id: '106', year: 2021, make: 'Porsche', model: '911 GT3', trim: 'Touring', mileage: 3000, price: 220000, imageUrl: IMG(106), condition: 'Used', bodyType: 'Coupe', transmission: 'Manual', dealer: 'Porsche San Francisco', badges: ['No Accidents'] },
+  { id: '107', year: 2023, make: 'Lamborghini', model: 'Huracán', trim: 'EVO RWD', mileage: 1800, price: 280000, imageUrl: IMG(107), condition: 'Used', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'Luxury Garage', badges: [] },
+  { id: '108', year: 2024, make: 'Ferrari', model: 'Roma', trim: 'Twin-Turbo V8', mileage: 1000, price: 260000, imageUrl: IMG(108), condition: 'Used', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'Ferrari Silicon Valley', badges: [] },
+  { id: '109', year: 2025, make: 'Tesla', model: 'Roadster', trim: 'Plaid', mileage: 50, price: 250000, imageUrl: IMG(109), condition: 'New', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'Tesla Store SF', badges: ['Electric'] },
+  { id: '110', year: 2022, make: 'Koenigsegg', model: 'Jesko', trim: 'Absolut', mileage: 900, price: 2800000, imageUrl: IMG(110), condition: 'Used', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'Supercar World', badges: [] },
+  
+  { id: '111', year: 2023, make: 'Porsche', model: 'Taycan Turbo S', trim: 'Performance', mileage: 5000, price: 195000, imageUrl: IMG(111), condition: 'Used', bodyType: 'Sedan', transmission: 'Automatic', dealer: 'Porsche San Francisco', badges: ['Electric'] },
+  { id: '112', year: 2024, make: 'Lamborghini', model: 'Revuelto', trim: 'Hybrid V12', mileage: 300, price: 670000, imageUrl: IMG(112), condition: 'New', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'Luxury Garage', badges: ['Hybrid'] },
+  { id: '113', year: 2022, make: 'McLaren', model: '765LT', trim: 'Spider', mileage: 2500, price: 420000, imageUrl: IMG(113), condition: 'Used', bodyType: 'Convertible', transmission: 'Automatic', dealer: 'McLaren San Jose', badges: [] },
+  { id: '114', year: 2021, make: 'Ferrari', model: '812 Superfast', trim: 'V12', mileage: 3500, price: 380000, imageUrl: IMG(114), condition: 'Used', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'Ferrari Silicon Valley', badges: [] },
+  { id: '115', year: 2024, make: 'Aston Martin', model: 'Vantage', trim: 'F1 Edition', mileage: 800, price: 230000, imageUrl: IMG(115), condition: 'Used', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'British Luxury Cars', badges: [] },
+  { id: '116', year: 2023, make: 'Pagani', model: 'Huayra', trim: 'BC Roadster', mileage: 1000, price: 2900000, imageUrl: IMG(116), condition: 'Used', bodyType: 'Convertible', transmission: 'Automatic', dealer: 'Supercar World', badges: [] },
+  { id: '117', year: 2025, make: 'Lotus', model: 'Emira', trim: 'First Edition', mileage: 400, price: 110000, imageUrl: IMG(117), condition: 'New', bodyType: 'Coupe', transmission: 'Manual', dealer: 'Lotus San Francisco', badges: [] },
+  { id: '118', year: 2023, make: 'BMW', model: 'M8 Competition', trim: 'Gran Coupe', mileage: 7000, price: 145000, imageUrl: IMG(118), condition: 'Used', bodyType: 'Sedan', transmission: 'Automatic', dealer: 'Euro Auto SF', badges: [] },
+  { id: '119', year: 2024, make: 'Porsche', model: '911 Turbo S', trim: 'Exclusive', mileage: 1500, price: 285000, imageUrl: IMG(119), condition: 'Used', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'Porsche San Francisco', badges: [] },
+  { id: '120', year: 2023, make: 'Bentley', model: 'Continental GT', trim: 'Speed', mileage: 3500, price: 290000, imageUrl: IMG(120), condition: 'Used', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'British Luxury Cars', badges: [] },
+];

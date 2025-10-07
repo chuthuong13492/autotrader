@@ -162,6 +162,12 @@ export function usePagination<T>({
         // eslint-disable-next-line
     }, []);
 
+    useEffect(() => {
+        if(initialPagination){
+            dispatch({ type: "SET_PAGINATION", payload:  initialPagination });
+        }
+    }, [initialPagination]);
+
     async function updatePagination(
         newPagination: Pagination<T>,
         options?: { setLoadingFirstPage?: boolean; delayMs?: number }
