@@ -16,9 +16,7 @@ export function CarList() {
     const pagedListRef = useRef<PagedListRef<Car>>(null)
 
     useUpdateEffect(() => {
-        pagedListRef.current?.updatePagination(state.pagination, {
-            setLoadingFirstPage: true,
-        })
+        pagedListRef.current?.updatePagination(state.pagination)
     }, [state.pagination])
 
     return (

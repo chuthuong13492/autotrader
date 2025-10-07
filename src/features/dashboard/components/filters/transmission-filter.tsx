@@ -1,7 +1,7 @@
 import type { Control } from 'react-hook-form'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
-import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
+import { FormControl, FormField, FormItem } from '@/components/ui/form'
 import { transmissionFilterData } from '../../data/filter-data'
 import type { FormData } from '../dashboard-filter' 
 import { cn } from '@/lib/utils'
@@ -17,7 +17,6 @@ export function TransmissionFilter({ control, className }: TransmissionFilterPro
             "space-y-3",
             className
         )}>
-            <FormLabel className="text-sm font-medium">Transmission</FormLabel>
             <FormField
                 control={control}
                 name="selectedTransmission"

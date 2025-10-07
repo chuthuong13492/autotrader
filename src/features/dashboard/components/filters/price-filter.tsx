@@ -14,7 +14,6 @@ export function PriceFilter({ control, className }: PriceFilterProps) {
             "space-y-3",
             className
         )}>
-            <FormLabel className="text-sm font-medium">Price Range</FormLabel>
             <div className="grid grid-cols-2 gap-3">
                 <FormField
                     control={control}

@@ -1,7 +1,6 @@
-import { FilterIcon, SearchIcon } from 'lucide-react'
+import { SearchIcon } from 'lucide-react'
 import { useSearch } from '@/context/search-provider'
 import { Separator } from '@/components/ui/separator'
-import isEqual from 'lodash/isEqual'
 import { type DashboardDispatch, type DashboardRootState } from '@/stores/dashboard-store'
 import { useDispatch, useSelector } from 'react-redux'
 import { useMemo } from 'react'
@@ -19,6 +18,8 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useUpdateEffect } from '@/hooks/use-update-effect'
 import { setSort, type SortKey } from '@/stores/dashboard-slice'
+import { DashboardFilterSheet } from '../sheets/filter-sheet'
+import { cn } from '@/lib/utils'
 
 
 interface CarListFilterProps {
@@ -26,25 +27,25 @@ interface CarListFilterProps {
 }
 
 export function CarListFilter({ onResetFilters }: CarListFilterProps) {
-    const states = useSelector((state: DashboardRootState) => state.dashboard)
+    const states = useSelector((state: DashboardRootState) => state.dashboard);
 
-    const {sort, pagination} = states;
+    const { sort, pagination } = states;
 
-    const dispatch = useDispatch<DashboardDispatch>()
+    const dispatch = useDispatch<DashboardDispatch>();
 
-    const onChange = (value: SortForm) => dispatch(setSort(value.sort as SortKey))
+    const onSorted = (value: SortForm) => dispatch(setSort(value.sort as SortKey));
 
     const total = useMemo(() => {
         const formatted = pagination.total.toLocaleString('en-US')
         return `${formatted} Matches`
-      }, [pagination.total])
+    }, [pagination.total]);
 
     return (
         <div className='lg:pl-4 pr-2 space-y-2'>
             <Filter onResetFilters={onResetFilters} />
             <div className='flex items-center justify-between'>
                 <div className='text-xl font-bold text-black whitespace-nowrap'>{total}</div>
-                <Sort defaultValues={{ sort: sort }} onChange={onChange} />
+                <Sort defaultValues={{ sort: sort }} onChange={onSorted} />
             </div>
         </div>
     )
@@ -56,18 +57,18 @@ function Filter({ onResetFilters }: { onResetFilters?: () => void }) {
     const { setOpen } = useSearch();
 
     const isClear = useMemo(() => {
-        const initialValues = {
-            minPrice: '',
-            maxPrice: '',
-            selectedMakes: '',
-            selectedModels: '',
-            selectedTrims: '',
-            selectedBodyTypes: [],
-            selectedTransmission: 'All'
-        }
-        return !isEqual(values, initialValues)
-    }, [values])
+        const { minPrice, maxPrice, selectedMakes, selectedModels, selectedTrims, selectedBodyTypes, selectedTransmission } = values
 
+        return (
+            (minPrice && minPrice.trim() !== "") ||
+            (maxPrice && maxPrice.trim() !== "") ||
+            (selectedBodyTypes && selectedBodyTypes.length > 0) ||
+            (selectedMakes && selectedMakes.trim() !== "") ||
+            (selectedModels && selectedModels.trim() !== "") ||
+            (selectedTrims && selectedTrims.trim() !== "") ||
+            (selectedTransmission && selectedTransmission !== "All")
+        )
+    }, [values])
 
     return (
         <div className="h-9 flex items-center justify-start">
@@ -85,27 +86,24 @@ function Filter({ onResetFilters }: { onResetFilters?: () => void }) {
                     orientation="vertical"
                 />
 
-                <button
-                    className="flex items-center gap-1"
-                >
-                    <FilterIcon color="#ff821c" aria-hidden="true" size={18} />
-                    <br />
-                    <span className="text-lg text-muted-foreground hover:underline transition-all duration-200">Filter</span>
-                </button>
+                <DashboardFilterSheet />
 
-                <Separator
-                    className="bg-border h-full mr-4"
-                    orientation="vertical"
-                />
+
             </div>
 
             {isClear && (
-                <button
-                    className="text-lg text-blue-400 hover:underline transition-all duration-200"
-                    onClick={() => onResetFilters?.()}
-                >
-                    Clear Filters
-                </button>
+                <>
+                    <Separator
+                        className="bg-border h-full mx-4 lg:hidden items-center transition-all duration-200"
+                        orientation="vertical"
+                    />
+                    <button
+                        className="text-lg text-blue-400 hover:underline transition-all duration-200"
+                        onClick={onResetFilters}
+                    >
+                        Clear Filters
+                    </button>
+                </>
             )}
         </div>
     );
@@ -116,17 +114,23 @@ const formSchema = z.object({
     sort: z.enum(['relevance', 'price-asc', 'price-desc', 'year-desc', 'year-asc', 'mileage-asc', 'mileage-desc']),
 })
 
-type SortForm = z.infer<typeof formSchema>
+export type SortForm = z.infer<typeof formSchema>
 
-function Sort({ defaultValues = { sort: 'relevance' }, onChange }: { defaultValues?: Partial<SortForm>, onChange: (values: SortForm) => void }) {
+type SortProps = {
+    defaultValues?: Partial<SortForm>,
+    onChange: (values: SortForm) => void
+    className?: string
+}
+
+export function Sort({ className, defaultValues = { sort: 'relevance' }, onChange }: SortProps) {
     const form = useForm<SortForm>({
         resolver: zodResolver(formSchema),
         defaultValues: defaultValues,
-    })
+    });
 
     const values = useWatch<SortForm>({
         control: form.control,
-    })
+    });
 
     const sortOptions = [
         { label: 'Relevance', value: 'relevance' },
@@ -136,29 +140,34 @@ function Sort({ defaultValues = { sort: 'relevance' }, onChange }: { defaultValu
         { label: 'Year - Oldest', value: 'year-asc' },
         { label: 'Mileage - Lowest', value: 'mileage-asc' },
         { label: 'Mileage - Highest', value: 'mileage-desc' },
-    ]
+    ];
 
     useUpdateEffect(() => {
         onChange(form.getValues())
-    }, [values])
-
+    }, [values]);
 
     return (
         <Form {...form}>
             <form
-                className='flex w-full justify-end items-center'
+                className={cn(
+                    'flex justify-end items-center',
+                    className
+                )}
             >
                 <FormField
                     control={form.control}
                     name='sort'
                     render={({ field }) => (
-                        <FormItem className='gap-0'>
+                        <FormItem>
                             <FormControl>
                                 <SelectDropdown
                                     defaultValue={field.value}
                                     onValueChange={field.onChange}
                                     items={sortOptions}
-                                    className='text-sm'
+                                    className={cn(
+                                        'text-sm',
+                                        className
+                                    )}
                                     prefix={
                                         <FormLabel className=''>Sort By:</FormLabel>
                                     }

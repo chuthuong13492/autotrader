@@ -115,7 +115,7 @@ export const dashboardSlice = createSlice({
         state.search = action.payload.search;
       }
       if (action.payload.values !== undefined) {
-        state.values = { ...state.values, ...action.payload.values };
+        state.values = action.payload.values;
       }
       if (action.payload.sort !== undefined) {
         state.sort = action.payload.sort;

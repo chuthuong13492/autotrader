@@ -1,7 +1,7 @@
 import { type Control } from 'react-hook-form'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
-import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
+import { FormControl, FormField, FormItem } from '@/components/ui/form'
 import { bodyTypeFilterData } from '../../data/filter-data'
 import type { FormData } from '../dashboard-filter'
 import { cn } from '@/lib/utils'
@@ -17,7 +17,6 @@ export function BodyTypeFilter({ control, className }: BodyTypeFilterProps) {
             "space-y-3",
             className
         )}>
-            <FormLabel className="text-sm font-medium">Body Type</FormLabel>
             <FormField
                 control={control}
                 name="selectedBodyTypes"

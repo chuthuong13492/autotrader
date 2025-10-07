@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
-import { Link } from '@tanstack/react-router'
+import { MobileNavigation } from './mobile-navigation'
+import { Link } from 'lucide-react'
+import { type DashboardDispatch } from '@/stores/dashboard-store'
+import { useDispatch } from 'react-redux'
+import { filterPage } from '@/stores/dashboard-slice'
 
 type HeaderProps = React.HTMLAttributes<HTMLElement> & {
   fixed?: boolean
@@ -46,12 +50,31 @@ export function Header({ className, fixed, children, ...props }: HeaderProps) {
           'after:bg-background/20 after:absolute after:inset-0 after:-z-10 after:backdrop-blur-lg'
         )}
       >
-        <Link className="header-brand" to="/" aria-label="Find Cars for Sale at Autotrader">
-          <img className="display-none display-lg-block" src="//www.autotrader.com/cm-api/content/static/img/icon/logos/atc-logo-blue.svg" width="139" height="38" title="Autotrader Used Cars For Sale - New Cars For Sale - SUVs And Trucks For Sale" alt="Autotrader Logo" loading="eager" />
-        </Link>
+        <Prefix />
         {children}
       </div>
     </header>
   )
 }
 
+
+function Prefix() {
+  const dispatch = useDispatch<DashboardDispatch>()
+
+  const onClick = () => dispatch(filterPage({}));
+  return (
+    <>
+      {/* HAMBURGER MENU*/}
+      <MobileNavigation />
+      {/* LOGO */}
+      <Link className="header-brand" onClick={onClick} to="/" aria-label="Find Cars for Sale at Autotrader">
+        <img
+          src="https://www.autotrader.com/cm-api/content/static/img/icon/logos/atc-logo-blue.svg"
+          width="139"
+          height="38"
+          alt="Autotrader Logo"
+        />
+      </Link>
+    </>
+  )
+}

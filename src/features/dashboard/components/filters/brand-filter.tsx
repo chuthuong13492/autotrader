@@ -14,12 +14,9 @@ interface BrandFilterProps {
 export function BrandFilter({ control, className }: BrandFilterProps) {
   return (
     <div className={cn("space-y-4", className)}>
-      <FormLabel className="text-sm font-medium ">Brand</FormLabel>
-      <div className="space-y-4 text-black">
-        <MakeSelect control={control} />
-        <ModelSelect control={control} />
-        <TrimSelect control={control} />
-      </div>
+      <MakeSelect control={control} />
+      <ModelSelect control={control} />
+      <TrimSelect control={control} />
     </div>
   )
 }
@@ -114,9 +111,9 @@ function ModelSelect({ control }: { control: Control<FormData> }) {
               }}
               placeholder='Select model'
               items={(selectedMakes
-                  ? brandFilterData.models[selectedMakes as keyof typeof brandFilterData.models] ?? []
-                  : []
-                ).map((model) => ({ label: model, value: model }))}
+                ? brandFilterData.models[selectedMakes as keyof typeof brandFilterData.models] ?? []
+                : []
+              ).map((model) => ({ label: model, value: model }))}
             />
           </FormControl>
         </FormItem>
@@ -144,7 +141,7 @@ function TrimSelect({ control }: { control: Control<FormData> }) {
         <FormItem>
           <div className="flex items-center justify-between">
             <FormLabel className="text-xs text-muted-foreground">Trim</FormLabel>
-              {selectedTrims && selectedTrims.length > 0 && <ClearButton onClick={() => {
+            {selectedTrims && selectedTrims.length > 0 && <ClearButton onClick={() => {
               reset({
                 ...getValues(),
                 selectedTrims: '',
@@ -152,16 +149,16 @@ function TrimSelect({ control }: { control: Control<FormData> }) {
             }} />}
           </div>
           <FormControl>
-          <SelectDropdown
+            <SelectDropdown
               defaultValue={field.value ?? ''}
               onValueChange={(value) => {
                 field.onChange(value)
               }}
               placeholder='Select trim'
               items={(selectedModels
-                  ? brandFilterData.trims[selectedModels as keyof typeof brandFilterData.trims] ?? []
-                  : []
-                ).map((trim) => ({ label: trim, value: trim }))}
+                ? brandFilterData.trims[selectedModels as keyof typeof brandFilterData.trims] ?? []
+                : []
+              ).map((trim) => ({ label: trim, value: trim }))}
             />
           </FormControl>
         </FormItem>
