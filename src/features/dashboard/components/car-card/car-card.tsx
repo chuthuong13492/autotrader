@@ -21,7 +21,7 @@ export function CarCard({ car, className }: CarCardProps) {
     return (
         <div 
             className={cn(
-                "rounded-md shadow hover:shadow-md cursor-pointer transition-shadow",
+                "rounded-md shadow hover:shadow-md cursor-pointer transition-all duration-300 ease-out",
                 className,
             )}
             onClick={handleClick}

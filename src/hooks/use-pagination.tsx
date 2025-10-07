@@ -242,14 +242,28 @@ export function usePagination<T>({
                 renderSeparator={renderSeparator}
                 renderLoadingMore={renderLoadingMore}
                 renderSubsequentPageError={renderSubsequentPageError}
-                renderEnd={renderEnd as RenderEndFn}
+                renderEnd={renderEnd}
                 onCheckLoadMore={checkLoadMore}
                 onRetryLoadMore={handleLoadMore}
             />
         );
     }
 
-
+    function renderPagedItemWithNoState(index: number): React.ReactNode {
+        return (
+            <PagedItem
+                key={itemKey(pagination.list[index])}
+                index={index}
+                pagination={pagination}
+                status={status}
+                itemKey={itemKey}
+                renderItem={renderItem}
+                renderSeparator={renderSeparator}
+                onCheckLoadMore={checkLoadMore}
+                onRetryLoadMore={handleLoadMore}
+            />
+        );
+    }
 
     // Kết quả trả về cho component sử dụng
     return {
@@ -259,6 +273,7 @@ export function usePagination<T>({
         handleRefresh,
         handleLoadMore,
         renderPagedItem,
+        renderPagedItemWithNoState,
         updatePagination,
         updateStatus,
     };
@@ -280,7 +295,7 @@ interface PagedItemProps<T> {
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
-function PagedItemComponent<T>({
+function PagedItem<T>({
     index,
     pagination,
     status,
@@ -336,14 +351,3 @@ function PagedItemComponent<T>({
         </div>
     );
 };
-
-function areEqual<T>(prev: PagedItemProps<T>, next: PagedItemProps<T>) {
-    return (
-        prev.index === next.index &&
-        prev.status === next.status &&
-        prev.pagination.list[prev.index] === next.pagination.list[next.index] &&
-        prev.pagination.error === next.pagination.error
-    );
-}
-
-const PagedItem = React.memo(PagedItemComponent, areEqual) as typeof PagedItemComponent;

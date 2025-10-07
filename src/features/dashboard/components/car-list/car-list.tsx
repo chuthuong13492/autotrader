@@ -1,4 +1,4 @@
-import { PagedList, type PagedListRef } from '@/components/layout/pagination/paged-list'
+
 import { type Car } from '@/features/dashboard/data/mock-data'
 import { CarCard } from '../car-card/car-card'
 import { CarCardLoading } from '../car-card/car-card-loading'
@@ -7,34 +7,44 @@ import { type DashboardDispatch, type DashboardRootState } from '@/stores/dashbo
 import { fetchPage } from '@/stores/dashboard-slice'
 import { useRef } from 'react'
 import { useUpdateEffect } from '@/hooks/use-update-effect'
+import { PagedGrid, type PagedGridRef } from '@/components/layout/pagination/paged-grid'
+import { Loader } from 'lucide-react'
 
 export function CarList() {
     const dispatch = useDispatch<DashboardDispatch>()
 
     const state = useSelector((state: DashboardRootState) => state.dashboard)
 
-    const pagedListRef = useRef<PagedListRef<Car>>(null)
+    const pagedListRef = useRef<PagedGridRef<Car>>(null)
 
     useUpdateEffect(() => {
         pagedListRef.current?.updatePagination(state.pagination)
     }, [state.pagination])
 
     return (
-        <PagedList<Car>
-            className="lg:pl-4 pr-2 pt-3 pb-2 grid grid-cols-1 gap-x-4 w-full md:grid-cols-2 lg:grid-cols-4"
+        <PagedGrid<Car>
+            className="lg:pl-4 pr-2 pt-3 pb-2"
             ref={pagedListRef}
+            hasScrollBar={false}
+            rowCount={4}
             itemKey={(item) => item.id}
             onInitial={() => dispatch(fetchPage(1)).unwrap()}
             onRefresh={() => dispatch(fetchPage(1)).unwrap()}
             onLoadMore={(nextPage) => dispatch(fetchPage(nextPage)).unwrap()}
             loadingFirstPageBuilder={() => (
                 <div className="pl-4 pr-2 pt-3 grid grid-cols-1 gap-4 w-full md:grid-cols-2 lg:grid-cols-4">
-                    {Array.from({ length: 8 }).map((_, idx) => (
+                    {Array.from({ length: 12 }).map((_, idx) => (
                         <CarCardLoading key={idx} />
                     ))}
                 </div>
             )}
-            loadingMoreBuilder={() => <CarCardLoading />}
+            loadingMoreBuilder={() => (
+                <div className='flex w-full items-center justify-center gap-2 py-4'>
+                    <Loader className='h-5 w-5 animate-spin' />
+                    {'  '}
+                    Loading...
+                </div>
+            )}
             firstPageErrorBuilder={(error, onRetry) => (
                 <div className="p-4 text-center">
                     <div className="mb-2 text-destructive">{error ?? 'Có lỗi xảy ra'}</div>
@@ -50,11 +60,18 @@ export function CarList() {
             separatorBuilder={() => (
                 <div className="h-4" />
             )}
-            itemBuilder={(_, car) => (
-                <CarCard car={car} />
+            itemBuilder={(index, car) => (
+                <div 
+                    className="animate-in fade-in-0 slide-in-from-bottom-4"
+                    style={{
+                        animationDelay: `${index * 20}ms`,
+                        animationDuration: '150ms',
+                        animationFillMode: 'both'
+                    }}
+                >
+                    <CarCard car={car} />
+                </div>
             )}
-
-            hasScrollBar={false}
         />
     )
 }
