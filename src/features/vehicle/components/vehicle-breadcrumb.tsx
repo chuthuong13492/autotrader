@@ -9,7 +9,7 @@ export function VehicleBreadcrumb() {
     // Find the vehicle by ID
     const vehicle = ALL_CARS.find(car => car.id === id)
     return (
-        <div className='pl-2 mb-4 flex items-center justify-between space-y-2'>
+        <div className='pl-2 flex items-center justify-between'>
             <DynamicBreadcrumb lastItem={{ label: `${vehicle?.make} ${vehicle?.model}` }} />
         </div>
     )

@@ -33,9 +33,10 @@ type PagedGridProps<T> = {
     onInitial: UsePaginationOptions<T>['onInitial'];
     onRefresh: UsePaginationOptions<T>['onRefresh'];
     onLoadMore: UsePaginationOptions<T>['onLoadMore'];
-    hasScrollBar: boolean,
+    hasScrollBar?: boolean,
     invisibleItemsThreshold?: number;
-    rowCount: number;
+    rowCount?: number;
+    orientation?: 'vertical' | 'horizontal'
 };
 
 function InnerPagedGrid<T>(
@@ -60,6 +61,7 @@ function InnerPagedGrid<T>(
         invisibleItemsThreshold,
         hasScrollBar = false,
         rowCount = 4,
+        orientation = 'vertical',
     } = props;
 
     const {
@@ -98,7 +100,17 @@ function InnerPagedGrid<T>(
 
     // --- Xử lý build các trạng thái ---
     if (status === PaginationStatus.LOADING_FIRST_PAGE) {
-        return <>{loadingFirstPageBuilder ? loadingFirstPageBuilder() : <div>Loading...</div>}</>;
+        return loadingFirstPageBuilder &&
+            <ScrollArea orientation={orientation} hasScrollbar={false}>
+                <div
+                    className={cn(
+                        `grid grid-cols-1 gap-x-4 w-full md:grid-cols-2 lg:grid-cols-${rowCount}`,
+                        className,
+                    )}>
+                    {loadingFirstPageBuilder()}
+                </div>
+            </ScrollArea>;
+            
     }
 
     if (status === PaginationStatus.FIRST_PAGE_ERROR) {

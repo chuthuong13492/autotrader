@@ -1,7 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import {
-  copyPagination,
+  copyWithPagination,
   type Pagination,
 } from "@/components/layout/data/pagination";
 import isEqual from "lodash/isEqual";
@@ -81,7 +81,7 @@ export function updatePage<T>(
     }
   });
 
-  return copyPagination(pagination, {
+  return copyWithPagination(pagination, {
     list: updatedList,
     page: newPagination.page,
     pageSize: newPagination.pageSize,
@@ -89,4 +89,12 @@ export function updatePage<T>(
     total: newPagination.total,
     error: newPagination.error,
   });
+}
+
+// Utility function to create copyWith pattern
+export function copyWith<T extends Record<string, unknown>>(
+  original: T,
+  updates: Partial<T>
+): T {
+  return { ...original, ...updates };
 }

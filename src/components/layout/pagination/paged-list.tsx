@@ -2,6 +2,7 @@ import React, { forwardRef, useImperativeHandle } from 'react';
 import { usePagination, PaginationStatus, type UsePaginationOptions } from '@/hooks/use-pagination';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { type Pagination } from '../data/pagination';
+import { cn } from '@/lib/utils';
 
 // --- Các kiểu builder ---
 type EmptyBuilder = () => React.ReactNode;
@@ -32,8 +33,9 @@ type PagedListProps<T> = {
   onInitial: UsePaginationOptions<T>['onInitial'];
   onRefresh: UsePaginationOptions<T>['onRefresh'];
   onLoadMore: UsePaginationOptions<T>['onLoadMore'];
-  hasScrollBar: boolean,
+  hasScrollBar?: boolean,
   invisibleItemsThreshold?: number;
+  orientation?: 'vertical' | 'horizontal'
 };
 
 function InnerPagedList<T>(
@@ -57,6 +59,7 @@ function InnerPagedList<T>(
     pagination,
     invisibleItemsThreshold,
     hasScrollBar = false,
+    orientation = 'vertical',
   } = props;
 
   const {
@@ -94,7 +97,14 @@ function InnerPagedList<T>(
 
   // --- Xử lý build các trạng thái ---
   if (status === PaginationStatus.LOADING_FIRST_PAGE) {
-    return <>{loadingFirstPageBuilder ? loadingFirstPageBuilder() : <div>Loading...</div>}</>;
+    return loadingFirstPageBuilder && <ScrollArea orientation={orientation} hasScrollbar={false}>
+      <div className={cn(
+        `${orientation === 'horizontal' ? "flex" : ''}`,
+        className
+      )}>
+        {loadingFirstPageBuilder()}
+      </div>
+    </ScrollArea>;
   }
   if (status === PaginationStatus.FIRST_PAGE_ERROR) {
     return (
@@ -110,11 +120,14 @@ function InnerPagedList<T>(
   }
 
   return (
-    <ScrollArea hasScrollbar={hasScrollBar}>
-      <div className={className}>
+    <ScrollArea orientation={orientation} hasScrollbar={hasScrollBar}>
+      <div className={cn(
+        `${orientation === 'horizontal' ? "flex" : ''}`,
+        className
+      )}>
         {statePagination.list.map((item: T, index: number) => (
           <React.Fragment key={itemKey(item)}>
-            {renderPagedItem(index)}
+            {renderPagedItem(index, orientation === 'horizontal' ? 'flex' : undefined)}
           </React.Fragment>
         ))}
       </div>

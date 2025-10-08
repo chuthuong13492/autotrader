@@ -43,6 +43,18 @@ export function VehicleDetailForm() {
     });
 
     const onSubmit = (data: QuestionFormData) => {
+        // Custom phone validation chỉ khi submit
+        if (data.phone && data.phone.trim() !== '') {
+            const phoneRegex = /^[+]?1?[\s\-.]?[(]?[0-9]{3}[)]?[\s\-.]?[0-9]{3}[\s\-.]?[0-9]{4}$/;
+            if (!phoneRegex.test(data.phone)) {
+                form.setError('phone', {
+                    type: 'manual',
+                    message: 'Please enter a valid phone number (e.g., (123) 456-7890)'
+                });
+                return;
+            }
+        }
+
         // Handle form submission here
         // eslint-disable-next-line no-console
         console.log("Form submitted:", data);

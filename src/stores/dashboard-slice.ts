@@ -8,6 +8,7 @@ import { applyFilters } from "@/features/dashboard/data/filter-data";
 import { ALL_CARS, type Car } from "@/features/dashboard/data/mock-data";
 import {
   type Pagination,
+  copyWithPagination,
   emptyPagination,
 } from "@/components/layout/data/pagination";
 import { updatePage, delay } from "@/lib/utils";
@@ -67,7 +68,6 @@ export interface DashboardState {
   search?: string;
   sort: SortKey;
   pagination: Pagination<Car>;
-  isEmpty: boolean | null;
 }
 
 export const initialState: DashboardState = {
@@ -83,7 +83,6 @@ export const initialState: DashboardState = {
     selectedTransmission: "All",
   },
   pagination: emptyPagination(),
-  isEmpty: null
 };
 
 export const dashboardSlice = createSlice({
@@ -103,8 +102,6 @@ export const dashboardSlice = createSlice({
       );
 
       state.pagination = paginationResult;
-
-      state.isEmpty = paginationResult.total === 0
 
       // eslint-disable-next-line no-console
       console.log("Set sort", state.pagination);
@@ -143,8 +140,6 @@ export const dashboardSlice = createSlice({
 
       state.pagination = paginationResult;
 
-      state.isEmpty = paginationResult.total === 0
-
       // eslint-disable-next-line no-console
       console.log("filterPage", state.pagination);
     },
@@ -153,9 +148,14 @@ export const dashboardSlice = createSlice({
     builder.addCase(fetchPage.fulfilled, (state, action) => {
       state.pagination = action.payload;
 
-      state.isEmpty = action.payload.total === 0
       // eslint-disable-next-line no-console
       console.log("fetchPage", action.payload);
+    });
+    builder.addCase(getSimilarCars.fulfilled, (state, action) => {
+      state.pagination = action.payload;
+
+      // eslint-disable-next-line no-console
+      console.log("getSimilarCars", action.payload);
     });
   },
 });
@@ -181,5 +181,37 @@ export const fetchPage = createAsyncThunk(
   }
 );
 
-export const { setSort, setSearch, setState, filterPage, setForm } = dashboardSlice.actions;
+export const getSimilarCars = createAsyncThunk(
+  "dashboard/getSimilarCarsById",
+  async ({ page, id }: { page: number; id?: string }, { getState }) => {
+    await delay(2000);
+
+    const state = getState() as { dashboard: DashboardState };
+
+    const vehicle = ALL_CARS.find((car) => car.id === id);
+
+    debugger;
+
+    if(!vehicle){
+      return copyWithPagination(state.dashboard.pagination, { error: "Vehicle not found" })
+    }
+
+    // Apply filters and pagination
+    const paginationResult = getPagination(
+      ALL_CARS,
+      {
+        selectedMakes: vehicle?.make,
+      },
+      state.dashboard.search ?? "",
+      state.dashboard.sort,
+      page,
+      10 // pageSize
+    );
+
+    return updatePage(state.dashboard.pagination, paginationResult);
+  }
+);
+
+export const { setSort, setSearch, setState, filterPage, setForm } =
+  dashboardSlice.actions;
 export default dashboardSlice.reducer;

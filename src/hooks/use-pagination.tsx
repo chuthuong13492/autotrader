@@ -237,7 +237,7 @@ export function usePagination<T>({
     // -------------------
     // BUILDER: render item theo trạng thái
     // -------------------
-    function renderPagedItem(index: number): React.ReactNode {
+    function renderPagedItem(index: number, itemClassName?: string): React.ReactNode {
         return (
             <PagedItem
                 key={itemKey(pagination.list[index])}
@@ -252,11 +252,12 @@ export function usePagination<T>({
                 renderEnd={renderEnd}
                 onCheckLoadMore={checkLoadMore}
                 onRetryLoadMore={handleLoadMore}
+                className={itemClassName}
             />
         );
     }
 
-    function renderPagedItemWithNoState(index: number): React.ReactNode {
+    function renderPagedItemWithNoState(index: number, itemClassName?: string): React.ReactNode {
         return (
             <PagedItem
                 key={itemKey(pagination.list[index])}
@@ -268,6 +269,7 @@ export function usePagination<T>({
                 renderSeparator={renderSeparator}
                 onCheckLoadMore={checkLoadMore}
                 onRetryLoadMore={handleLoadMore}
+                className={itemClassName}
             />
         );
     }
@@ -299,6 +301,7 @@ interface PagedItemProps<T> {
     renderEnd?: () => React.ReactNode;
     onCheckLoadMore: (index: number) => void;
     onRetryLoadMore: () => void;
+    className?: string;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -314,6 +317,7 @@ function PagedItem<T>({
     renderEnd,
     onCheckLoadMore,
     onRetryLoadMore,
+    className,
 }: PagedItemProps<T>) {
     const itemData = pagination.list[index];
 
@@ -335,7 +339,7 @@ function PagedItem<T>({
     const isLastItem = index === pagination.list.length - 1;
 
     return (
-        <div ref={ref} key={itemKey(itemData)}>
+        <div ref={ref} key={itemKey(itemData)} className={className}>
             {item}
 
             {renderSeparator?.({ index, data: itemData })}
