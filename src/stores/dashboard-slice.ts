@@ -190,8 +190,6 @@ export const getSimilarCars = createAsyncThunk(
 
     const vehicle = ALL_CARS.find((car) => car.id === id);
 
-    debugger;
-
     if(!vehicle){
       return copyWithPagination(state.dashboard.pagination, { error: "Vehicle not found" })
     }
