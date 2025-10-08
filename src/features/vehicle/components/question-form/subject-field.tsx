@@ -1,6 +1,14 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+
+import { FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import type { Control } from "react-hook-form";
+import { SelectDropdown } from "@/components/select-dropdown";
+
+const SUBJECT_OPTIONS = [
+    { label: "This Vehicle's Availability", value: "This Vehicle's Availability" },
+    { label: "More Information", value: "More Information" },
+    { label: "Schedule a Test Drive", value: "Schedule a Test Drive" },
+    { label: "Vehicle History Report", value: "Vehicle History Report" },
+];
 
 interface SubjectFieldProps {
     control: Control<{
@@ -23,20 +31,13 @@ export function SubjectField({ control }: SubjectFieldProps) {
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>Subject</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a subject" />
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                <SelectItem value="This Vehicle's Availability">This Vehicle's Availability</SelectItem>
-                                <SelectItem value="Vehicle Information">Vehicle Information</SelectItem>
-                                <SelectItem value="Financing Options">Financing Options</SelectItem>
-                                <SelectItem value="Test Drive">Test Drive</SelectItem>
-                                <SelectItem value="Other">Other</SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <SelectDropdown
+                            defaultValue={field.value}
+                            onValueChange={field.onChange}
+                            items={SUBJECT_OPTIONS}
+                            className="text-sm w-full"
+                        />
+
                         <FormMessage />
                     </FormItem>
                 )}
