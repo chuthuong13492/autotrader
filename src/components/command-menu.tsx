@@ -42,7 +42,7 @@ export function CommandMenu() {
   const onValueChange = useDebouncedCallback((e) => {
     setQuery(e);
     dispatch(filterPage({}))
-  }, 300)
+  }, 500)
 
   const onSelect = (e: string) => {
     setQuery(e)

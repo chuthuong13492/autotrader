@@ -1,4 +1,4 @@
-import React, { useImperativeHandle, forwardRef, useEffect, useRef } from 'react'
+import React, { useImperativeHandle, forwardRef, useEffect, useRef, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { useDebouncedCallback } from 'use-debounce'
 import { ChevronDown } from 'lucide-react'
@@ -87,13 +87,14 @@ export const DashboardFilter = forwardRef<FilterRef, DashboardFilterProps>((prop
         searchValue: string
     };
 
+    const [loading, setLoading] = useState(true)
     const stateRef = useRef<LoaderStateRef>({
         loading: true,
         defaultValues: { ...initialValues },
     })
 
     useEffect(() => {
-        stateRef.current.loading = true
+        setLoading(true)
         const nextDefaults: Partial<FormData> = {
             minPrice: loader.formData?.minPrice !== undefined ? String(loader.formData.minPrice) : '',
             maxPrice: loader.formData?.maxPrice !== undefined ? String(loader.formData.maxPrice) : '',
@@ -104,12 +105,12 @@ export const DashboardFilter = forwardRef<FilterRef, DashboardFilterProps>((prop
             selectedTransmission: (loader.formData?.selectedTransmission as FilterTransmissionType) ?? 'All',
         }
         stateRef.current.defaultValues = { ...stateRef.current.defaultValues, ...nextDefaults } as FormData
-        stateRef.current.loading = false
+        setLoading(false)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
 
-    return stateRef.current.loading ? (
+    return loading ? (
         <Card className={cn("hidden w-full max-w-[16rem] shrink-0 self-start lg:block p-0", props.className)}>
             {Array.from({ length: 6 }).map((_, idx) => (
                 <React.Fragment key={idx}>
