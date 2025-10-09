@@ -45,10 +45,12 @@ export function CarListFilter({ onResetFilters, onSortChange }: CarListFilterPro
     }, [pagination.total]);
 
     return (
-        <div className='lg:pl-4 pr-2 flex items-center justify-start'>
+        <div className='lg:pl-4 pr-2 flex flex-col lg:flex-row items-start lg:items-center justify-start gap-2 lg:gap-0'>
             <Filter onResetFilters={onResetFilters} />
             <div className='w-full flex items-center justify-between'>
-                <div className='text-xl font-bold text-black whitespace-nowrap'>{total}</div>
+                <div className="text-base md:text-lg lg:text-xl font-bold text-black whitespace-nowrap">
+                    {total}
+                </div>
                 <Sort defaultValues={{ sort: sort }} onChange={onSorted} />
             </div>
         </div>
@@ -75,8 +77,8 @@ function Filter({ onResetFilters }: { onResetFilters?: () => void }) {
     }, [values])
 
     return (
-        <div className="h-9 flex items-center justify-start space-x-4">
-            <div className="flex lg:hidden space-x-4 h-full items-center gap-1 transition-all duration-200">
+        <div className="h-9 flex items-center justify-start">
+            <div className="flex lg:hidden space-x-4 h-full items-center gap-1 transition-all duration-200 pr-4">
                 <SearchIcon
                     aria-hidden="true"
                     className="text-muted-foreground cursor-pointer"
@@ -106,7 +108,7 @@ function Filter({ onResetFilters }: { onResetFilters?: () => void }) {
                         Clear Filters
                     </button>
                     <Separator
-                        className="bg-border h-full"
+                        className="hidden lg:flex  bg-border h-full"
                         orientation="vertical"
                     />
                 </div>
