@@ -80,7 +80,7 @@ export function CommandMenu() {
     <CommandDialog modal open={state.open} onOpenChange={setOpen}>
       <CommandInput
         placeholder='Type vehicle brands/models or search...'
-        onValueChange={(e) => {
+        onSubmit={(e) => {
           onValueChange(e)
         }}
       />
