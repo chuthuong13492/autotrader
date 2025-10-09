@@ -8,20 +8,17 @@ import { fetchPage } from '@/stores/dashboard-slice'
 import { PagedGrid } from '@/components/layout/pagination/paged-grid'
 import { Loader } from 'lucide-react'
 import { SuggestionList } from './suggestion-list'
-import { useMemo } from 'react'
 
 export function CarList() {
     const dispatch = useDispatch<DashboardDispatch>();
 
     const state = useSelector((state: DashboardRootState) => state.dashboard);
 
-    const pagination = useMemo(()=> state.pagination, [state.pagination]);
-
     return (
         <PagedGrid<Car>
             className="lg:pl-4 pr-2 pt-3 pb-2"
             itemKey={(item) => item.id}
-            pagination={pagination}
+            pagination={state.pagination}
             onInitial={() => dispatch(fetchPage(1)).unwrap()}
             onRefresh={() => dispatch(fetchPage(1)).unwrap()}
             onLoadMore={(nextPage) => dispatch(fetchPage(nextPage)).unwrap()}

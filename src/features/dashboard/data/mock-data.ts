@@ -17,9 +17,71 @@ export type Car = {
 }
 
 
+export const CAR_IMAGES = [
+  "https://images.unsplash.com/photo-1503376780353-7e6692767b70",
+  "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d",
+  "https://images.unsplash.com/photo-1511910849309-0c5ed3b3e06c",
+  "https://images.unsplash.com/photo-1493238792000-8113da705763",
+  "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7",
+  "https://images.unsplash.com/photo-1485463611703-7ae3f26f0c42",
+  "https://images.unsplash.com/photo-1549924231-f129b911e442",
+  "https://images.unsplash.com/photo-1601933470928-cf53b1b7f3f2",
+  "https://images.unsplash.com/photo-1517948430535-1e246b1b5a9a",
+  "https://images.unsplash.com/photo-1519681393784-d120267933ba",
+  "https://images.unsplash.com/photo-1511910849309-0c5ed3b3e06c",
+  "https://images.unsplash.com/photo-1605184861740-5a64b57c6b12",
+  "https://images.unsplash.com/photo-1571607388263-1b121b7e9efc",
+  "https://images.unsplash.com/photo-1600718371414-ec1c8f56f25d",
+  "https://images.unsplash.com/photo-1525609004556-c46c7d6cf023",
+  "https://images.unsplash.com/photo-1570129477492-45c003edd2be",
+  "https://images.unsplash.com/photo-1600267165477-70e928b20b3d",
+  "https://images.unsplash.com/photo-1512499617640-c2f999098c1a",
+  "https://images.unsplash.com/photo-1502164980785-f8aa41d53611",
+  "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf",
+  "https://images.unsplash.com/photo-1542365887-7e3d89ef8f96",
+  "https://images.unsplash.com/photo-1549921296-3d5a6e1c7f45",
+  "https://images.unsplash.com/photo-1552519507-da3b142c6e3d",
+  "https://images.unsplash.com/photo-1503731982160-7fbe3a3a9b8f",
+  "https://images.unsplash.com/photo-1601933470928-cf53b1b7f3f2",
+  "https://images.unsplash.com/photo-1571607388263-1b121b7e9efc",
+  "https://images.unsplash.com/photo-1502164980785-f8aa41d53611",
+  "https://images.unsplash.com/photo-1600700159871-45a35d7ab696",
+  "https://images.unsplash.com/photo-1502877338535-766e1452684a",
+  "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf",
+  "https://images.unsplash.com/photo-1542365887-7e3d89ef8f96",
+  "https://images.unsplash.com/photo-1563720223185-11003d516935",
+  "https://images.unsplash.com/photo-1600700159871-45a35d7ab696",
+  "https://images.unsplash.com/photo-1503376780353-7e6692767b70",
+  "https://images.unsplash.com/photo-1525609004556-c46c7d6cf023",
+  "https://images.unsplash.com/photo-1512499617640-c2f999098c1a",
+  "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d",
+  "https://images.unsplash.com/photo-1605184861740-5a64b57c6b12",
+  "https://images.unsplash.com/photo-1511910849309-0c5ed3b3e06c",
+  "https://images.unsplash.com/photo-1601933470928-cf53b1b7f3f2",
+  "https://images.unsplash.com/photo-1600718371414-ec1c8f56f25d",
+  "https://images.unsplash.com/photo-1600267165477-70e928b20b3d",
+  "https://images.unsplash.com/photo-1552519507-da3b142c6e3d",
+  "https://images.unsplash.com/photo-1512499617640-c2f999098c1a",
+  "https://images.unsplash.com/photo-1502877338535-766e1452684a",
+  "https://images.unsplash.com/photo-1600700159871-45a35d7ab696",
+  "https://images.unsplash.com/photo-1563720223185-11003d516935",
+  "https://images.unsplash.com/photo-1542365887-7e3d89ef8f96",
+  "https://images.unsplash.com/photo-1549921296-3d5a6e1c7f45",
+  "https://images.unsplash.com/photo-1503731982160-7fbe3a3a9b8f",
+  "https://images.unsplash.com/photo-1570129477492-45c003edd2be",
+  "https://images.unsplash.com/photo-1605184861740-5a64b57c6b12",
+  "https://images.unsplash.com/photo-1571607388263-1b121b7e9efc",
+  "https://images.unsplash.com/photo-1503376780353-7e6692767b70",
+  "https://images.unsplash.com/photo-1502164980785-f8aa41d53611",
+  "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf",
+  "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7",
+  "https://images.unsplash.com/photo-1485463611703-7ae3f26f0c42",
+  "https://images.unsplash.com/photo-1549924231-f129b911e442",
+  "https://images.unsplash.com/photo-1600267165477-70e928b20b3d",
+  "https://images.unsplash.com/photo-1517948430535-1e246b1b5a9a",
+];
 
-// ---------- Mock Cars (30 items => 5 pages x 6 each) ----------
-const IMG = (seed: number) => `https://picsum.photos/id/${seed}/306/408`
+export const IMG = (id: number) => CAR_IMAGES[(id - 1) % CAR_IMAGES.length];
 
 
 export const ALL_CARS: Car[] = [
@@ -88,7 +150,7 @@ export const ALL_CARS: Car[] = [
   { id: '58', year: 2024, make: 'Toyota', model: 'Corolla Cross', trim: 'LE', mileage: 3000, price: 26990, imageUrl: IMG(58), condition: 'Used', bodyType: 'SUV', transmission: 'Automatic', dealer: 'Livermore Toyota', badges: [] },
   { id: '59', year: 2018, make: 'Audi', model: 'A3', trim: 'Premium', mileage: 52000, price: 17990, imageUrl: IMG(59), condition: 'Used', bodyType: 'Sedan', transmission: 'Automatic', dealer: 'Euro Auto SF', badges: [] },
   { id: '60', year: 2022, make: 'Honda', model: 'HR-V', trim: 'EX', mileage: 11000, price: 22990, imageUrl: IMG(60), condition: 'Used', bodyType: 'SUV', transmission: 'Automatic', dealer: 'Livermore Honda', badges: [] },
-]
+];
 
 export const PAGE_SIZE = 20
 export const TOTAL = ALL_CARS.length

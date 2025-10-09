@@ -11,28 +11,19 @@ const searchSchema = z.object({
   selectedTrims: z.string().optional().catch(undefined),
   selectedBodyTypes: z.array(z.string()).optional().catch([]),
   selectedTransmission: z.string().optional().catch('All'),
-  sort: z.enum(['asc', 'desc']).optional().catch(undefined),
+  sort: z.enum([
+    'relevance',
+    'price-asc',
+    'price-desc',
+    'year-asc',
+    'year-desc',
+    'mileage-asc',
+    'mileage-desc'
+  ]).optional().catch('relevance'),
 })
 
 export const Route = createFileRoute('/_dashboard/search-result-page/')({
   validateSearch: searchSchema,
-  loaderDeps: ({ search }) => ({ search }),
-  staleTime: 5 * 60 * 1000, // 5 minutes: avoid flashing when navigating back
-  gcTime: 30 * 60 * 1000,   // keep in cache longer to improve back/forward UX
-  loader: async ({ deps: { search } }) => {
-    return {
-      formData: {
-        minPrice: search.minPrice,
-        maxPrice: search.maxPrice,
-        selectedMakes: search.selectedMakes,
-        selectedModels: search.selectedModels,
-        selectedTrims: search.selectedTrims,
-        selectedBodyTypes: search.selectedBodyTypes,
-        selectedTransmission: search.selectedTransmission,
-      },
-      searchValue: search.value ?? '',
-    }
-  },
+  shouldReload: false,
   component: Dashboard,
 })
-

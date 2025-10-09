@@ -164,7 +164,7 @@ export function usePagination<T>({
 
     useUpdateEffect(() => {
         if (initialPagination) {
-            dispatch({ type: "SET_PAGINATION", payload: initialPagination });
+            updatePagination(initialPagination);
         }
     }, [initialPagination]);
 
@@ -247,7 +247,7 @@ export function usePagination<T>({
         const isLastItem = index === pagination.list.length - 1;
         const itemData = pagination.list[index];
         return (
-            <React.Fragment key={itemKey(itemData)}>
+            <React.Fragment>
                 {renderSeparator?.({ index, data: itemData })}
                 {isLastItem && (() => {
                     switch (status) {

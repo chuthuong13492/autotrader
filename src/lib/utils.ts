@@ -28,7 +28,7 @@ export function sleep(ms: number = 1000) {
  */
 export function getPageNumbers(currentPage: number, totalPages: number) {
   const maxVisiblePages = 5; // Maximum number of page buttons to show
-  const rangeWithDots = [];
+  const rangeWithDots: (number | '...')[] = [];
 
   if (totalPages <= maxVisiblePages) {
     // If total pages is 5 or less, show all pages
@@ -44,20 +44,20 @@ export function getPageNumbers(currentPage: number, totalPages: number) {
       for (let i = 2; i <= 4; i++) {
         rangeWithDots.push(i);
       }
-      rangeWithDots.push("...", totalPages);
+      rangeWithDots.push('...', totalPages);
     } else if (currentPage >= totalPages - 2) {
       // Near the end: [1] ... [7] [8] [9] [10]
-      rangeWithDots.push("...");
+      rangeWithDots.push('...');
       for (let i = totalPages - 3; i <= totalPages; i++) {
         rangeWithDots.push(i);
       }
     } else {
       // In the middle: [1] ... [4] [5] [6] ... [10]
-      rangeWithDots.push("...");
+      rangeWithDots.push('...');
       for (let i = currentPage - 1; i <= currentPage + 1; i++) {
         rangeWithDots.push(i);
       }
-      rangeWithDots.push("...", totalPages);
+      rangeWithDots.push('...', totalPages);
     }
   }
 

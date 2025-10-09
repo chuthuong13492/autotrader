@@ -1,78 +1,68 @@
 import { Provider, useDispatch } from 'react-redux'
-import { useRef, useEffect } from 'react'
-import { createDashboardStore, type DashboardDispatch } from '@/stores/dashboard-store'
+import {  useEffect, useMemo } from 'react'
+import {  dashboardStore, type DashboardDispatch } from '@/stores/dashboard-store'
 import { type FilterTransmissionType } from '@/features/dashboard/components/dashboard-filter'
-import { useLoaderData } from '@tanstack/react-router'
-import { setState } from '@/stores/dashboard-slice'
+import { setState, type SortKey } from '@/stores/dashboard-slice'
+import { useStableLocation } from '@/hooks/use-stable-location'
 
 type DashboardDataLoaderProps = {
     children: React.ReactNode
 }
 
 export function DashboardDataLoader({ children }: DashboardDataLoaderProps) {
-    // const location = useLocation();
-
     const dispatch = useDispatch<DashboardDispatch>()
+    const { pathname, search } = useStableLocation()
 
-    const loader = useLoaderData({ from: '/_dashboard/search-result-page/' }) as {
-        formData: {
-            minPrice?: number | undefined
-            maxPrice?: number | undefined
-            selectedMakes?: string | undefined
-            selectedModels?: string | undefined
-            selectedTrims?: string | undefined
-            selectedBodyTypes?: string[] | undefined
-            selectedTransmission?: string | undefined
+    // Only process search params when we're on the search-result-page route
+    const isSearchResultPage = pathname.includes('/search-result-page')
+    
+    // Memoize the state update to prevent unnecessary dispatches
+    const stateUpdate = useMemo(() => {
+        if (!isSearchResultPage || !search) return null
+        return {
+            search: search.value ?? '',
+            values: {
+                minPrice: search.minPrice ?? '',
+                maxPrice: search.maxPrice ?? '',
+                selectedMakes: search.selectedMakes ?? '',
+                selectedModels: search.selectedModels ?? '',
+                selectedTrims: search.selectedTrims ?? '',
+                selectedBodyTypes: search.selectedBodyTypes ?? [],
+                selectedTransmission: (search.selectedTransmission as FilterTransmissionType) ?? 'All',
+            },
+            sort: (search.sort as SortKey) ?? 'relevance',
         }
-        searchValue: string
-    }
+    }, [search, isSearchResultPage])
 
     useEffect(() => {
-        dispatch(setState({
-            search: loader.searchValue ?? '',
-            values: {
-                minPrice: loader.formData?.minPrice !== undefined ? String(loader.formData.minPrice) : '',
-                maxPrice: loader.formData?.maxPrice !== undefined ? String(loader.formData.maxPrice) : '',
-                selectedMakes: loader.formData?.selectedMakes ?? '',
-                selectedModels: loader.formData?.selectedModels ?? '',
-                selectedTrims: loader.formData?.selectedTrims ?? '',
-                selectedBodyTypes: loader.formData?.selectedBodyTypes ?? [],
-                selectedTransmission: (loader.formData?.selectedTransmission as FilterTransmissionType) ?? 'All',
-            }
-        }))
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+        if (stateUpdate && isSearchResultPage) {
+            const { values, sort } = stateUpdate;
+            dispatch(setState({
+                search: stateUpdate.search ?? '',
+                sort: sort,
+                values: {
+                    minPrice: values.minPrice !== undefined ? String(values.minPrice) : '',
+                    maxPrice: values.maxPrice !== undefined ? String(values.maxPrice) : '',
+                    selectedMakes: values.selectedMakes ?? '',
+                    selectedModels: values.selectedModels ?? '',
+                    selectedTrims: values.selectedTrims ?? '',
+                    selectedBodyTypes: values?.selectedBodyTypes ?? [],
+                    selectedTransmission: (values.selectedTransmission as FilterTransmissionType) ?? 'All',
+                }
+            }))
+        }
+    }, [stateUpdate, isSearchResultPage, dispatch])
 
-    return <>{children}</>
+    return children
 }
 
 type DashboardProviderProps = {
     children: React.ReactNode
 }
 
-
 export function DashboardProvider({ children }: DashboardProviderProps) {
-    const storeRef = useRef(
-        createDashboardStore({
-            dashboard: {
-                search: '',
-                values: {
-                    minPrice: '',
-                    maxPrice: '',
-                    selectedMakes: '',
-                    selectedModels: '',
-                    selectedTrims: '',
-                    selectedBodyTypes: [],
-                    selectedTransmission: 'All' as FilterTransmissionType,
-                },
-            }
-        })
-    )
-
-    const store = storeRef.current
-
     return (
-        <Provider store={store}>
+        <Provider store={dashboardStore}>
             {children}
         </Provider>
     )

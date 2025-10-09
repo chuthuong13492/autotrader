@@ -1,4 +1,4 @@
-import React, { useImperativeHandle, forwardRef, useEffect, useRef } from 'react'
+import { useImperativeHandle, forwardRef } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { useDebouncedCallback } from 'use-debounce'
 import { ChevronDown } from 'lucide-react'
@@ -18,12 +18,9 @@ import type { TransmissionType } from '../data/mock-data'
 import { useUpdateEffect } from '@/hooks/use-update-effect'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useLoaderData } from '@tanstack/react-router'
 import isEqual from "lodash/isEqual"
-import { type DashboardRootState } from '@/stores/dashboard-store'
-import { useSelector } from 'react-redux'
 import { cn } from '@/lib/utils'
-import { FilterLoading } from './filters/filter-loading'
+import { useStableLocation } from '@/hooks/use-stable-location'
 interface DashboardFilterProps {
     onFilterChange?: (formData: Partial<FormData>) => void
     className?: string
@@ -66,62 +63,29 @@ const initialValues: FormData = {
 }
 export interface FilterRef {
     reset: () => void
-}
-
-type LoaderStateRef = {
-    loading: boolean
-    defaultValues: FormData
+    submit: () => void
 }
 
 export const DashboardFilter = forwardRef<FilterRef, DashboardFilterProps>((props, ref) => {
-    const loader = useLoaderData({ from: '/_dashboard/search-result-page/' }) as {
-        formData: {
-            minPrice?: number | undefined
-            maxPrice?: number | undefined
-            selectedMakes?: string | undefined
-            selectedModels?: string | undefined
-            selectedTrims?: string | undefined
-            selectedBodyTypes?: string[] | undefined
-            selectedTransmission?: string | undefined
-        }
-        searchValue: string
-    };
+    // Get search params from stable location
+    const { pathname, search } = useStableLocation();
+    const isSearchResultPage = pathname.includes('/search-result-page');
 
-    const stateRef = useRef<LoaderStateRef>({
-        loading: true,
-        defaultValues: { ...initialValues },
-    })
+    // Convert search params to form default values
+    const defaultValues: FormData = isSearchResultPage && search ? {
+        minPrice: search.minPrice !== undefined ? String(search.minPrice) : '',
+        maxPrice: search.maxPrice !== undefined ? String(search.maxPrice) : '',
+        selectedMakes: search.selectedMakes ?? '',
+        selectedModels: search.selectedModels ?? '',
+        selectedTrims: search.selectedTrims ?? '',
+        selectedBodyTypes: search.selectedBodyTypes ?? [],
+        selectedTransmission: (search.selectedTransmission as FilterTransmissionType) ?? 'All',
+    } : initialValues
 
-    useEffect(() => {
-        stateRef.current.loading = true;
-        const nextDefaults: Partial<FormData> = {
-            minPrice: loader.formData?.minPrice !== undefined ? String(loader.formData.minPrice) : '',
-            maxPrice: loader.formData?.maxPrice !== undefined ? String(loader.formData.maxPrice) : '',
-            selectedMakes: loader.formData?.selectedMakes ?? '',
-            selectedModels: loader.formData?.selectedModels ?? '',
-            selectedTrims: loader.formData?.selectedTrims ?? '',
-            selectedBodyTypes: loader.formData?.selectedBodyTypes ?? [],
-            selectedTransmission: (loader.formData?.selectedTransmission as FilterTransmissionType) ?? 'All',
-        }
-        stateRef.current = { loading: false, defaultValues: { ...stateRef.current.defaultValues, ...nextDefaults } }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
-
-
-    return stateRef.current.loading ? (
-        <Card className={cn("hidden w-full max-w-[16rem] shrink-0 self-start lg:block p-0", props.className)}>
-            {Array.from({ length: 6 }).map((_, idx) => (
-                <React.Fragment key={idx}>
-                    <FilterLoading />
-                    {idx < 5 && <Separator orientation="horizontal" />}
-                </React.Fragment>
-            ))}
-        </Card>
-    ) : (
+    return (
         <Filter
             className={props.className}
-            defaultValues={stateRef.current.defaultValues}
+            defaultValues={defaultValues}
             onFilterChange={props.onFilterChange}
             ref={ref} />
     )
@@ -134,8 +98,8 @@ type InnerFilterProps = {
     className?: string
 }
 
-const Filter = forwardRef<FilterRef, InnerFilterProps>(
-    ({ onFilterChange, defaultValues, className }, ref) => {
+export const Filter = forwardRef<FilterRef, InnerFilterProps>(
+    ({ onFilterChange, defaultValues = initialValues, className }, ref) => {
         const form = useForm<FormData>({
             resolver: zodResolver(filterFormSchema),
             defaultValues,
@@ -143,19 +107,21 @@ const Filter = forwardRef<FilterRef, InnerFilterProps>(
             mode: "onChange",
         })
 
-        const states = useSelector((state: DashboardRootState) => state.dashboard.values)
-
         useUpdateEffect(() => {
-            if (!isEqual(form.getValues(), states)) {
-                form.reset(states)
+            if (!isEqual(form.getValues(), defaultValues)) {
+                form.reset(defaultValues)
             }
-        }, [states, form])
+        }, [defaultValues, form])
 
         useImperativeHandle(ref, () => ({
             reset: () => {
                 form.reset(initialValues)
             },
-
+            submit: () => {
+                form.handleSubmit((_) => {
+                  form.trigger(['minPrice', 'maxPrice'])
+                })()
+              },
         }), [form])
 
         const debouncedFilterChange = useDebouncedCallback(
@@ -174,6 +140,7 @@ const Filter = forwardRef<FilterRef, InnerFilterProps>(
             form.trigger(['minPrice', 'maxPrice'])
             debouncedFilterChange(values)
         }, [values, debouncedFilterChange, form])
+
 
         return (
             <Form {...form}>

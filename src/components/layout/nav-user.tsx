@@ -87,19 +87,19 @@ export function NavUser({ user }: NavUserProps) {
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
-                  <Link to='/search-result'>
+                  <Link to='/search-result-page'>
                     <BadgeCheck />
                     Account
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to='/search-result'>
+                  <Link to='/search-result-page'>
                     <CreditCard />
                     Billing
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to='/search-result'>
+                  <Link to='/search-result-page'>
                     <Bell />
                     Notifications
                   </Link>

@@ -1,6 +1,6 @@
 import { BaseImage } from "@/components/ui/base-image";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ALL_CARS } from "@/features/dashboard/data/mock-data";
+import { ALL_CARS, IMG } from "@/features/dashboard/data/mock-data";
 import { cn } from "@/lib/utils";
 import { useParams } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
@@ -13,9 +13,9 @@ export function VehicleDetailGallery() {
 
     const gallery = useMemo(() => {
         const baseSeed = Number(vehicle?.id ?? 1) || 1;
-        const main = vehicle?.imageUrl ?? `https://picsum.photos/seed/car-${baseSeed}/800/500`;
+        const main = vehicle?.imageUrl ?? IMG(baseSeed);
         const thumbs = Array.from({ length: 8 }).map((_, idx) =>
-            `https://picsum.photos/seed/car-${baseSeed}-${idx + 1}/800/500`
+            IMG(baseSeed + idx + 1)
         );
         return [main, ...thumbs];
     }, [vehicle?.id, vehicle?.imageUrl]);

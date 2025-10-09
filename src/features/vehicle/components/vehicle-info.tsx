@@ -31,22 +31,25 @@ function VehicleTitle({ title }: { title: string }) {
 }
 
 export function VehiclePrice({ vehicle, className }: { vehicle?: typeof ALL_CARS[0], className?: string }) {
+    const price = vehicle?.price ?? 0
     return (
-        <div className={cn(
-            'w-full space-y-4',
-            className
-        )}>
-            {(vehicle?.badges && vehicle?.badges.length > 0) &&
-                <div className="flex flex-wrap gap-2">
-                    {vehicle?.badges?.map((b, i) => (
-                        <Badge key={i} variant="secondary" className="text-sm px-3 py-1">{b}</Badge>
-                    ))}
-                </div>
-            }
-            <div className="text-3xl font-bold text-foreground">${vehicle?.price.toLocaleString()}</div>
+      <div
+        data-testid="vehicle-price-container"
+        className={cn('w-full space-y-4', className)}
+      >
+        {(vehicle?.badges && vehicle?.badges.length > 0) && (
+          <div className="flex flex-wrap gap-2">
+            {vehicle.badges.map((b, i) => (
+              <Badge key={i} variant="secondary" className="text-sm px-3 py-1">{b}</Badge>
+            ))}
+          </div>
+        )}
+        <div className="text-3xl font-bold text-foreground">
+          ${price.toLocaleString()}
         </div>
+      </div>
     )
-}
+  }
 
 function VehicleSpecs({ vehicle }: { vehicle: typeof ALL_CARS[0] }) {
     return (

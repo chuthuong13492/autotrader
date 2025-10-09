@@ -1,18 +1,19 @@
 import { Outlet } from '@tanstack/react-router'
-import { SkipToMain } from '@/components/skip-to-main'
 import { DashboardProvider } from '@/features/dashboard/dashboard-provider'
+import { SearchProvider } from '@/context/search-provider'
+import { DashboardHeader } from '@/features/dashboard/components/dashboard-header'
+import { Footer } from './footer'
+export function DashboardLayout() {
 
-type AuthenticatedLayoutProps = {
-  children?: React.ReactNode
-}
-
-export function DashboardLayout({ children }: AuthenticatedLayoutProps) {
   return (
     <DashboardProvider >
-      <SkipToMain />
+      <SearchProvider >
         <div className='@container/content min-h-svh'>
-          {children ?? <Outlet />}
+          <DashboardHeader />
+          <Outlet />
         </div>
+        <Footer />
+      </SearchProvider>
     </DashboardProvider>
   )
 }

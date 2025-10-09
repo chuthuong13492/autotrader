@@ -15,7 +15,7 @@ export function SignOutDialog({ open, onOpenChange }: SignOutDialogProps) {
   const handleSignOut = () => {
     auth.reset()
     navigate({
-      to: '/search-result',
+      to: '/search-result-page',
       replace: true,
     })
   }

@@ -11,21 +11,27 @@ export function CarCard({ car, className }: CarCardProps) {
     const navigate = useNavigate();
 
     const handleClick = () => {
-        navigate({ 
-            to: '/vehicle/$id', 
+        navigate({
+            to: '/vehicle/$id',
             params: { id: car.id },
         })
     };
 
     return (
-        <div 
+        <div
             className={cn(
                 "rounded-md shadow hover:shadow-md cursor-pointer transition-all duration-300 ease-out",
                 className,
             )}
             onClick={handleClick}
         >
-            <BaseImage key={car.imageUrl} src={car.imageUrl} alt={`${car.make} ${car.model}`} className="aspect-[408/306] rounded-md" />
+            <BaseImage
+                data-testid="car-image"
+                key={car.imageUrl}
+                src={car.imageUrl}
+                alt={`${car.make} ${car.model}`}
+                className="aspect-[408/306] rounded-md"
+            />
             <div className="p-3">
                 <div className={cn('font-semibold')}>{car.year} {car.make} {car.model}</div>
                 <div className="text-sm text-muted-foreground">{car.trim} • {car.mileage.toLocaleString()} mi</div>
