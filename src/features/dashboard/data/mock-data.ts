@@ -18,68 +18,68 @@ export type Car = {
 
 
 export const CAR_IMAGES = [
-  "https://images.unsplash.com/photo-1503376780353-7e6692767b70",
-  "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d",
-  "https://images.unsplash.com/photo-1511910849309-0c5ed3b3e06c",
-  "https://images.unsplash.com/photo-1493238792000-8113da705763",
-  "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7",
-  "https://images.unsplash.com/photo-1485463611703-7ae3f26f0c42",
-  "https://images.unsplash.com/photo-1549924231-f129b911e442",
-  "https://images.unsplash.com/photo-1601933470928-cf53b1b7f3f2",
-  "https://images.unsplash.com/photo-1517948430535-1e246b1b5a9a",
-  "https://images.unsplash.com/photo-1519681393784-d120267933ba",
-  "https://images.unsplash.com/photo-1511910849309-0c5ed3b3e06c",
-  "https://images.unsplash.com/photo-1605184861740-5a64b57c6b12",
-  "https://images.unsplash.com/photo-1571607388263-1b121b7e9efc",
-  "https://images.unsplash.com/photo-1600718371414-ec1c8f56f25d",
-  "https://images.unsplash.com/photo-1525609004556-c46c7d6cf023",
-  "https://images.unsplash.com/photo-1570129477492-45c003edd2be",
-  "https://images.unsplash.com/photo-1600267165477-70e928b20b3d",
-  "https://images.unsplash.com/photo-1512499617640-c2f999098c1a",
-  "https://images.unsplash.com/photo-1502164980785-f8aa41d53611",
-  "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf",
-  "https://images.unsplash.com/photo-1542365887-7e3d89ef8f96",
-  "https://images.unsplash.com/photo-1549921296-3d5a6e1c7f45",
-  "https://images.unsplash.com/photo-1552519507-da3b142c6e3d",
-  "https://images.unsplash.com/photo-1503731982160-7fbe3a3a9b8f",
-  "https://images.unsplash.com/photo-1601933470928-cf53b1b7f3f2",
-  "https://images.unsplash.com/photo-1571607388263-1b121b7e9efc",
-  "https://images.unsplash.com/photo-1502164980785-f8aa41d53611",
-  "https://images.unsplash.com/photo-1600700159871-45a35d7ab696",
-  "https://images.unsplash.com/photo-1502877338535-766e1452684a",
-  "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf",
-  "https://images.unsplash.com/photo-1542365887-7e3d89ef8f96",
-  "https://images.unsplash.com/photo-1563720223185-11003d516935",
-  "https://images.unsplash.com/photo-1600700159871-45a35d7ab696",
-  "https://images.unsplash.com/photo-1503376780353-7e6692767b70",
-  "https://images.unsplash.com/photo-1525609004556-c46c7d6cf023",
-  "https://images.unsplash.com/photo-1512499617640-c2f999098c1a",
-  "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d",
-  "https://images.unsplash.com/photo-1605184861740-5a64b57c6b12",
-  "https://images.unsplash.com/photo-1511910849309-0c5ed3b3e06c",
-  "https://images.unsplash.com/photo-1601933470928-cf53b1b7f3f2",
-  "https://images.unsplash.com/photo-1600718371414-ec1c8f56f25d",
-  "https://images.unsplash.com/photo-1600267165477-70e928b20b3d",
-  "https://images.unsplash.com/photo-1552519507-da3b142c6e3d",
-  "https://images.unsplash.com/photo-1512499617640-c2f999098c1a",
-  "https://images.unsplash.com/photo-1502877338535-766e1452684a",
-  "https://images.unsplash.com/photo-1600700159871-45a35d7ab696",
-  "https://images.unsplash.com/photo-1563720223185-11003d516935",
-  "https://images.unsplash.com/photo-1542365887-7e3d89ef8f96",
-  "https://images.unsplash.com/photo-1549921296-3d5a6e1c7f45",
-  "https://images.unsplash.com/photo-1503731982160-7fbe3a3a9b8f",
-  "https://images.unsplash.com/photo-1570129477492-45c003edd2be",
-  "https://images.unsplash.com/photo-1605184861740-5a64b57c6b12",
-  "https://images.unsplash.com/photo-1571607388263-1b121b7e9efc",
-  "https://images.unsplash.com/photo-1503376780353-7e6692767b70",
-  "https://images.unsplash.com/photo-1502164980785-f8aa41d53611",
-  "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf",
-  "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7",
-  "https://images.unsplash.com/photo-1485463611703-7ae3f26f0c42",
-  "https://images.unsplash.com/photo-1549924231-f129b911e442",
-  "https://images.unsplash.com/photo-1600267165477-70e928b20b3d",
-  "https://images.unsplash.com/photo-1517948430535-1e246b1b5a9a",
+  "https://images.unsplash.com/photo-1503376780353-7e6692767b70", // 0
+  "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d", // 1
+  "https://images2.autotrader.com/hn/c/0c42fbd4da54493bbca94c3efc1ee8c8.jpg?format=auto&width=408&height=306", // 2 ✅
+  "https://images.unsplash.com/photo-1493238792000-8113da705763", // 3
+  "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7", // 4
+  "https://images2.autotrader.com/hn/c/cb21b15ba4854a68aec864d270feef6f.jpg?format=auto&width=408&height=306", // 5 ✅
+  "https://images2.autotrader.com/hn/c/5e481a9a5ddb40d3bb40b1c1fa7a1b6f.jpg?format=auto&width=408&height=306",     // 6
+  "https://images2.autotrader.com/hn/c/f494480c3a824b67a0c6e4717d2222ce.jpg?format=auto&width=408&height=306", // 7 ✅
+  "https://images2.autotrader.com/hn/c/2bc0b8d34af44761b8b7e499fd6ba868.jpg?format=auto&width=408&height=306", // 8 ✅
+  "https://images2.autotrader.com/hn/c/ffa9e285737d447fa397aea5ed13d062.jpg?format=auto&width=408&height=306", // 9
+  "https://images2.autotrader.com/hn/c/e50aba058fab433b9e4d176cde4d7548.jpg?format=auto&width=408&height=306", // 10 ✅
+  "https://images2.autotrader.com/hn/c/0529463a672d4e68a373244eefb2c23a.jpg?format=auto&width=408&height=306", // 11 ✅
+  "https://images2.autotrader.com/hn/c/09bd2677b7a44eec8bfb353a4a064b0c.jpg?format=auto&width=408&height=306", // 12 ✅
+  "https://images2.autotrader.com/hn/c/9ecc0c1ef9844055852afa01f70364ed.jpg?format=auto&width=408&height=306", // 13 ✅
+  "https://images2.autotrader.com/hn/c/871b931df0f347d0bbe88ac1fb402e42.jpg?format=auto&width=408&height=306", // 14
+  "https://images2.autotrader.com/hn/c/9ecc0c1ef9844055852afa01f70364ed.jpg?format=auto&width=408&height=306", // 15 ✅
+  "https://images2.autotrader.com/hn/c/21c1ac47bfd940c6b96d55a931eecc77.jpg?format=auto&width=408&height=306", // 16 ✅
+  "https://images.unsplash.com/photo-1512499617640-c2f999098c1a", // 17
+  "https://images2.autotrader.com/hn/c/5d2cf39c3b4d4acc81e9f91c130f841e.jpg?format=auto&width=408&height=306", // 18
+  "https://images2.autotrader.com/hn/c/b634662539504db0867f2546908950c5.jpg?format=auto&width=408&height=306", // 19 ✅
+  "https://images2.autotrader.com/hn/c/21c1ac47bfd940c6b96d55a931eecc77.jpg?format=auto&width=408&height=306", // 20 ✅
+  "https://images.unsplash.com/photo-1549921296-3d5a6e1c7f45",     // 21
+  "https://images.unsplash.com/photo-1552519507-da3b142c6e3d",     // 22
+  "https://images2.autotrader.com/hn/c/6a08e81dd9fc4547b06f413e402e7db5.jpg?format=auto&width=408&height=306", // 23 ✅
+  "https://images2.autotrader.com/hn/c/2289cccc880c4840908754b4458afaac.jpg?format=auto&width=408&height=306", // 24 ✅
+  "https://images2.autotrader.com/hn/c/c7e88f0fc98847fe9036d0082f2d92cc.jpg?format=auto&width=408&height=306", // 25 ✅
+  "https://images.unsplash.com/photo-1600700159871-45a35d7ab696", // 26
+  "https://images2.autotrader.com/hn/c/49e8cf6304f2427cae63797bf57048a8.jpg?format=auto&width=408&height=306", // 27 ✅
+  "https://images.unsplash.com/photo-1502877338535-766e1452684a", // 28
+  "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf", // 29
+  "https://images2.autotrader.com/hn/c/22520209d8154804b245908a67a26b56.jpg?format=auto&width=408&height=306", // 30 ✅
+  "https://images.unsplash.com/photo-1563720223185-11003d516935", // 31
+  "https://images2.autotrader.com/hn/c/ebdebb78cc1041699f25aeaff64d4185.jpg?format=auto&width=408&height=306", // 32 ✅
+  "https://images.unsplash.com/photo-1503376780353-7e6692767b70", // 33
+  "https://images.unsplash.com/photo-1525609004556-c46c7d6cf023", // 34
+  "https://images2.autotrader.com/hn/c/cd9a7e66b0104e7986b3cd47f29ea504.jpg?format=auto&width=408&height=306", // 35 ✅
+  "https://images.unsplash.com/photo-1605184861740-5a64b57c6b12", // 36
+  "https://images2.autotrader.com/hn/c/0eb941e863934141b9b2b12ae1da29df.jpg?format=auto&width=408&height=306", // 37 ✅
+  "https://images2.autotrader.com/hn/c/4177af881f294c8b81a7b92279111130.jpg?format=auto&width=408&height=306", // 38 ✅
+  "https://images2.autotrader.com/hn/c/ef573f1a63aa4048ac79368a67877516.jpg?format=auto&width=408&height=306", // 39 ✅
+  "https://images2.autotrader.com/ps-vehicle-media/0a8945d3-f97f-486c-8d1a-80c7cac63662.jpeg?format=auto&width=408&height=306", // 40 ✅
+  "https://images2.autotrader.com/ps-vehicle-media/fe5f349b-9474-44b3-af1b-23b0b89923dd.jpeg?format=auto&width=408&height=306", // 41 ✅
+  "https://images.unsplash.com/photo-1502877338535-766e1452684a", // 42
+  "https://images2.autotrader.com/hn/c/d44a320e9fd142e7944db8c716cdfb4b.jpg?format=auto&width=408&height=306", // 43 ✅
+  "https://images.unsplash.com/photo-1563720223185-11003d516935", // 44
+  "https://images2.autotrader.com/ps-vehicle-media/0ae1916e-c92b-4a8c-922b-f26ccd7e2f31.jpeg?format=auto&width=408&height=306", // 45 ✅
+  "https://images.unsplash.com/photo-1549921296-3d5a6e1c7f45",     // 46
+  "https://images2.autotrader.com/hn/c/2d62138cc2d84d2c82839faed1d8ab4c.jpg?format=auto&width=408&height=306", // 47 ✅
+  "https://images2.autotrader.com/hn/c/9601b35e82e84d81a8ed296c97cbe666.jpg?format=auto&width=408&height=306", // 48 ✅
+  "https://images2.autotrader.com/hn/c/c805bb771bc74bb598f4f7ab9435dd7d.jpg?format=auto&width=408&height=306", // 49 ✅
+  "https://images2.autotrader.com/hn/c/c4b6d824a9ed49d09c5584a4e96a85b1.jpg?format=auto&width=408&height=306", // 50
+  "https://images2.autotrader.com/hn/c/67304377137b4b5e9c70259219fd9d46.jpg?format=auto&width=408&height=306", // 51 ✅
+  "https://images2.autotrader.com/hn/c/0e884efe1c3845a7801959c7f716b1a9.jpg?format=auto&width=408&height=306", // 52 ✅
+  "https://images.unsplash.com/photo-1503376780353-7e6692767b70", // 53
+  "https://images2.autotrader.com/ps-vehicle-media/91f0bfb0-0ee6-4d40-8c7f-3cdd6e510c00.jpg?format=auto&width=408&height=306", // 54
+  "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf", // 55
+  "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7", // 56
+  "https://images2.autotrader.com/hn/c/df9f2159677b4a3ea5974290680f3074.jpg?format=auto&width=408&height=306", // 57 ✅
+  "https://images2.autotrader.com/ps-vehicle-media/91f0bfb0-0ee6-4d40-8c7f-3cdd6e510c00.jpg?format=auto&width=408&height=306",     // 58
+  "https://images2.autotrader.com/hn/c/4e8393c8fa0c4940b8fa4a7e6e6d8a54.jpg?format=auto&width=408&height=306", // 59 ✅
 ];
+
 
 export const IMG = (id: number) => CAR_IMAGES[(id - 1) % CAR_IMAGES.length];
 

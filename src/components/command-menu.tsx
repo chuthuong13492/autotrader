@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from '@tanstack/react-router'
 import { ArrowRight, ChevronRight } from 'lucide-react'
 import { useSearch } from '@/context/search-provider'
@@ -23,8 +23,6 @@ export function CommandMenu() {
 
   const { state, setOpen } = useSearch()
 
-  const [text, setText] = useState("");
-
   const search = useSelector((state: DashboardRootState) => state.dashboard.search)
 
   const values = useSelector((state: DashboardRootState) => state.dashboard.values)
@@ -34,7 +32,7 @@ export function CommandMenu() {
 
 
   useEffect(() => {
-    setText(search ?? "")
+
   }, [search])
 
   const setQuery = (e: string) => dispatch(setSearch(e));
@@ -82,9 +80,7 @@ export function CommandMenu() {
     <CommandDialog modal open={state.open} onOpenChange={setOpen}>
       <CommandInput
         placeholder='Type vehicle brands/models or search...'
-        value={text}
         onValueChange={(e) => {
-          setText(e);
           onValueChange(e)
         }}
       />

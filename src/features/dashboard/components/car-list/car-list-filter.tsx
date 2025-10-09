@@ -45,9 +45,9 @@ export function CarListFilter({ onResetFilters, onSortChange }: CarListFilterPro
     }, [pagination.total]);
 
     return (
-        <div className='lg:pl-4 pr-2 space-y-2'>
+        <div className='lg:pl-4 pr-2 flex items-center justify-start'>
             <Filter onResetFilters={onResetFilters} />
-            <div className='flex items-center justify-between'>
+            <div className='w-full flex items-center justify-between'>
                 <div className='text-xl font-bold text-black whitespace-nowrap'>{total}</div>
                 <Sort defaultValues={{ sort: sort }} onChange={onSorted} />
             </div>
@@ -75,7 +75,7 @@ function Filter({ onResetFilters }: { onResetFilters?: () => void }) {
     }, [values])
 
     return (
-        <div className="h-9 flex items-center justify-start">
+        <div className="h-9 flex items-center justify-start space-x-4">
             <div className="flex lg:hidden space-x-4 h-full items-center gap-1 transition-all duration-200">
                 <SearchIcon
                     aria-hidden="true"
@@ -91,23 +91,25 @@ function Filter({ onResetFilters }: { onResetFilters?: () => void }) {
                 />
 
                 <DashboardFilterSheet />
-
-
             </div>
 
             {isClear && (
-                <>
+                <div className='flex space-x-4 h-full pr-4'>
                     <Separator
-                        className="bg-border h-full mx-4 lg:hidden items-center transition-all duration-200"
+                        className="bg-border h-full lg:hidden transition-all duration-200"
                         orientation="vertical"
                     />
                     <button
-                        className="text-lg text-blue-400 hover:underline transition-all duration-200"
+                        className="text-lg text-blue-400 hover:underline transition-all duration-200 whitespace-nowrap"
                         onClick={onResetFilters}
                     >
                         Clear Filters
                     </button>
-                </>
+                    <Separator
+                        className="bg-border h-full"
+                        orientation="vertical"
+                    />
+                </div>
             )}
         </div>
     );
