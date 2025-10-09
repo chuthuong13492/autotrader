@@ -24,24 +24,22 @@ interface SubjectFieldProps {
 
 export function SubjectField({ control }: SubjectFieldProps) {
     return (
-        <div className="pb-4">
-            <FormField
-                control={control}
-                name="subject"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Subject</FormLabel>
-                        <SelectDropdown
-                            defaultValue={field.value}
-                            onValueChange={field.onChange}
-                            items={SUBJECT_OPTIONS}
-                            className="text-sm w-full"
-                        />
+        <FormField
+        control={control}
+        name="subject"
+        render={({ field }) => (
+            <FormItem>
+                <FormLabel>Subject</FormLabel>
+                <SelectDropdown
+                    defaultValue={field.value}
+                    onValueChange={field.onChange}
+                    items={SUBJECT_OPTIONS}
+                    className="text-sm w-full"
+                />
 
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-        </div>
+                <FormMessage />
+            </FormItem>
+        )}
+    />
     );
 }

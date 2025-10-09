@@ -68,10 +68,12 @@ export function VehicleDetailForm() {
 
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="px-4">
-                    <SubjectField control={form.control} />
-                    <NameFields control={form.control} />
-                    <ContactFields control={form.control} />
-                    <MessageField control={form.control} />
+                    <div className="space-y-4">
+                        <SubjectField control={form.control} />
+                        <NameFields control={form.control} />
+                        <ContactFields control={form.control} />
+                        <MessageField control={form.control} />
+                    </div>
 
                     <div className="space-y-4">
                         <TermsText />
