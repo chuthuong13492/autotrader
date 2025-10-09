@@ -68,6 +68,7 @@ function InnerPagedList<T>(
     handleInitial,
     renderPagedItem,
     updatePagination,
+    renderPagedStatus,
   } = usePagination<T>({
     initialPagination: pagination,
     onInitial,
@@ -127,7 +128,10 @@ function InnerPagedList<T>(
       )}>
         {statePagination.list.map((item: T, index: number) => (
           <React.Fragment key={itemKey(item)}>
-            {renderPagedItem(index, orientation === 'horizontal' ? 'flex' : undefined)}
+            <div className={orientation === 'horizontal' ? 'flex' : undefined}>
+              {renderPagedItem(index)}
+              {renderPagedStatus(index)}
+            </div>
           </React.Fragment>
         ))}
       </div>

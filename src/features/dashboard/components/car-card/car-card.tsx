@@ -2,7 +2,6 @@ import { BaseImage } from "@/components/ui/base-image"
 import { type Car } from "../../data/mock-data"
 import { cn } from "@/lib/utils"
 import { useNavigate } from '@tanstack/react-router'
-
 interface CarCardProps {
     car: Car,
     className?: string
@@ -26,7 +25,7 @@ export function CarCard({ car, className }: CarCardProps) {
             )}
             onClick={handleClick}
         >
-            <BaseImage src={car.imageUrl} alt={`${car.make} ${car.model}`} className="aspect-[408/306] rounded-md" />
+            <BaseImage key={car.imageUrl} src={car.imageUrl} alt={`${car.make} ${car.model}`} className="aspect-[408/306] rounded-md" />
             <div className="p-3">
                 <div className={cn('font-semibold')}>{car.year} {car.make} {car.model}</div>
                 <div className="text-sm text-muted-foreground">{car.trim} • {car.mileage.toLocaleString()} mi</div>

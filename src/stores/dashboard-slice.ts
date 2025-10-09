@@ -13,7 +13,7 @@ import {
 } from "@/components/layout/data/pagination";
 import { updatePage, delay } from "@/lib/utils";
 
-function getPagination(
+export function getPagination(
   cars: Car[],
   filters: Partial<FormData>,
   search: string,
@@ -151,8 +151,8 @@ export const dashboardSlice = createSlice({
       // eslint-disable-next-line no-console
       console.log("fetchPage", action.payload);
     });
-    builder.addCase(getSimilarCars.fulfilled, (state, action) => {
-      state.pagination = action.payload;
+    builder.addCase(getSimilarCars.fulfilled, (_, action) => {
+      // state.pagination = updatePage(state.pagination, action.payload);
 
       // eslint-disable-next-line no-console
       console.log("getSimilarCars", action.payload);
@@ -206,7 +206,7 @@ export const getSimilarCars = createAsyncThunk(
       10 // pageSize
     );
 
-    return updatePage(state.dashboard.pagination, paginationResult);
+    return paginationResult;
   }
 );
 

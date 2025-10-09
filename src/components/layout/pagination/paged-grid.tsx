@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 
 // --- Các kiểu builder ---
 type EmptyBuilder = () => React.ReactNode;
-type SeparatorBuilder<T> = (index: number, item: T) => React.ReactNode;
+type SeparatorBuilder = (index: number) => React.ReactNode;
 type LoadingFirstPageBuilder = () => React.ReactNode;
 type LoadingMoreBuilder = () => React.ReactNode;
 type FirstPageErrorBuilder = (error: string | null, onRetry: () => void) => React.ReactNode;
@@ -26,7 +26,7 @@ type PagedGridProps<T> = {
     emptyBuilder?: EmptyBuilder;
     loadingFirstPageBuilder?: LoadingFirstPageBuilder;
     loadingMoreBuilder?: LoadingMoreBuilder;
-    separatorBuilder?: SeparatorBuilder<T>;
+    separatorBuilder?: SeparatorBuilder;
     firstPageErrorBuilder?: FirstPageErrorBuilder;
     subsequentPageErrorBuilder?: SubsequentPageErrorBuilder;
     endBuilder?: EndBuilder;
@@ -70,7 +70,7 @@ function InnerPagedGrid<T>(
         handleInitial,
         handleLoadMore,
         updatePagination,
-        renderPagedItemWithNoState,
+        renderPagedItem,
     } = usePagination<T>({
         initialPagination: pagination,
         onInitial,
@@ -79,7 +79,7 @@ function InnerPagedGrid<T>(
         itemKey,
         renderItem: ({ index, data }) => itemBuilder(index, data),
         renderSeparator: separatorBuilder
-            ? ({ index, data }) => separatorBuilder(index, data)
+            ? ({ index }) => separatorBuilder(index)
             : undefined,
         renderEmpty: emptyBuilder,
         renderLoadingFirstPage: loadingFirstPageBuilder,
@@ -131,12 +131,12 @@ function InnerPagedGrid<T>(
     return (
         <ScrollArea hasScrollbar={hasScrollBar}>
             <div className={cn(
-                `grid grid-cols-1 gap-x-4 w-full md:grid-cols-2 lg:grid-cols-${rowCount}`,
+                `grid grid-cols-1 gap-4 w-full md:grid-cols-2 lg:grid-cols-${rowCount}`,
                 className,
             )}>
                 {statePagination.list.map((item: T, index: number) => (
                     <React.Fragment key={itemKey(item)}>
-                        {renderPagedItemWithNoState(index)}
+                        {renderPagedItem(index)}
                     </React.Fragment>
                 ))}
 

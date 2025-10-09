@@ -16,7 +16,7 @@ export function VehicleInfo({ vehicle, className }: VehicleInfoProps) {
     return (
         <div className={cn("pt-4 space-y-4", className)}>
             <VehicleTitle title={title} />
-            <VehiclePrice className="lg:hidden" vehicle={vehicle}/>
+            <VehiclePrice className="lg:hidden" vehicle={vehicle} />
             <VehicleSpecs vehicle={vehicle} />
         </div>
     );
@@ -33,15 +33,17 @@ function VehicleTitle({ title }: { title: string }) {
 export function VehiclePrice({ vehicle, className }: { vehicle?: typeof ALL_CARS[0], className?: string }) {
     return (
         <div className={cn(
-            'w-full',
+            'w-full space-y-4',
             className
         )}>
-            <div className="flex flex-wrap gap-2">
-                {vehicle?.badges?.map((b, i) => (
-                    <Badge key={i} variant="secondary" className="text-sm px-3 py-1">{b}</Badge>
-                ))}
-            </div>
-            <div className="mt-4 text-3xl font-bold text-foreground">${vehicle?.price.toLocaleString()}</div>
+            {(vehicle?.badges && vehicle?.badges.length > 0) &&
+                <div className="flex flex-wrap gap-2">
+                    {vehicle?.badges?.map((b, i) => (
+                        <Badge key={i} variant="secondary" className="text-sm px-3 py-1">{b}</Badge>
+                    ))}
+                </div>
+            }
+            <div className="text-3xl font-bold text-foreground">${vehicle?.price.toLocaleString()}</div>
         </div>
     )
 }

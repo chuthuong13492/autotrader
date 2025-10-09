@@ -6,7 +6,7 @@ export function VehicleCardLoading({ className } : { className?: string }) {
     return (
         <div
             className={cn(
-                "w-64 flex flex-col rounded-md shadow bg-white",
+                "w-64 flex flex-col rounded-md shadow bg-white mr-4",
                 className
             )}
         >

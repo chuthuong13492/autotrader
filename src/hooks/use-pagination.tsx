@@ -1,7 +1,6 @@
 import React, { useEffect, useCallback, useReducer } from "react";
 import { emptyPagination, isLastPage, type Pagination } from "@/components/layout/data/pagination";
 import { useItemVisibility } from "./use-intersection-observer";
-import { delay } from "@/lib/utils";
 import { useUpdateEffect } from "./use-update-effect";
 
 export enum PaginationStatus {
@@ -164,20 +163,14 @@ export function usePagination<T>({
     }, []);
 
     useUpdateEffect(() => {
-        if(initialPagination){
-            dispatch({ type: "SET_PAGINATION", payload:  initialPagination });
+        if (initialPagination) {
+            dispatch({ type: "SET_PAGINATION", payload: initialPagination });
         }
     }, [initialPagination]);
 
     async function updatePagination(
         newPagination: Pagination<T>,
-        options?: { setLoadingFirstPage?: boolean; delayMs?: number }
     ) {
-        if (options?.setLoadingFirstPage) {
-            dispatch({ type: "INIT_REQUEST" });
-            await delay(options.delayMs ?? 300)
-        }
-
         dispatch({ type: "SET_PAGINATION", payload: newPagination });
     }
 
@@ -237,43 +230,43 @@ export function usePagination<T>({
     // -------------------
     // BUILDER: render item theo trạng thái
     // -------------------
-    function renderPagedItem(index: number, itemClassName?: string): React.ReactNode {
+    function renderPagedItem(index: number): React.ReactNode {
         return (
             <PagedItem
-                key={itemKey(pagination.list[index])}
                 index={index}
                 pagination={pagination}
-                status={status}
-                itemKey={itemKey}
-                renderItem={renderItem}
-                renderSeparator={renderSeparator}
-                renderLoadingMore={renderLoadingMore}
-                renderSubsequentPageError={renderSubsequentPageError}
-                renderEnd={renderEnd}
-                onCheckLoadMore={checkLoadMore}
-                onRetryLoadMore={handleLoadMore}
-                className={itemClassName}
-            />
-        );
-    }
-
-    function renderPagedItemWithNoState(index: number, itemClassName?: string): React.ReactNode {
-        return (
-            <PagedItem
-                key={itemKey(pagination.list[index])}
-                index={index}
-                pagination={pagination}
-                status={status}
                 itemKey={itemKey}
                 renderItem={renderItem}
                 renderSeparator={renderSeparator}
                 onCheckLoadMore={checkLoadMore}
-                onRetryLoadMore={handleLoadMore}
-                className={itemClassName}
             />
         );
     }
 
+    function renderPagedStatus(index: number): React.ReactNode {
+        const isLastItem = index === pagination.list.length - 1;
+        const itemData = pagination.list[index];
+        return (
+            <React.Fragment key={itemKey(itemData)}>
+                {renderSeparator?.({ index, data: itemData })}
+                {isLastItem && (() => {
+                    switch (status) {
+                        case PaginationStatus.LOADING_MORE:
+                            return renderLoadingMore?.();
+                        case PaginationStatus.SUBSEQUENT_PAGE_ERROR:
+                            return renderSubsequentPageError?.({
+                                error: pagination.error ?? null,
+                                onRetry: handleLoadMore,
+                            });
+                        case PaginationStatus.COMPLETED:
+                            return renderEnd?.();
+                        default:
+                            return null;
+                    }
+                })()}
+            </React.Fragment>
+        )
+    }
     // Kết quả trả về cho component sử dụng
     return {
         pagination,
@@ -282,7 +275,7 @@ export function usePagination<T>({
         handleRefresh,
         handleLoadMore,
         renderPagedItem,
-        renderPagedItemWithNoState,
+        renderPagedStatus,
         updatePagination,
         updateStatus,
     };
@@ -292,32 +285,19 @@ export function usePagination<T>({
 interface PagedItemProps<T> {
     index: number;
     pagination: Pagination<T>;
-    status: PaginationStatus;
     itemKey: ItemKeyFn<T>;
     renderItem: RenderItemFn<T>;
     renderSeparator?: RenderSeparatorFn<T>;
-    renderLoadingMore?: () => React.ReactNode;
-    renderSubsequentPageError?: (params: { error: string | null; onRetry: () => void }) => React.ReactNode;
-    renderEnd?: () => React.ReactNode;
     onCheckLoadMore: (index: number) => void;
-    onRetryLoadMore: () => void;
-    className?: string;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
 function PagedItem<T>({
     index,
     pagination,
-    status,
     itemKey,
     renderItem,
-    renderSeparator,
-    renderLoadingMore,
-    renderSubsequentPageError,
-    renderEnd,
     onCheckLoadMore,
-    onRetryLoadMore,
-    className,
 }: PagedItemProps<T>) {
     const itemData = pagination.list[index];
 
@@ -335,30 +315,9 @@ function PagedItem<T>({
         key: itemKey(itemData),
     });
 
-
-    const isLastItem = index === pagination.list.length - 1;
-
     return (
-        <div ref={ref} key={itemKey(itemData)} className={className}>
+        <div ref={ref} >
             {item}
-
-            {renderSeparator?.({ index, data: itemData })}
-
-            {isLastItem && (() => {
-                switch (status) {
-                    case PaginationStatus.LOADING_MORE:
-                        return renderLoadingMore?.();
-                    case PaginationStatus.SUBSEQUENT_PAGE_ERROR:
-                        return renderSubsequentPageError?.({
-                            error: pagination.error ?? null,
-                            onRetry: onRetryLoadMore,
-                        });
-                    case PaginationStatus.COMPLETED:
-                        return renderEnd?.();
-                    default:
-                        return null;
-                }
-            })()}
         </div>
     );
 };
