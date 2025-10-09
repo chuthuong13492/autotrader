@@ -17,23 +17,27 @@ import {
 } from '@/components/ui/form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useUpdateEffect } from '@/hooks/use-update-effect'
-import { setSort } from '@/stores/dashboard-slice'
+import { setSort, type SortKey } from '@/stores/dashboard-slice'
 import { DashboardFilterSheet } from '../sheets/filter-sheet'
 import { cn } from '@/lib/utils'
 
 
 interface CarListFilterProps {
     onResetFilters?: () => void
+    onSortChange?: (sort: SortKey) => void
 }
 
-export function CarListFilter({ onResetFilters }: CarListFilterProps) {
+export function CarListFilter({ onResetFilters, onSortChange }: CarListFilterProps) {
     const states = useSelector((state: DashboardRootState) => state.dashboard);
 
     const { sort, pagination } = states;
 
     const dispatch = useDispatch<DashboardDispatch>();
 
-    const onSorted = (value: SortForm) => dispatch(setSort(value.sort));
+    const onSorted = (value: SortForm) => {
+        dispatch(setSort(value.sort))
+        onSortChange?.(value.sort)
+    };
 
     const total = useMemo(() => {
         const formatted = pagination.total.toLocaleString('en-US')

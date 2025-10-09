@@ -19,7 +19,12 @@ export function DynamicBreadcrumb({ lastItem }: DynamicBreadcrumbProps) {
 
   const breadcrumbItems = useMemo(() => {
     const items: BreadcrumbItem[] = [
-      { label: 'Cars for Sale', href: '/search-result-page' },
+      {
+        label: 'Cars for Sale', href: buildFilterUrl({
+          search: state.search,
+          sort: state.sort,
+        })
+      },
     ]
 
     if (values.selectedMakes) {
@@ -27,6 +32,7 @@ export function DynamicBreadcrumb({ lastItem }: DynamicBreadcrumbProps) {
         label: values.selectedMakes,
         href: buildFilterUrl({
           search: state.search,
+          sort: state.sort,
           minPrice: values.minPrice,
           maxPrice: values.maxPrice,
           selectedMakes: values.selectedMakes,
@@ -41,6 +47,7 @@ export function DynamicBreadcrumb({ lastItem }: DynamicBreadcrumbProps) {
         label: values.selectedModels,
         href: buildFilterUrl({
           search: state.search,
+          sort: state.sort,
           minPrice: values.minPrice,
           maxPrice: values.maxPrice,
           selectedMakes: values.selectedMakes,
@@ -56,6 +63,7 @@ export function DynamicBreadcrumb({ lastItem }: DynamicBreadcrumbProps) {
         label: values.selectedTrims,
         href: buildFilterUrl({
           search: state.search,
+          sort: state.sort,
           minPrice: values.minPrice,
           maxPrice: values.maxPrice,
           selectedMakes: values.selectedMakes,
