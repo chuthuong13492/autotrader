@@ -14,6 +14,7 @@ export function buildFilterUrl(filters: {
   maxPrice?: string
   selectedTransmission?: string
   search?: string
+  sort?: string
 }): string {
   const params = new URLSearchParams()
   
@@ -29,6 +30,7 @@ export function buildFilterUrl(filters: {
   if (filters.selectedTransmission && filters.selectedTransmission !== 'All') {
     params.set('selectedTransmission', filters.selectedTransmission)
   }
+  if (filters.sort) params.set('sort', filters.sort)
   
   const queryString = params.toString()
   return queryString ? `/search-result-page?${queryString}` : '/search-result-page'
