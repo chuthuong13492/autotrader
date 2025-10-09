@@ -1,4 +1,4 @@
-import { type Car, type TransmissionType } from './mock-data'
+import { type Car, type TransmissionType, ALL_CARS } from './mock-data'
 import { type SortKey } from '@/stores/dashboard-slice'
 
 // Filter State Interface
@@ -33,81 +33,72 @@ export interface FilterState {
   sortKey?: SortKey
 }
 
-// Brand (Make, Model, Trim) Filter Data
-export const brandFilterData = {
-  makes: ['Toyota', 'Honda', 'Ford', 'BMW', 'Tesla'],
-  models: {
-    'Toyota': ['Corolla', 'Camry', 'RAV4'],
-    'Honda': ['Accord', 'Civic', 'CR-V'],
-    'Ford': ['F-150', 'Mustang', 'Escape'],
-    'BMW': ['328i', 'X3'],
-    'Tesla': ['Model 3']
-  },
-  trims: {
-    'Corolla': ['LE', 'SE'],
-    'Camry': ['SE', 'XLE'],
-    'RAV4': ['XLE', 'Limited'],
-    'Accord': ['Sport', 'Touring'],
-    'Civic': ['EX', 'Sport'],
-    'CR-V': ['EX', 'Touring'],
-    'F-150': ['XLT', 'Lariat'],
-    'Mustang': ['GT', 'EcoBoost'],
-    'Escape': ['SE', 'Titanium'],
-    '328i': ['Base', 'M Sport'],
-    'X3': ['xDrive30i', 'M40i'],
-    'Model 3': ['Standard', 'Long Range']
+// Helper function to build brand data from ALL_CARS
+function buildBrandData(cars: Car[]) {
+  const makesSet = new Set<string>()
+  const modelsMap = new Map<string, Set<string>>()
+  const trimsMap = new Map<string, Set<string>>()
+
+  for (const car of cars) {
+    // makes
+    if (car.make) {
+      makesSet.add(car.make)
+      // models per make
+      if (car.model) {
+        const modelsForMake = modelsMap.get(car.make) ?? new Set<string>()
+        modelsForMake.add(car.model)
+        modelsMap.set(car.make, modelsForMake)
+      }
+    }
+    // trims per model
+    if (car.model && car.trim) {
+      const trimsForModel = trimsMap.get(car.model) ?? new Set<string>()
+      trimsForModel.add(car.trim)
+      trimsMap.set(car.model, trimsForModel)
+    }
   }
+
+  const makes = Array.from(makesSet).sort()
+  const models: Record<string, string[]> = {}
+  const trims: Record<string, string[]> = {}
+
+  for (const [make, set] of modelsMap.entries()) {
+    models[make] = Array.from(set).sort()
+  }
+  for (const [model, set] of trimsMap.entries()) {
+    trims[model] = Array.from(set).sort()
+  }
+
+  return { makes, models, trims }
 }
 
-// Price Range Filter Data
-export const priceRangeFilterData = {
-  min: 0,
-  max: 100000,
-  step: 1000,
-  defaultMin: 0,
-  defaultMax: 100000,
-  presets: [
-    { label: 'Under $10K', min: 0, max: 10000 },
-    { label: '$10K - $20K', min: 10000, max: 20000 },
-    { label: '$20K - $30K', min: 20000, max: 30000 },
-    { label: '$30K - $40K', min: 30000, max: 40000 },
-    { label: '$40K - $50K', min: 40000, max: 50000 },
-    { label: 'Over $50K', min: 50000, max: 100000 }
-  ]
+// Brand (Make, Model, Trim) Filter Data - dynamically generated from ALL_CARS
+export const brandFilterData = buildBrandData(ALL_CARS)
+
+// Body Type Filter Data - dynamically generated from ALL_CARS
+const bodyTypeIconMap: Record<string, string> = {
+  Sedan: '🚗',
+  SUV: '🚙',
+  Hatchback: '🚗',
+  Coupe: '🏎️',
+  Truck: '🚚',
+  Wagon: '🚐',
+  Convertible: '🏎️',
 }
 
-// Body Type Filter Data
 export const bodyTypeFilterData: Array<{
   value: string
   label: string
   icon: string
   description: string
-}> = [
-  {
-    value: 'Sedan',
-    label: 'Sedan',
-    icon: '🚗',
-    description: '4-door passenger car'
-  },
-  {
-    value: 'SUV',
-    label: 'SUV',
-    icon: '🚙',
-    description: 'Sport Utility Vehicle'
-  },
-  {
-    value: 'Hatchback',
-    label: 'Hatchback',
-    icon: '🚗',
-    description: 'Compact car with rear door'
-  },
-  {
-    value: 'Coupe',
-    label: 'Coupe',
-    icon: '🏎️',
-    description: '2-door sports car'
-  }
-]
+}> = Array.from(new Set(ALL_CARS.map(c => c.bodyType)))
+  .sort()
+  .map(value => ({
+    value,
+    label: value,
+    icon: bodyTypeIconMap[value] ?? '🚘',
+    description: value,
+  }))
 
 // Transmission Filter Data
 export const transmissionFilterData: Array<{
@@ -127,25 +118,25 @@ export const transmissionFilterData: Array<{
   }
 ]
 
-// Additional Filter Data
+// Additional Filter Data - dynamically generated from ALL_CARS
 export const additionalFilterData = {
   condition: [
     { value: 'New', label: 'New', description: 'Brand new vehicle' },
     { value: 'Used', label: 'Used', description: 'Previously owned vehicle' }
   ],
   yearRange: {
-    min: 2020,
-    max: 2025,
+    min: Math.min(...ALL_CARS.map(c => c.year)),
+    max: Math.max(...ALL_CARS.map(c => c.year)),
     step: 1,
-    defaultMin: 2020,
-    defaultMax: 2025
+    defaultMin: Math.min(...ALL_CARS.map(c => c.year)),
+    defaultMax: Math.max(...ALL_CARS.map(c => c.year))
   },
   mileageRange: {
     min: 0,
-    max: 100000,
+    max: Math.max(...ALL_CARS.map(c => c.mileage)),
     step: 1000,
     defaultMin: 0,
-    defaultMax: 100000,
+    defaultMax: Math.max(...ALL_CARS.map(c => c.mileage)),
     presets: [
       { label: 'Under 25K miles', max: 25000 },
       { label: '25K - 50K miles', min: 25000, max: 50000 },
@@ -153,13 +144,18 @@ export const additionalFilterData = {
       { label: 'Over 75K miles', min: 75000 }
     ]
   },
-  badges: [
-    { value: 'Great Price', label: 'Great Price', color: 'green' },
-    { value: 'No Accidents', label: 'No Accidents', color: 'blue' },
-    { value: 'Electric', label: 'Electric', color: 'emerald' }
-  ]
+  // Badges dynamically generated from ALL_CARS
+  badges: Array.from(new Set(ALL_CARS.flatMap(c => c.badges || [])))
+    .sort()
+    .map(badge => ({
+      value: badge,
+      label: badge,
+      color: badge === 'Great Price' ? 'green' : 
+             badge === 'No Accidents' ? 'blue' : 
+             badge === 'Electric' ? 'emerald' : 
+             badge === 'Hybrid' ? 'blue' : 'gray'
+    }))
 }
-
 
 // Filter utility functions
 // Sort function

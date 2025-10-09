@@ -35,16 +35,16 @@ export const CAR_IMAGES = [
   "https://images2.autotrader.com/hn/c/871b931df0f347d0bbe88ac1fb402e42.jpg?format=auto&width=408&height=306", // 14
   "https://images2.autotrader.com/hn/c/9ecc0c1ef9844055852afa01f70364ed.jpg?format=auto&width=408&height=306", // 15 ✅
   "https://images2.autotrader.com/hn/c/21c1ac47bfd940c6b96d55a931eecc77.jpg?format=auto&width=408&height=306", // 16 ✅
-  "https://images.unsplash.com/photo-1512499617640-c2f999098c1a", // 17
+  "https://images2.autotrader.com/hn/c/6797347887124fbe99ab5336cf1e0d4e.jpg?format=auto&width=408&height=306", // 17
   "https://images2.autotrader.com/hn/c/5d2cf39c3b4d4acc81e9f91c130f841e.jpg?format=auto&width=408&height=306", // 18
   "https://images2.autotrader.com/hn/c/b634662539504db0867f2546908950c5.jpg?format=auto&width=408&height=306", // 19 ✅
   "https://images2.autotrader.com/hn/c/21c1ac47bfd940c6b96d55a931eecc77.jpg?format=auto&width=408&height=306", // 20 ✅
-  "https://images.unsplash.com/photo-1549921296-3d5a6e1c7f45",     // 21
+  "https://images2.autotrader.com/hn/c/5e481a9a5ddb40d3bb40b1c1fa7a1b6f.jpg?format=auto&width=408&height=306",     // 21
   "https://images.unsplash.com/photo-1552519507-da3b142c6e3d",     // 22
   "https://images2.autotrader.com/hn/c/6a08e81dd9fc4547b06f413e402e7db5.jpg?format=auto&width=408&height=306", // 23 ✅
   "https://images2.autotrader.com/hn/c/2289cccc880c4840908754b4458afaac.jpg?format=auto&width=408&height=306", // 24 ✅
   "https://images2.autotrader.com/hn/c/c7e88f0fc98847fe9036d0082f2d92cc.jpg?format=auto&width=408&height=306", // 25 ✅
-  "https://images.unsplash.com/photo-1600700159871-45a35d7ab696", // 26
+  "https://images2.autotrader.com/hn/c/0177fb3ffb9f4b7b84080999df45800a.jpg?format=auto&width=408&height=306", // 26
   "https://images2.autotrader.com/hn/c/49e8cf6304f2427cae63797bf57048a8.jpg?format=auto&width=408&height=306", // 27 ✅
   "https://images.unsplash.com/photo-1502877338535-766e1452684a", // 28
   "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf", // 29
@@ -54,7 +54,7 @@ export const CAR_IMAGES = [
   "https://images.unsplash.com/photo-1503376780353-7e6692767b70", // 33
   "https://images.unsplash.com/photo-1525609004556-c46c7d6cf023", // 34
   "https://images2.autotrader.com/hn/c/cd9a7e66b0104e7986b3cd47f29ea504.jpg?format=auto&width=408&height=306", // 35 ✅
-  "https://images.unsplash.com/photo-1605184861740-5a64b57c6b12", // 36
+  "https://images2.autotrader.com/hn/c/1181dfc8f989425396cd4748abea1283.jpg?format=auto&width=408&height=306", // 36
   "https://images2.autotrader.com/hn/c/0eb941e863934141b9b2b12ae1da29df.jpg?format=auto&width=408&height=306", // 37 ✅
   "https://images2.autotrader.com/hn/c/4177af881f294c8b81a7b92279111130.jpg?format=auto&width=408&height=306", // 38 ✅
   "https://images2.autotrader.com/hn/c/ef573f1a63aa4048ac79368a67877516.jpg?format=auto&width=408&height=306", // 39 ✅
@@ -64,7 +64,7 @@ export const CAR_IMAGES = [
   "https://images2.autotrader.com/hn/c/d44a320e9fd142e7944db8c716cdfb4b.jpg?format=auto&width=408&height=306", // 43 ✅
   "https://images.unsplash.com/photo-1563720223185-11003d516935", // 44
   "https://images2.autotrader.com/ps-vehicle-media/0ae1916e-c92b-4a8c-922b-f26ccd7e2f31.jpeg?format=auto&width=408&height=306", // 45 ✅
-  "https://images.unsplash.com/photo-1549921296-3d5a6e1c7f45",     // 46
+  "https://images2.autotrader.com/hn/c/5e481a9a5ddb40d3bb40b1c1fa7a1b6f.jpg?format=auto&width=408&height=306",     // 46
   "https://images2.autotrader.com/hn/c/2d62138cc2d84d2c82839faed1d8ab4c.jpg?format=auto&width=408&height=306", // 47 ✅
   "https://images2.autotrader.com/hn/c/9601b35e82e84d81a8ed296c97cbe666.jpg?format=auto&width=408&height=306", // 48 ✅
   "https://images2.autotrader.com/hn/c/c805bb771bc74bb598f4f7ab9435dd7d.jpg?format=auto&width=408&height=306", // 49 ✅
