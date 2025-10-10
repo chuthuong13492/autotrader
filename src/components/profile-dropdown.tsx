@@ -21,8 +21,9 @@ export function ProfileDropdown() {
     <>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
-          <Button variant='ghost' className='relative h-8 w-8 rounded-full'>
-            <Avatar className='h-8 w-8'>
+          <Button variant='ghost' className='relative h-auto px-3 py-2 rounded-full flex items-center gap-2 hover:bg-transparent'>
+            <span className='text-sm font-medium text-gray-600 hover:underline'>Sign In</span>
+            <Avatar className='h-6 w-6'>
               <AvatarImage src='/avatars/01.png' alt='@autotrader' />
               <AvatarFallback>SN</AvatarFallback>
             </Avatar>
