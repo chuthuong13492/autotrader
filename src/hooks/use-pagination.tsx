@@ -1,7 +1,8 @@
-import React, { useEffect, useCallback, useReducer } from "react";
+import React, { useEffect, useCallback, useReducer, useRef } from "react";
 import { emptyPagination, isLastPage, type Pagination } from "@/components/layout/data/pagination";
 import { useItemVisibility } from "./use-intersection-observer";
 import { useUpdateEffect } from "./use-update-effect";
+import { useAsyncDeduplicator } from "./use-async-deduplicate";
 
 export enum PaginationStatus {
     INITIAL = "initial",
@@ -93,6 +94,7 @@ export function usePagination<T>({
     renderSubsequentPageError,
     renderEnd,
 }: UsePaginationOptions<T>) {
+    const resetTriggerRef = useRef<(() => void)[]>([]);
     type State = {
         pagination: Pagination<T>;
         status: PaginationStatus;
@@ -106,6 +108,7 @@ export function usePagination<T>({
         | { type: "LOAD_MORE_REQUEST" }
         | { type: "LOAD_MORE_SUCCESS"; payload: Pagination<T> }
         | { type: "SET_PAGINATION"; payload: Pagination<T> }
+        | { type: "SET_STATUS"; payload: { status: PaginationStatus; hasRequestedNextPage: boolean } }
         | { type: "SET_HAS_REQUESTED_NEXT_PAGE"; payload: boolean };
 
     function reducer(state: State, action: Action): State {
@@ -129,14 +132,16 @@ export function usePagination<T>({
                 return { pagination: action.payload, status: nextStatus, hasRequestedNextPage: false };
             }
             case "SET_PAGINATION": {
-                const newPagination = action.payload;
-                const nextStatus = getStatus(newPagination);
-                const updatedStatus = updateStatus(state, nextStatus, true);
-
                 return {
                     ...state,
-                    pagination: newPagination, // cập nhật pagination thực tế
-                    ...updatedStatus,          // cập nhật status và hasRequestedNextPage
+                    pagination: action.payload,
+                };
+            }
+            case "SET_STATUS": {
+                return {
+                    ...state,
+                    status: action.payload.status,
+                    hasRequestedNextPage: action.payload.hasRequestedNextPage,
                 };
             }
             case "SET_HAS_REQUESTED_NEXT_PAGE": {
@@ -155,6 +160,8 @@ export function usePagination<T>({
 
     const { pagination, status, hasRequestedNextPage } = state;
 
+    const { fetch: fetchDedup, cancel: cancelLoadMore } = useAsyncDeduplicator<Pagination<T>>();
+
     useEffect(() => {
         if (status === PaginationStatus.INITIAL) {
             handleInitial();
@@ -162,37 +169,55 @@ export function usePagination<T>({
         // eslint-disable-next-line
     }, []);
 
+    useEffect(() => {
+        return () => cancelLoadMore();
+      }, [cancelLoadMore]);
+
     useUpdateEffect(() => {
         if (initialPagination) {
             updatePagination(initialPagination);
         }
     }, [initialPagination]);
 
-    async function updatePagination(
-        newPagination: Pagination<T>,
-    ) {
+
+    // Register reset callback từ PagedItem
+    const resetTrigger = useCallback((resetCallback: () => void) => {
+        resetTriggerRef.current.push(resetCallback);
+        // Return cleanup function
+        return () => {
+            const index = resetTriggerRef.current.indexOf(resetCallback);
+            if (index > -1) {
+                resetTriggerRef.current.splice(index, 1);
+            }
+        };
+    }, []);
+
+    function updatePagination(newPagination: Pagination<T>) {
+        cancelLoadMore();
+        
+        const resetCallbacks = [...resetTriggerRef.current];
+        requestIdleCallback(() => resetCallbacks.forEach(reset => reset()));
+        
         dispatch({ type: "SET_PAGINATION", payload: newPagination });
+        updateStatus(getStatus(newPagination), true);
     }
 
-    function updateStatus(
-        state: State,
-        nextStatus: PaginationStatus,
+    const updateStatus = useCallback((
+        newStatus: PaginationStatus,
         forcedReload = false
-    ): Pick<State, "status" | "hasRequestedNextPage"> {
-        const hasChanged = state.status !== nextStatus || forcedReload;
-
-        const resetRequested =
-            nextStatus === PaginationStatus.ONGOING ? false : state.hasRequestedNextPage;
+    ) => {
+        const hasChanged = status !== newStatus || forcedReload;
 
         if (hasChanged) {
-            return {
-                status: nextStatus,
-                hasRequestedNextPage: resetRequested,
-            };
+            dispatch({
+                type: "SET_STATUS",
+                payload: {
+                    status: newStatus,
+                    hasRequestedNextPage: newStatus === PaginationStatus.ONGOING ? false : hasRequestedNextPage
+                }
+            });
         }
-
-        return { status: state.status, hasRequestedNextPage: state.hasRequestedNextPage };
-    }
+    }, [status, hasRequestedNextPage, dispatch]);
 
 
     async function handleInitial() {
@@ -208,7 +233,11 @@ export function usePagination<T>({
 
     async function handleLoadMore() {
         dispatch({ type: "LOAD_MORE_REQUEST" });
-        const result = await onLoadMore(pagination.page + 1);
+        const result = await fetchDedup(async (_) => {
+            const res = await onLoadMore(pagination.page + 1);
+            return res;
+        });
+
         dispatch({ type: "LOAD_MORE_SUCCESS", payload: result });
     }
 
@@ -218,6 +247,7 @@ export function usePagination<T>({
             if (status === PaginationStatus.ONGOING && !hasRequestedNextPage) {
                 const triggerIndex = Math.max(0, pagination.list.length - invisibleItemsThreshold);
                 if (!isLastPage(pagination) && index === triggerIndex) {
+        
                     dispatch({ type: "SET_HAS_REQUESTED_NEXT_PAGE", payload: true });
                     setTimeout(() => handleLoadMore(), 0);
                 }
@@ -235,10 +265,11 @@ export function usePagination<T>({
             <PagedItem
                 index={index}
                 pagination={pagination}
-                itemKey={itemKey}
-                renderItem={renderItem}
-                renderSeparator={renderSeparator}
+                itemKey={itemKey as ItemKeyFn<unknown>}
+                renderItem={renderItem as RenderItemFn<unknown>}
+                renderSeparator={renderSeparator as RenderSeparatorFn<unknown> | undefined}
                 onCheckLoadMore={checkLoadMore}
+                onRegisterReset={resetTrigger}
             />
         );
     }
@@ -289,25 +320,32 @@ interface PagedItemProps<T> {
     renderItem: RenderItemFn<T>;
     renderSeparator?: RenderSeparatorFn<T>;
     onCheckLoadMore: (index: number) => void;
+    onRegisterReset: (resetFn: () => void) => () => void;
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
-function PagedItem<T>({
+const PagedItem = React.memo(function PagedItem<T>({
     index,
     pagination,
     itemKey,
     renderItem,
     onCheckLoadMore,
+    onRegisterReset,
 }: PagedItemProps<T>) {
     const itemData = pagination.list[index];
 
-    const { ref, setIndex } = useItemVisibility((visibleIndex) => {
-        onCheckLoadMore(visibleIndex);
+    const { ref, setIndex, reset } = useItemVisibility((index) => {
+        onCheckLoadMore(index);
     });
 
     useEffect(() => {
         setIndex(index);
     }, [index, setIndex]);
+
+    // Register reset function một lần khi mount
+    useEffect(() => {
+        const cleanup = onRegisterReset(reset);
+        return cleanup;
+    }, [onRegisterReset, reset]);
 
     const item = renderItem({
         index,
@@ -316,8 +354,19 @@ function PagedItem<T>({
     });
 
     return (
-        <div ref={ref} >
+        <div ref={ref}>
             {item}
         </div>
     );
-};
+}, (prevProps, nextProps) => {
+    return (
+        prevProps.index === nextProps.index &&
+        prevProps.pagination.page === nextProps.pagination.page &&
+        prevProps.pagination.total === nextProps.pagination.total &&
+        prevProps.pagination.list.length === nextProps.pagination.list.length &&
+        prevProps.itemKey === nextProps.itemKey &&
+        prevProps.renderItem === nextProps.renderItem &&
+        prevProps.onCheckLoadMore === nextProps.onCheckLoadMore &&
+        prevProps.onRegisterReset === nextProps.onRegisterReset
+    );
+});

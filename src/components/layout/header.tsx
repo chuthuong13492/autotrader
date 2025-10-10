@@ -4,7 +4,7 @@ import { MobileNavigation } from './mobile-navigation'
 import { Link } from '@tanstack/react-router'
 import { type DashboardDispatch } from '@/stores/dashboard-store'
 import { useDispatch } from 'react-redux'
-import { filterPage } from '@/stores/dashboard-slice'
+import { filterPageAsync } from '@/stores/dashboard-slice'
 
 type HeaderProps = React.HTMLAttributes<HTMLElement> & {
   fixed?: boolean
@@ -61,7 +61,7 @@ export function Header({ className, fixed, children, ...props }: HeaderProps) {
 function Prefix() {
   const dispatch = useDispatch<DashboardDispatch>()
 
-  const onClick = () => dispatch(filterPage({}));
+  const onClick = async () => await dispatch(filterPageAsync({}));
   return (
     <>
       {/* HAMBURGER MENU*/}

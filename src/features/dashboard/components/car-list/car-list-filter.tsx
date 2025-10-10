@@ -17,14 +17,16 @@ import {
 } from '@/components/ui/form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useUpdateEffect } from '@/hooks/use-update-effect'
-import { setSort, type SortKey } from '@/stores/dashboard-slice'
+import { setSortAsync, type SortKey } from '@/stores/dashboard-slice'
 import { DashboardFilterSheet } from '../sheets/filter-sheet'
 import { cn } from '@/lib/utils'
+import type { Pagination } from '@/components/layout/data/pagination'
+import type { Car } from '../../data/mock-data'
 
 
 interface CarListFilterProps {
     onResetFilters?: () => void
-    onSortChange?: (sort: SortKey) => void
+    onSortChange?: (sort: SortKey, pagination: Pagination<Car>) => void
 }
 
 export function CarListFilter({ onResetFilters, onSortChange }: CarListFilterProps) {
@@ -34,9 +36,9 @@ export function CarListFilter({ onResetFilters, onSortChange }: CarListFilterPro
 
     const dispatch = useDispatch<DashboardDispatch>();
 
-    const onSorted = (value: SortForm) => {
-        dispatch(setSort(value.sort))
-        onSortChange?.(value.sort)
+    const onSorted = async (value: SortForm) => {
+        const result =   await dispatch(setSortAsync(value.sort)).unwrap()
+        onSortChange?.(value.sort, result.pagination)
     };
 
     const total = useMemo(() => {

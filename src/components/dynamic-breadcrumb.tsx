@@ -4,7 +4,7 @@ import { ChevronRight } from 'lucide-react'
 import { useDispatch, useSelector } from 'react-redux'
 import { type DashboardDispatch, type DashboardRootState } from '@/stores/dashboard-store'
 import { type BreadcrumbItem, buildFilterUrl } from '@/lib/breadcrumb-utils'
-import { filterPage } from '@/stores/dashboard-slice'
+import { filterPageAsync } from '@/stores/dashboard-slice'
 import type { FormData } from '@/features/dashboard/components/dashboard-filter'
 
 type DynamicBreadcrumbProps = {
@@ -119,7 +119,7 @@ export function DynamicBreadcrumb({ lastItem }: DynamicBreadcrumbProps) {
           {item.href ? (
             <Link
               to={item.href}
-              onClick={() => dispatch(filterPage(parseHrefToFormData(item.href!)))}
+              onClick={async () => await dispatch(filterPageAsync(parseHrefToFormData(item.href!)))}
               className={`relative ${item.isActive ? "text-foreground font-medium" : "text-muted-foreground "}
                 hover:text-foreground transition-colors 
                 after:transition-all after:duration-300 after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[1px] after:w-0 

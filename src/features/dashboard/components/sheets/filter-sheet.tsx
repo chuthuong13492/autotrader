@@ -6,7 +6,7 @@ import { useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { DashboardDispatch, DashboardRootState } from "@/stores/dashboard-store";
 import { useRouter } from "@tanstack/react-router";
-import { filterPage, setSort } from "@/stores/dashboard-slice";
+import { filterPageAsync, setSortAsync } from "@/stores/dashboard-slice";
 import { Sort, type SortForm } from "../car-list/car-list-filter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import isEqual from "lodash/isEqual";
@@ -55,9 +55,9 @@ export function DashboardFilterSheet() {
 
     const router = useRouter();
 
-    const onFilterChange = (formData: Partial<FormData>) => {
+    const onFilterChange = async (formData: Partial<FormData>) => {
         const { search } = state;
-        dispatch(filterPage(formData));
+        await dispatch(filterPageAsync(formData));
 
         const nextSearch = buildSearchParams(formData, search);
         const nextLocation = router.buildLocation({
@@ -68,7 +68,7 @@ export function DashboardFilterSheet() {
         router.history.replace(nextLocation.href);
     };
 
-    const onChange = (value: SortForm) => dispatch(setSort(value.sort));
+    const onChange = (value: SortForm) => dispatch(setSortAsync(value.sort));
 
     const onResetFilters =() => dashboardFilterRef.current?.reset();
 

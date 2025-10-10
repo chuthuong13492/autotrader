@@ -14,6 +14,7 @@ interface UseIntersectionObserverReturn {
 }
 
 export function useIntersectionObserver(
+  deps: unknown[] = [],
   callback?: (entry: IntersectionObserverEntry) => void,
   options: UseIntersectionObserverOptions = {}
 ): UseIntersectionObserverReturn {
@@ -52,8 +53,8 @@ export function useIntersectionObserver(
       observer.unobserve(element);
       observer.disconnect();
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [threshold, root, rootMargin, triggerOnce]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [threshold, root, rootMargin, triggerOnce, ...deps]); // 👈 thêm deps để khi resetCount thay đổi thì remount observer
 
   return { ref, isIntersecting, entry };
 }
@@ -62,23 +63,30 @@ export function useItemVisibility(
   onVisible?: (index: number) => void,
   options: UseIntersectionObserverOptions = {}
 ) {
+  const resetToken = useRef({});
   const indexRef = useRef<number>(-1);
+  const hasTriggered = useRef(false);
 
   const { ref, isIntersecting } = useIntersectionObserver(
-    useCallback(
-      (entry: IntersectionObserverEntry) => {
-        if (entry.isIntersecting && onVisible && indexRef.current >= 0) {
-          onVisible(indexRef.current);
-        }
-      },
-      [onVisible]
-    ),
-    { ...options, triggerOnce: true } // luôn trigger 1 lần cho item
+    [resetToken.current],
+    useCallback((entry: IntersectionObserverEntry) => {
+      if (entry.isIntersecting && onVisible && indexRef.current >= 0 && !hasTriggered.current) {
+        onVisible(indexRef.current);
+        hasTriggered.current = true;
+      }
+    }, [onVisible]),
+    options,
+
   );
 
   const setIndex = useCallback((index: number) => {
     indexRef.current = index;
   }, []);
 
-  return { ref, setIndex, isIntersecting };
+  const reset = useCallback(() => {
+    hasTriggered.current = false;
+    resetToken.current = {};
+  }, []);
+
+  return { ref, setIndex, isIntersecting, reset };
 }

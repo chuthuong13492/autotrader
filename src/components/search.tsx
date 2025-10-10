@@ -5,7 +5,7 @@ import { useRouter } from '@tanstack/react-router'
 import { Button } from './ui/button'
 import { useDispatch, useSelector } from 'react-redux'
 import { type DashboardDispatch, type DashboardRootState } from '@/stores/dashboard-store'
-import { setSearch, filterPage } from '@/stores/dashboard-slice'
+import { setSearch, filterPageAsync } from '@/stores/dashboard-slice'
 
 type SearchProps = {
   className?: string
@@ -28,7 +28,7 @@ export function Search({
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation()
     dispatch(setSearch(''))
-    dispatch(filterPage({}))
+    dispatch(filterPageAsync({}))
 
     const currentSearch = new URLSearchParams(window.location.search)
 

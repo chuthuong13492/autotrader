@@ -1,14 +1,16 @@
 import { Main } from "@/components/layout/main"
 import { DashboardFilter, type FormData, type FilterTransmissionType, type FilterRef } from "./dashboard-filter"
-import { CarList } from "./car-list/car-list"
+import { CarList, type CarListRef } from "./car-list/car-list"
 import { CarListFilter } from "./car-list/car-list-filter"
 import { useRef } from "react"
 import { Search } from "@/components/search"
 import { useRouter } from "@tanstack/react-router"
 import { type DashboardRootState, type DashboardDispatch } from "@/stores/dashboard-store"
 import { useDispatch, useSelector } from "react-redux"
-import { filterPage, type SortKey } from "@/stores/dashboard-slice"
+import { filterPageAsync, type SortKey } from "@/stores/dashboard-slice"
 import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb"
+import type { Pagination } from "@/components/layout/data/pagination"
+import type { Car } from "../data/mock-data"
 
 type SearchParams = {
     value?: string
@@ -46,30 +48,35 @@ function buildSearchParams(
 
 export function DashboardMain() {
     const dashboardFilterRef = useRef<FilterRef>(null);
+    const carListRef = useRef<CarListRef>(null);
 
     const dispatch = useDispatch<DashboardDispatch>()
     const state = useSelector((state: DashboardRootState) => state.dashboard)
 
-
     const router = useRouter()
 
-    const onFilterChange = (formData: Partial<FormData>) => {
+    const onFilterChange = async (formData: Partial<FormData>) => {
         const { search, sort } = state
-        dispatch(filterPage(formData))
 
-        const nextSearch = buildSearchParams(formData, search, sort)
+        const result = await dispatch(filterPageAsync(formData)).unwrap();
+
+        carListRef.current?.updatePagination(result.pagination);
+
+        const nextSearch = buildSearchParams(formData, search, sort);
         const nextLocation = router.buildLocation({
             from: '/search-result-page',
             to: '.',
             search: nextSearch,
-        })
-        router.history.replace(nextLocation.href)
+        });
+        
+        router.history.replace(nextLocation.href);
     }
 
 
     const onResetFilters = () => dashboardFilterRef.current?.reset();
 
-    const onSortChange = (sort: SortKey) => {
+    const onSortChange = (sort: SortKey, pagination: Pagination<Car>) => {
+        carListRef.current?.updatePagination(pagination)
         const { values, search } = state
         const nextSearch = buildSearchParams(values, search, sort)
         const nextLocation = router.buildLocation({
@@ -78,6 +85,7 @@ export function DashboardMain() {
             search: nextSearch,
         })
         router.history.replace(nextLocation.href)
+        // Reset pagination when sort changes
     }
 
     return (
@@ -96,7 +104,7 @@ export function DashboardMain() {
                 </div>
                 <section className="min-w-0 grow">
                     <CarListFilter onResetFilters={onResetFilters} onSortChange={onSortChange} />
-                    <CarList />
+                    <CarList ref={carListRef} />
                 </section>
             </div>
         </Main>

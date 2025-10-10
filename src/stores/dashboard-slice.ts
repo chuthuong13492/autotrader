@@ -85,27 +85,56 @@ export const initialState: DashboardState = {
   pagination: emptyPagination(),
 };
 
+// Async thunk for setting sort
+export const setSortAsync = createAsyncThunk(
+  'dashboard/setSort',
+  async (sortKey: SortKey, { getState }) => {
+    const state = getState() as { dashboard: DashboardState };
+    const { values, search } = state.dashboard;
+    
+    const paginationResult = getPagination(
+      ALL_CARS,
+      values,
+      search ?? "",
+      sortKey,
+      1, // page
+      20 // pageSize
+    );
+
+    return {
+      sort: sortKey,
+      pagination: paginationResult
+    };
+  }
+);
+
+// Async thunk for filtering page
+export const filterPageAsync = createAsyncThunk(
+  'dashboard/filterPage',
+  async (formData: Partial<FormData>, { getState }) => {
+    const state = getState() as { dashboard: DashboardState };
+    const { search, sort } = state.dashboard;
+    
+    const paginationResult = getPagination(
+      ALL_CARS,
+      formData,
+      search ?? "",
+      sort,
+      1, // page
+      20 // pageSize
+    );
+
+    return {
+      values: formData,
+      pagination: paginationResult
+    };
+  }
+);
+
 export const dashboardSlice = createSlice({
   name: "dashboard",
   initialState,
   reducers: {
-    setSort(state, action: PayloadAction<SortKey>) {
-      state.sort = action.payload;
-      // Apply filters and pagination
-      const paginationResult = getPagination(
-        ALL_CARS,
-        state.values,
-        state.search ?? "",
-        state.sort,
-        1, // page
-        20 // pageSize
-      );
-
-      state.pagination = paginationResult;
-
-      // eslint-disable-next-line no-console
-      console.log("Set sort", state.pagination);
-    },
     setSearch(state, action: PayloadAction<string>) {
       state.search = action.payload;
     },
@@ -124,25 +153,6 @@ export const dashboardSlice = createSlice({
     setForm(state, action: PayloadAction<Partial<FormData>>) {
       state.values = action.payload;
     },
-    filterPage(state, action: PayloadAction<Partial<FormData>>) {
-      //SET FORM
-      state.values = action.payload;
-
-      // Apply filters and pagination
-      const paginationResult = getPagination(
-        ALL_CARS,
-        state.values,
-        state.search ?? "",
-        state.sort,
-        1, // page
-        20 // pageSize
-      );
-
-      state.pagination = paginationResult;
-
-      // eslint-disable-next-line no-console
-      console.log("filterPage", state.pagination);
-    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchPage.fulfilled, (state, action) => {
@@ -151,6 +161,35 @@ export const dashboardSlice = createSlice({
       // eslint-disable-next-line no-console
       console.log("fetchPage", action.payload);
     });
+    
+    builder.addCase(setSortAsync.fulfilled, (state, action) => {
+      state.sort = action.payload.sort;
+      state.pagination = action.payload.pagination;
+
+      // eslint-disable-next-line no-console
+      console.log("setSortAsync", action.payload);
+    });
+    
+    builder.addCase(setSortAsync.rejected, (_, action) => {
+      // Handle error if needed
+      // eslint-disable-next-line no-console
+      console.error("setSortAsync failed:", action.error);
+    });
+    
+    builder.addCase(filterPageAsync.fulfilled, (state, action) => {
+      state.values = action.payload.values;
+      state.pagination = action.payload.pagination;
+
+      // eslint-disable-next-line no-console
+      console.log("filterPageAsync", action.payload);
+    });
+    
+    builder.addCase(filterPageAsync.rejected, (_, action) => {
+      // Handle error if needed
+      // eslint-disable-next-line no-console
+      console.error("filterPageAsync failed:", action.error);
+    });
+    
     builder.addCase(getSimilarCars.fulfilled, (_, action) => {
       // state.pagination = updatePage(state.pagination, action.payload);
 
@@ -210,6 +249,6 @@ export const getSimilarCars = createAsyncThunk(
   }
 );
 
-export const { setSort, setSearch, setState, filterPage, setForm } =
+export const { setSearch, setState, setForm } =
   dashboardSlice.actions;
 export default dashboardSlice.reducer;

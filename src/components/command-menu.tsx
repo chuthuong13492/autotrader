@@ -16,7 +16,7 @@ import {
 import { ScrollArea } from './ui/scroll-area'
 import { type DashboardDispatch, type DashboardRootState } from '@/stores/dashboard-store'
 import { useSelector, useDispatch } from 'react-redux'
-import { setSearch, filterPage } from '@/stores/dashboard-slice'
+import { setSearch, filterPageAsync } from '@/stores/dashboard-slice'
 import { type FilterTransmissionType } from '@/features/dashboard/components/dashboard-filter'
 
 // Optimized CommandItem component
@@ -102,7 +102,7 @@ export function CommandMenu() {
 
   const onValueChange = useDebouncedCallback((query: string) => {
     setQuery(query)
-    dispatch(filterPage({}))
+    dispatch(filterPageAsync({}))
   }, 500)
 
   const buildSearchParams = useCallback((value: string) => {
@@ -152,7 +152,7 @@ export function CommandMenu() {
   const onSelect = useCallback((value: string) => {
     setQuery(value)
     setOpen(false)
-    dispatch(filterPage({}))
+    dispatch(filterPageAsync({}))
     
     const searchParams = buildSearchParams(value)
     navigateToSearch(searchParams)
