@@ -256,14 +256,3 @@ export function ComponentName({ prop1, prop2 }: ComponentProps) {
 4. Push to branch: `git push origin feature/amazing-feature`
 5. Open a Pull Request
 
-## 📄 License
-
-This project is licensed under the MIT License.
-
-## 🆘 Support
-
-For support, please open an issue in the GitHub repository or contact the development team.
-
----
-
-**Built with ❤️ using React, TypeScript, and modern web technologies.**
