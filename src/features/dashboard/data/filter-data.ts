@@ -75,6 +75,17 @@ function buildBrandData(cars: Car[]) {
 // Brand (Make, Model, Trim) Filter Data - dynamically generated from ALL_CARS
 export const brandFilterData = buildBrandData(ALL_CARS)
 
+// Year Filter Data - dynamically generated from ALL_CARS
+export const yearFilterData = {
+  years: Array.from(new Set(ALL_CARS.map(c => c.year)))
+    .sort((a, b) => b - a) // Sort from newest to oldest
+    .map(year => ({
+      value: year.toString(),
+      label: year.toString(),
+      description: `${year} model year`
+    }))
+}
+
 // Body Type Filter Data - dynamically generated from ALL_CARS
 const bodyTypeIconMap: Record<string, string> = {
   Sedan: '🚗',
@@ -216,7 +227,7 @@ export function applyFilters(cars: Car[], filters?: FilterState): Car[] {
     // Search query
     if (filters.searchQuery) {
       const searchLower = filters.searchQuery.toLowerCase()
-      const carText = `${car.make} ${car.model} ${car.trim}`.toLowerCase()
+      const carText = `${car.make} ${car.model} ${car.trim} ${car.year}`.toLowerCase()
       if (!carText.includes(searchLower)) {
         return false
       }
