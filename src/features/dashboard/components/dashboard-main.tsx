@@ -68,7 +68,7 @@ export function DashboardMain() {
             to: '.',
             search: nextSearch,
         });
-        
+
         router.history.replace(nextLocation.href);
     }
 

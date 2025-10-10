@@ -1,4 +1,4 @@
-import { useImperativeHandle, forwardRef } from 'react'
+import { useImperativeHandle, forwardRef, useMemo } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { useDebouncedCallback } from 'use-debounce'
 import { ChevronDown } from 'lucide-react'
@@ -71,16 +71,22 @@ export const DashboardFilter = forwardRef<FilterRef, DashboardFilterProps>((prop
     const { pathname, search } = useStableLocation();
     const isSearchResultPage = pathname.includes('/search-result-page');
 
-    // Convert search params to form default values
-    const defaultValues: FormData = isSearchResultPage && search ? {
-        minPrice: search.minPrice !== undefined ? String(search.minPrice) : '',
-        maxPrice: search.maxPrice !== undefined ? String(search.maxPrice) : '',
-        selectedMakes: search.selectedMakes ?? '',
-        selectedModels: search.selectedModels ?? '',
-        selectedTrims: search.selectedTrims ?? '',
-        selectedBodyTypes: search.selectedBodyTypes ?? [],
-        selectedTransmission: (search.selectedTransmission as FilterTransmissionType) ?? 'All',
-    } : initialValues
+    // Convert search params to form default values - memoized for performance
+    const defaultValues: FormData = useMemo(() => {
+        if (!isSearchResultPage || !search) {
+            return initialValues;
+        }
+
+        return {
+            minPrice: search.minPrice !== undefined ? String(search.minPrice) : '',
+            maxPrice: search.maxPrice !== undefined ? String(search.maxPrice) : '',
+            selectedMakes: search.selectedMakes ?? '',
+            selectedModels: search.selectedModels ?? '',
+            selectedTrims: search.selectedTrims ?? '',
+            selectedBodyTypes: search.selectedBodyTypes ?? [],
+            selectedTransmission: (search.selectedTransmission as FilterTransmissionType) ?? 'All',
+        };
+    }, [isSearchResultPage, search])
 
     return (
         <Filter
@@ -108,10 +114,11 @@ export const Filter = forwardRef<FilterRef, InnerFilterProps>(
         })
 
         useUpdateEffect(() => {
-            if (!isEqual(form.getValues(), defaultValues)) {
+            const currentValues = form.getValues();
+            if (!isEqual(currentValues, defaultValues)) {
                 form.reset(defaultValues)
             }
-        }, [defaultValues, form])
+        }, [defaultValues])
 
         useImperativeHandle(ref, () => ({
             reset: () => {
@@ -139,7 +146,7 @@ export const Filter = forwardRef<FilterRef, InnerFilterProps>(
             // Trigger validation khi values thay đổi
             form.trigger(['minPrice', 'maxPrice'])
             debouncedFilterChange(values)
-        }, [values, debouncedFilterChange, form])
+        }, [values, debouncedFilterChange])
 
 
         return (
