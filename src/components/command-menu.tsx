@@ -1,5 +1,5 @@
 
-import { useState } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useRouter } from '@tanstack/react-router'
 import { ArrowRight, ChevronRight } from 'lucide-react'
 import { useSearch } from '@/context/search-provider'
@@ -19,6 +19,31 @@ import { useSelector, useDispatch } from 'react-redux'
 import { setSearch, filterPage } from '@/stores/dashboard-slice'
 import { type FilterTransmissionType } from '@/features/dashboard/components/dashboard-filter'
 
+// Optimized CommandItem component
+const CommandItemWithIcon = ({ 
+  value, 
+  onSelect, 
+  children, 
+  icon 
+}: { 
+  value: string
+  onSelect: (value: string) => void
+  children: React.ReactNode
+  icon?: React.ReactNode
+}) => (
+  <CommandItem
+    value={value}
+    onSelect={() => onSelect(value)}
+  >
+    {icon || (
+      <div className='flex size-4 items-center justify-center'>
+        <ArrowRight className='text-muted-foreground/80 size-2' />
+      </div>
+    )}
+    {children}
+  </CommandItem>
+)
+
 export function CommandMenu() {
   const router = useRouter()
 
@@ -32,11 +57,20 @@ export function CommandMenu() {
   // Local state for current input value
   const [inputValue, setInputValue] = useState('')
 
-  // Search results function
-  const getSearchResults = (query: string) => {
-    if (!query.trim()) return { makes: [], models: [], years: [] }
+  // Memoized suggestions (static data)
+  const suggestions = useMemo(() => ({
+    makes: brandFilterData.makes,
+    models: Object.entries(brandFilterData.models).flatMap(([make, models]) =>
+      models.map(model => ({ make, model }))
+    ),
+    years: yearFilterData.years
+  }), [])
 
-    const queryLower = query.toLowerCase()
+  // Memoized search results
+  const searchResults = useMemo(() => {
+    if (!inputValue.trim()) return { makes: [], models: [], years: [] }
+
+    const queryLower = inputValue.toLowerCase()
     const queryParts = queryLower.split(/\s+/)
 
     const makes = brandFilterData.makes.filter(make =>
@@ -54,38 +88,24 @@ export function CommandMenu() {
     )
 
     return { makes, models, years }
-  }
+  }, [inputValue])
 
-  // Suggestions function (always returns all data)
-  const getSuggestions = () => {
-    return {
-      makes: brandFilterData.makes,
-      models: Object.entries(brandFilterData.models).flatMap(([make, models]) =>
-        models.map(model => ({ make, model }))
-      ),
-      years: yearFilterData.years
-    }
-  }
-
-  const searchResults = getSearchResults(inputValue)
-  const suggestions = getSuggestions()
-
-  // Check if we have search results
-  const hasSearchResults = searchResults.makes.length > 0 || searchResults.models.length > 0 || searchResults.years.length > 0
+  // Memoized check for search results
+  const hasSearchResults = useMemo(() => 
+    searchResults.makes.length > 0 || searchResults.models.length > 0 || searchResults.years.length > 0,
+    [searchResults]
+  )
 
 
-  const setQuery = (e: string) => dispatch(setSearch(e));
+  // Memoized callbacks
+  const setQuery = useCallback((query: string) => dispatch(setSearch(query)), [dispatch])
 
-  const onValueChange = useDebouncedCallback((e) => {
-    setQuery(e);
+  const onValueChange = useDebouncedCallback((query: string) => {
+    setQuery(query)
     dispatch(filterPage({}))
   }, 500)
 
-  const onSelect = (e: string) => {
-    setQuery(e)
-    setOpen(false)
-    dispatch(filterPage({}))
-
+  const buildSearchParams = useCallback((value: string) => {
     const nextSearch: Partial<{
       value: string
       minPrice: number
@@ -96,7 +116,8 @@ export function CommandMenu() {
       selectedBodyTypes: string[]
       selectedTransmission: FilterTransmissionType
     }> = {}
-    if (e) nextSearch.value = e
+    
+    if (value) nextSearch.value = value
     if (values.minPrice) nextSearch.minPrice = Number(values.minPrice)
     if (values.maxPrice) nextSearch.maxPrice = Number(values.maxPrice)
     if (values.selectedMakes) nextSearch.selectedMakes = values.selectedMakes
@@ -106,14 +127,46 @@ export function CommandMenu() {
     if (values.selectedTransmission && values.selectedTransmission !== 'All') {
       nextSearch.selectedTransmission = values.selectedTransmission
     }
+    
+    return nextSearch
+  }, [values])
 
+  const navigateToSearch = useCallback((searchParams: Partial<{
+    value: string
+    minPrice: number
+    maxPrice: number
+    selectedMakes: string
+    selectedModels: string
+    selectedTrims: string
+    selectedBodyTypes: string[]
+    selectedTransmission: FilterTransmissionType
+  }>) => {
     const nextLocation = router.buildLocation({
       from: '/search-result-page',
       to: '.',
-      search: nextSearch,
+      search: searchParams,
     })
     router.history.replace(nextLocation.href)
-  }
+  }, [router])
+
+  const onSelect = useCallback((value: string) => {
+    setQuery(value)
+    setOpen(false)
+    dispatch(filterPage({}))
+    
+    const searchParams = buildSearchParams(value)
+    navigateToSearch(searchParams)
+  }, [setQuery, setOpen, dispatch, buildSearchParams, navigateToSearch])
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      if (inputValue.trim()) {
+        onValueChange(inputValue)
+        setOpen(false)
+      }
+    }
+  }, [inputValue, onValueChange, setOpen])
 
   return (
     <CommandDialog
@@ -121,13 +174,13 @@ export function CommandMenu() {
       open={state.open}
       onOpenChange={(open) => {
         setOpen(open)
-        if (!open) setInputValue('') // Reset input when closing
+        if (!open) setInputValue('')
       }}
     >
       <CommandInput
         placeholder='Type vehicle brands/models or search...'
         onValueChange={setInputValue}
-        onSubmit={() => onValueChange(inputValue)}
+        onKeyDown={handleKeyDown}
       />
       <CommandList >
         <ScrollArea type='hover' className='h-72 pe-1'>
@@ -137,16 +190,13 @@ export function CommandMenu() {
               {searchResults.makes.length > 0 && (
                 <CommandGroup heading='Brands'>
                   {searchResults.makes.map((make) => (
-                    <CommandItem
+                    <CommandItemWithIcon
                       key={`search-make-${make}`}
                       value={make}
-                      onSelect={() => onSelect(make)}
+                      onSelect={onSelect}
                     >
-                      <div className='flex size-4 items-center justify-center'>
-                        <ArrowRight className='text-muted-foreground/80 size-2' />
-                      </div>
                       {make}
-                    </CommandItem>
+                    </CommandItemWithIcon>
                   ))}
                 </CommandGroup>
               )}
@@ -154,16 +204,13 @@ export function CommandMenu() {
               {searchResults.models.length > 0 && (
                 <CommandGroup heading='Models'>
                   {searchResults.models.map(({ make, model }) => (
-                    <CommandItem
+                    <CommandItemWithIcon
                       key={`search-model-${make}-${model}`}
                       value={`${make} ${model}`}
-                      onSelect={() => onSelect(`${make} ${model}`)}
+                      onSelect={onSelect}
                     >
-                      <div className='flex size-4 items-center justify-center'>
-                        <ArrowRight className='text-muted-foreground/80 size-2' />
-                      </div>
                       {make} <ChevronRight /> {model}
-                    </CommandItem>
+                    </CommandItemWithIcon>
                   ))}
                 </CommandGroup>
               )}
@@ -171,16 +218,13 @@ export function CommandMenu() {
               {searchResults.years.length > 0 && (
                 <CommandGroup heading='Years'>
                   {searchResults.years.map((year) => (
-                    <CommandItem
+                    <CommandItemWithIcon
                       key={`search-year-${year.value}`}
                       value={year.value}
-                      onSelect={() => onSelect(year.value)}
+                      onSelect={onSelect}
                     >
-                      <div className='flex size-4 items-center justify-center'>
-                        <ArrowRight className='text-muted-foreground/80 size-2' />
-                      </div>
                       {year.label}
-                    </CommandItem>
+                    </CommandItemWithIcon>
                   ))}
                 </CommandGroup>
               )}
@@ -190,46 +234,37 @@ export function CommandMenu() {
               {/* Nếu không có search result thì show suggestions */}
               <CommandGroup heading='Suggested Brands'>
                 {suggestions.makes.map((make) => (
-                  <CommandItem
+                  <CommandItemWithIcon
                     key={`suggestion-make-${make}`}
                     value={make}
-                    onSelect={() => onSelect(make)}
+                    onSelect={onSelect}
                   >
-                    <div className='flex size-4 items-center justify-center'>
-                      <ArrowRight className='text-muted-foreground/80 size-2' />
-                    </div>
                     {make}
-                  </CommandItem>
+                  </CommandItemWithIcon>
                 ))}
               </CommandGroup>
 
               <CommandGroup heading='Suggested Models'>
                 {suggestions.models.map(({ make, model }) => (
-                  <CommandItem
+                  <CommandItemWithIcon
                     key={`suggestion-model-${make}-${model}`}
                     value={`${make} ${model}`}
-                    onSelect={() => onSelect(`${make} ${model}`)}
+                    onSelect={onSelect}
                   >
-                    <div className='flex size-4 items-center justify-center'>
-                      <ArrowRight className='text-muted-foreground/80 size-2' />
-                    </div>
                     {make} <ChevronRight /> {model}
-                  </CommandItem>
+                  </CommandItemWithIcon>
                 ))}
               </CommandGroup>
 
               <CommandGroup heading='Suggested Years'>
                 {suggestions.years.map((year) => (
-                  <CommandItem
+                  <CommandItemWithIcon
                     key={`suggestion-year-${year.value}`}
                     value={year.value}
-                    onSelect={() => onSelect(year.value)}
+                    onSelect={onSelect}
                   >
-                    <div className='flex size-4 items-center justify-center'>
-                      <ArrowRight className='text-muted-foreground/80 size-2' />
-                    </div>
                     {year.label}
-                  </CommandItem>
+                  </CommandItemWithIcon>
                 ))}
               </CommandGroup>
             </>
