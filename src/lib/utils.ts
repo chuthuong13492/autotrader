@@ -1,12 +1,17 @@
-import { type ClassValue, clsx } from 'clsx'
-import { twMerge } from 'tailwind-merge'
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+import {
+  copyWithPagination,
+  type Pagination,
+} from "@/components/layout/data/pagination";
+import isEqual from "lodash/isEqual";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 export function sleep(ms: number = 1000) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
@@ -22,39 +27,74 @@ export function sleep(ms: number = 1000) {
  * - Near end: [1, '...', 7, 8, 9, 10]
  */
 export function getPageNumbers(currentPage: number, totalPages: number) {
-  const maxVisiblePages = 5 // Maximum number of page buttons to show
-  const rangeWithDots = []
+  const maxVisiblePages = 5; // Maximum number of page buttons to show
+  const rangeWithDots: (number | '...')[] = [];
 
   if (totalPages <= maxVisiblePages) {
     // If total pages is 5 or less, show all pages
     for (let i = 1; i <= totalPages; i++) {
-      rangeWithDots.push(i)
+      rangeWithDots.push(i);
     }
   } else {
     // Always show first page
-    rangeWithDots.push(1)
+    rangeWithDots.push(1);
 
     if (currentPage <= 3) {
       // Near the beginning: [1] [2] [3] [4] ... [10]
       for (let i = 2; i <= 4; i++) {
-        rangeWithDots.push(i)
+        rangeWithDots.push(i);
       }
-      rangeWithDots.push('...', totalPages)
+      rangeWithDots.push('...', totalPages);
     } else if (currentPage >= totalPages - 2) {
       // Near the end: [1] ... [7] [8] [9] [10]
-      rangeWithDots.push('...')
+      rangeWithDots.push('...');
       for (let i = totalPages - 3; i <= totalPages; i++) {
-        rangeWithDots.push(i)
+        rangeWithDots.push(i);
       }
     } else {
       // In the middle: [1] ... [4] [5] [6] ... [10]
-      rangeWithDots.push('...')
+      rangeWithDots.push('...');
       for (let i = currentPage - 1; i <= currentPage + 1; i++) {
-        rangeWithDots.push(i)
+        rangeWithDots.push(i);
       }
-      rangeWithDots.push('...', totalPages)
+      rangeWithDots.push('...', totalPages);
     }
   }
 
-  return rangeWithDots
+  return rangeWithDots;
+}
+
+export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export function updatePage<T>(
+  pagination: Pagination<T>,
+  newPagination: Pagination<T>
+): Pagination<T> {
+  const updatedList = [...pagination.list];
+
+  newPagination.list.forEach((item) => {
+    const index = updatedList.findIndex((e) => isEqual(e, item));
+    if (index >= 0) {
+      updatedList[index] = item; // update
+    } else {
+      updatedList.push(item); // add mới
+    }
+  });
+
+  return copyWithPagination(pagination, {
+    list: updatedList,
+    page: newPagination.page,
+    pageSize: newPagination.pageSize,
+    pageCount: newPagination.pageCount,
+    total: newPagination.total,
+    error: newPagination.error,
+  });
+}
+
+// Utility function to create copyWith pattern
+export function copyWith<T extends Record<string, unknown>>(
+  original: T,
+  updates: Partial<T>
+): T {
+  return { ...original, ...updates };
 }

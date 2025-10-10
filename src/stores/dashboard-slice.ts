@@ -1,83 +1,215 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
+import {
+  createSlice,
+  type PayloadAction,
+  createAsyncThunk,
+} from "@reduxjs/toolkit";
+import { type FormData } from "@/features/dashboard/components/dashboard-filter";
+import { applyFilters } from "@/features/dashboard/data/filter-data";
+import { ALL_CARS, type Car } from "@/features/dashboard/data/mock-data";
+import {
+  type Pagination,
+  copyWithPagination,
+  emptyPagination,
+} from "@/components/layout/data/pagination";
+import { updatePage, delay } from "@/lib/utils";
 
-export type SortKey = 'relevance' | 'price-asc' | 'price-desc' | 'year-asc' | 'year-desc' | 'mileage-asc' | 'mileage-desc'
+export function getPagination(
+  cars: Car[],
+  filters: Partial<FormData>,
+  search: string,
+  sort: SortKey,
+  page: number = 1,
+  pageSize: number = 20
+) {
+  const filteredCars = applyFilters(cars, {
+    selectedMakes: filters.selectedMakes ?? "",
+    selectedModels: filters.selectedModels ?? "",
+    selectedTrims: filters.selectedTrims ?? "",
+    priceMin: filters.minPrice ? Number(filters.minPrice) : 0,
+    priceMax: filters.maxPrice
+      ? Number(filters.maxPrice)
+      : Number.MAX_SAFE_INTEGER,
+    selectedBodyTypes: filters.selectedBodyTypes ?? [],
+    selectedTransmission:
+      filters.selectedTransmission === "All"
+        ? null
+        : (filters.selectedTransmission ?? null),
+    searchQuery: search ?? "",
+    sortKey: sort,
+  });
 
-export type DashboardFilters = {
-  search: string
-  brands: string[]
-  bodyTypes: string[]
-  transmission?: 'Automatic' | 'Manual' | 'All'
-  priceMin?: number
-  priceMax?: number
-  sort: SortKey
-  page: number
+  const total = filteredCars.length;
+  const pageCount = Math.ceil(total / pageSize);
+  const safePage = Math.min(Math.max(page, 1), pageCount);
+  const start = (safePage - 1) * pageSize;
+  const end = start + pageSize;
+  const list = filteredCars.slice(start, end);
+
+  return {
+    list,
+    page: safePage,
+    pageSize,
+    pageCount,
+    total,
+  };
 }
 
-const initialState: DashboardFilters = {
-  search: '',
-  brands: [],
-  bodyTypes: [],
-  transmission: 'All',
-  priceMin: undefined,
-  priceMax: undefined,
-  sort: 'relevance',
-  page: 1,
+export type SortKey =
+  | "relevance"
+  | "price-asc"
+  | "price-desc"
+  | "year-asc"
+  | "year-desc"
+  | "mileage-asc"
+  | "mileage-desc";
+
+export interface DashboardState {
+  values: Partial<FormData>;
+  search?: string;
+  sort: SortKey;
+  pagination: Pagination<Car>;
 }
+
+export const initialState: DashboardState = {
+  search: "",
+  sort: "relevance",
+  values: {
+    minPrice: "",
+    maxPrice: "",
+    selectedMakes: "",
+    selectedModels: "",
+    selectedTrims: "",
+    selectedBodyTypes: [],
+    selectedTransmission: "All",
+  },
+  pagination: emptyPagination(),
+};
 
 export const dashboardSlice = createSlice({
-  name: 'dashboard',
+  name: "dashboard",
   initialState,
   reducers: {
-    setSearch(state, action: PayloadAction<string>) {
-      state.search = action.payload
-      state.page = 1
-    },
     setSort(state, action: PayloadAction<SortKey>) {
-      state.sort = action.payload
-      state.page = 1
+      state.sort = action.payload;
+      // Apply filters and pagination
+      const paginationResult = getPagination(
+        ALL_CARS,
+        state.values,
+        state.search ?? "",
+        state.sort,
+        1, // page
+        20 // pageSize
+      );
+
+      state.pagination = paginationResult;
+
+      // eslint-disable-next-line no-console
+      console.log("Set sort", state.pagination);
     },
-    setPage(state, action: PayloadAction<number>) {
-      state.page = action.payload
+    setSearch(state, action: PayloadAction<string>) {
+      state.search = action.payload;
     },
-    toggleBrand(state, action: PayloadAction<string>) {
-      const v = action.payload
-      state.page = 1
-      state.brands = state.brands.includes(v)
-        ? state.brands.filter((b) => b !== v)
-        : [...state.brands, v]
+    setState(state, action: PayloadAction<Partial<DashboardState>>) {
+      // Update state với data từ action
+      if (action.payload.search !== undefined) {
+        state.search = action.payload.search;
+      }
+      if (action.payload.values !== undefined) {
+        state.values = action.payload.values;
+      }
+      if (action.payload.sort !== undefined) {
+        state.sort = action.payload.sort;
+      }
     },
-    toggleBodyType(state, action: PayloadAction<string>) {
-      const v = action.payload
-      state.page = 1
-      state.bodyTypes = state.bodyTypes.includes(v)
-        ? state.bodyTypes.filter((b) => b !== v)
-        : [...state.bodyTypes, v]
+    setForm(state, action: PayloadAction<Partial<FormData>>) {
+      state.values = action.payload;
     },
-    setTransmission(state, action: PayloadAction<'Automatic' | 'Manual' | 'All'>) {
-      state.transmission = action.payload
-      state.page = 1
-    },
-    setPrice(state, action: PayloadAction<{ min?: number; max?: number }>) {
-      state.priceMin = action.payload.min
-      state.priceMax = action.payload.max
-      state.page = 1
-    },
-    resetFilters() {
-      return initialState
+    filterPage(state, action: PayloadAction<Partial<FormData>>) {
+      //SET FORM
+      state.values = action.payload;
+
+      // Apply filters and pagination
+      const paginationResult = getPagination(
+        ALL_CARS,
+        state.values,
+        state.search ?? "",
+        state.sort,
+        1, // page
+        20 // pageSize
+      );
+
+      state.pagination = paginationResult;
+
+      // eslint-disable-next-line no-console
+      console.log("filterPage", state.pagination);
     },
   },
-})
+  extraReducers: (builder) => {
+    builder.addCase(fetchPage.fulfilled, (state, action) => {
+      state.pagination = action.payload;
 
-export const {
-  setSearch,
-  setSort,
-  setPage,
-  toggleBrand,
-  toggleBodyType,
-  setTransmission,
-  setPrice,
-  resetFilters,
-} = dashboardSlice.actions
+      // eslint-disable-next-line no-console
+      console.log("fetchPage", action.payload);
+    });
+    builder.addCase(getSimilarCars.fulfilled, (_, action) => {
+      // state.pagination = updatePage(state.pagination, action.payload);
 
-export default dashboardSlice.reducer
+      // eslint-disable-next-line no-console
+      console.log("getSimilarCars", action.payload);
+    });
+  },
+});
 
+export const fetchPage = createAsyncThunk(
+  "dashboard/fetchPage",
+  async (page: number, { getState }) => {
+    await delay(2000);
+
+    const state = getState() as { dashboard: DashboardState };
+
+    // Apply filters and pagination
+    const paginationResult = getPagination(
+      ALL_CARS,
+      state.dashboard.values,
+      state.dashboard.search ?? "",
+      state.dashboard.sort,
+      page,
+      20 // pageSize
+    );
+
+    return updatePage(state.dashboard.pagination, paginationResult);
+  }
+);
+
+export const getSimilarCars = createAsyncThunk(
+  "dashboard/getSimilarCarsById",
+  async ({ page, id }: { page: number; id?: string }, { getState }) => {
+    await delay(2000);
+
+    const state = getState() as { dashboard: DashboardState };
+
+    const vehicle = ALL_CARS.find((car) => car.id === id);
+
+    if(!vehicle){
+      return copyWithPagination(state.dashboard.pagination, { error: "Vehicle not found" })
+    }
+
+    // Apply filters and pagination
+    const paginationResult = getPagination(
+      ALL_CARS,
+      {
+        selectedMakes: vehicle?.make,
+      },
+      state.dashboard.search ?? "",
+      state.dashboard.sort,
+      page,
+      10 // pageSize
+    );
+
+    return paginationResult;
+  }
+);
+
+export const { setSort, setSearch, setState, filterPage, setForm } =
+  dashboardSlice.actions;
+export default dashboardSlice.reducer;

@@ -5,12 +5,14 @@ import { cn } from '@/lib/utils'
 interface ScrollAreaProps
   extends React.ComponentProps<typeof ScrollAreaPrimitive.Root> {
   orientation?: 'vertical' | 'horizontal'
+  hasScrollbar?: boolean,
 }
 
 function ScrollArea({
   className,
   children,
   orientation = 'vertical',
+  hasScrollbar = true,
   ...props
 }: ScrollAreaProps) {
   return (
@@ -28,7 +30,8 @@ function ScrollArea({
       >
         {children}
       </ScrollAreaPrimitive.Viewport>
-      <ScrollBar orientation={orientation} />
+      {hasScrollbar && <ScrollBar orientation={orientation} />}
+      {hasScrollbar && <ScrollAreaPrimitive.Corner />}
       <ScrollAreaPrimitive.Corner />
     </ScrollAreaPrimitive.Root>
   )
@@ -46,9 +49,9 @@ function ScrollBar({
       className={cn(
         'flex touch-none p-px transition-colors select-none',
         orientation === 'vertical' &&
-          'h-full w-2.5 border-l border-l-transparent',
+        'h-full w-2.5 border-l border-l-transparent',
         orientation === 'horizontal' &&
-          'h-2.5 flex-col border-t border-t-transparent',
+        'h-2.5 flex-col border-t border-t-transparent',
         className
       )}
       {...props}

@@ -8,11 +8,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { type ReactNode } from 'react'
 
 type SelectDropdownProps = {
   onValueChange?: (value: string) => void
   defaultValue: string | undefined
   placeholder?: string
+  prefix?: ReactNode
   isPending?: boolean
   items: { label: string; value: string }[] | undefined
   disabled?: boolean
@@ -26,18 +28,21 @@ export function SelectDropdown({
   isPending,
   items,
   placeholder,
+  prefix,
   disabled,
   className = '',
-  isControlled = false,
 }: SelectDropdownProps) {
-  const defaultState = isControlled
-    ? { value: defaultValue, onValueChange }
-    : { defaultValue, onValueChange }
   return (
-    <Select {...defaultState}>
+    <Select value={defaultValue ?? ''}
+      onValueChange={onValueChange}
+      disabled={disabled}
+    >
       <FormControl>
         <SelectTrigger disabled={disabled} className={cn(className)}>
-          <SelectValue placeholder={placeholder ?? 'Select'} />
+          <div className="flex items-center gap-2">
+            {prefix && <div className="text-muted-foreground">{prefix}</div>}
+            <SelectValue placeholder={placeholder ?? 'Select'} />
+          </div>
         </SelectTrigger>
       </FormControl>
       <SelectContent>

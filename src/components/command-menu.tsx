@@ -1,7 +1,9 @@
-import React from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { useEffect } from 'react'
+import { useRouter } from '@tanstack/react-router'
 import { ArrowRight, ChevronRight } from 'lucide-react'
 import { useSearch } from '@/context/search-provider'
+import { useDebouncedCallback } from 'use-debounce'
+import { brandFilterData } from '@/features/dashboard/data/filter-data'
 import {
   CommandDialog,
   CommandEmpty,
@@ -9,66 +11,116 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  // CommandSeparator,
 } from '@/components/ui/command'
-import { sidebarData } from './layout/data/sidebar-data'
 import { ScrollArea } from './ui/scroll-area'
+import { type DashboardDispatch, type DashboardRootState } from '@/stores/dashboard-store'
+import { useSelector, useDispatch } from 'react-redux'
+import { setSearch, filterPage } from '@/stores/dashboard-slice'
+import { type FilterTransmissionType } from '@/features/dashboard/components/dashboard-filter'
 
 export function CommandMenu() {
-  const navigate = useNavigate()
+  const router = useRouter()
 
-  const { open, setOpen } = useSearch()
+  const { state, setOpen } = useSearch()
 
-  const runCommand = React.useCallback(
-    (command: () => unknown) => {
-      setOpen(false)
-      command()
-    },
-    [setOpen]
-  )
+  const search = useSelector((state: DashboardRootState) => state.dashboard.search)
+
+  const values = useSelector((state: DashboardRootState) => state.dashboard.values)
+
+
+  const dispatch = useDispatch<DashboardDispatch>()
+
+
+  useEffect(() => {
+
+  }, [search])
+
+  const setQuery = (e: string) => dispatch(setSearch(e));
+
+  const onValueChange = useDebouncedCallback((e) => {
+    setQuery(e);
+    dispatch(filterPage({}))
+  }, 500)
+
+  const onSelect = (e: string) => {
+    setQuery(e)
+    setOpen(false)
+    dispatch(filterPage({}))
+
+    const nextSearch: Partial<{
+      value: string
+      minPrice: number
+      maxPrice: number
+      selectedMakes: string
+      selectedModels: string
+      selectedTrims: string
+      selectedBodyTypes: string[]
+      selectedTransmission: FilterTransmissionType
+    }> = {}
+    if (e) nextSearch.value = e
+    if (values.minPrice) nextSearch.minPrice = Number(values.minPrice)
+    if (values.maxPrice) nextSearch.maxPrice = Number(values.maxPrice)
+    if (values.selectedMakes) nextSearch.selectedMakes = values.selectedMakes
+    if (values.selectedModels) nextSearch.selectedModels = values.selectedModels
+    if (values.selectedTrims) nextSearch.selectedTrims = values.selectedTrims
+    if (values.selectedBodyTypes?.length) nextSearch.selectedBodyTypes = values.selectedBodyTypes
+    if (values.selectedTransmission && values.selectedTransmission !== 'All') {
+      nextSearch.selectedTransmission = values.selectedTransmission
+    }
+
+    const nextLocation = router.buildLocation({
+      from: '/search-result-page',
+      to: '.',
+      search: nextSearch,
+    })
+    router.history.replace(nextLocation.href)
+  }
 
   return (
-    <CommandDialog modal open={open} onOpenChange={setOpen}>
-      <CommandInput placeholder='Type a command or search...' />
+    <CommandDialog modal open={state.open} onOpenChange={setOpen}>
+      <CommandInput
+        placeholder='Type vehicle brands/models or search...'
+        onSubmit={(e) => {
+          onValueChange(e)
+        }}
+      />
       <CommandList>
         <ScrollArea type='hover' className='h-72 pe-1'>
           <CommandEmpty>No results found.</CommandEmpty>
-          {sidebarData.navGroups.map((group) => (
-            <CommandGroup key={group.title} heading={group.title}>
-              {group.items.map((navItem, i) => {
-                if (navItem.url)
-                  return (
-                    <CommandItem
-                      key={`${navItem.url}-${i}`}
-                      value={navItem.title}
-                      onSelect={() => {
-                        runCommand(() => navigate({ to: navItem.url }))
-                      }}
-                    >
-                      <div className='flex size-4 items-center justify-center'>
-                        <ArrowRight className='text-muted-foreground/80 size-2' />
-                      </div>
-                      {navItem.title}
-                    </CommandItem>
-                  )
+          {/* Brand/Model Suggestions */}
+          <CommandGroup heading='Brands'>
+            {brandFilterData.makes.map((make) => (
+              <CommandItem
+                key={`make-${make}`}
+                value={make}
+                onSelect={() => onSelect(make)}
+              >
+                <div className='flex size-4 items-center justify-center'>
+                  <ArrowRight className='text-muted-foreground/80 size-2' />
+                </div>
+                {make}
+              </CommandItem>
+            ))}
+          </CommandGroup>
 
-                return navItem.items?.map((subItem, i) => (
-                  <CommandItem
-                    key={`${navItem.title}-${subItem.url}-${i}`}
-                    value={`${navItem.title}-${subItem.url}`}
-                    onSelect={() => {
-                      runCommand(() => navigate({ to: subItem.url }))
-                    }}
-                  >
-                    <div className='flex size-4 items-center justify-center'>
-                      <ArrowRight className='text-muted-foreground/80 size-2' />
-                    </div>
-                    {navItem.title} <ChevronRight /> {subItem.title}
-                  </CommandItem>
-                ))
-              })}
-            </CommandGroup>
-          ))}
+          <CommandGroup heading='Models'>
+            {Object.entries(brandFilterData.models).flatMap(([make, models]) =>
+              models.map((model) => (
+                <CommandItem
+                  key={`model-${make}-${model}`}
+                  value={`${make} ${model}`}
+                  onSelect={() => onSelect(`${make} ${model}`)}
+                >
+                  <div className='flex size-4 items-center justify-center'>
+                    <ArrowRight className='text-muted-foreground/80 size-2' />
+                  </div>
+                  {make} <ChevronRight /> {model}
+                </CommandItem>
+              ))
+            )}
+          </CommandGroup>
+
+
           {/* <CommandSeparator /> */}
           {/* <CommandGroup heading='Theme'>
             <CommandItem onSelect={() => runCommand(() => setTheme('light'))}>
@@ -88,3 +140,4 @@ export function CommandMenu() {
     </CommandDialog>
   )
 }
+

@@ -1,25 +1,51 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useReducer } from 'react'
 import { CommandMenu } from '@/components/command-menu'
+import { SearchContext } from './context'
 
-type SearchContextType = {
+type SearchState = {
   open: boolean
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const SearchContext = createContext<SearchContextType | null>(null)
+type SearchAction =
+  | { type: 'SET_OPEN'; payload: boolean }
+  | { type: 'TOGGLE_OPEN' }
+
+
+const searchReducer = (state: SearchState, action: SearchAction): SearchState => {
+  switch (action.type) {
+    case 'SET_OPEN':
+      return { ...state, open: action.payload }
+    case 'TOGGLE_OPEN':
+      return { ...state, open: !state.open }
+    default:
+      return state
+  }
+}
 
 type SearchProviderProps = {
   children: React.ReactNode
 }
 
 export function SearchProvider({ children }: SearchProviderProps) {
-  const [open, setOpen] = useState(false)
+  const [state, dispatch] = useReducer(searchReducer, {
+    open: false
+  })
+
+
+  const setOpen = (open: boolean) => {
+    dispatch({ type: 'SET_OPEN', payload: open })
+  }
+
+  const toggleOpen = () => {
+    dispatch({ type: 'TOGGLE_OPEN' })
+  }
+
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
-        setOpen((open) => !open)
+        toggleOpen()
       }
     }
     document.addEventListener('keydown', down)
@@ -27,10 +53,10 @@ export function SearchProvider({ children }: SearchProviderProps) {
   }, [])
 
   return (
-    <SearchContext value={{ open, setOpen }}>
+    <SearchContext.Provider value={{ state, setOpen, toggleOpen }}>
       {children}
       <CommandMenu />
-    </SearchContext>
+    </SearchContext.Provider>
   )
 }
 

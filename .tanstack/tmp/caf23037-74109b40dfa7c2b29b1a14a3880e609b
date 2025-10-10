@@ -1,0 +1,6 @@
+import { VehicleDetailPage } from '@/features/vehicle'
+import { createFileRoute } from '@tanstack/react-router'
+
+export const Route = createFileRoute('/_dashboard/vehicle/id/')({
+  component: VehicleDetailPage,
+})

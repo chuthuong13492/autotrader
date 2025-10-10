@@ -1,5 +1,4 @@
 export type TransmissionType = 'Automatic' | 'Manual'
-export type BodyType = 'Sedan' | 'SUV' | 'Hatchback' | 'Coupe' | 'Truck' | 'Wagon'
 
 export type Car = {
   id: string
@@ -11,61 +10,79 @@ export type Car = {
   price: number // USD
   imageUrl: string
   condition: 'New' | 'Used'
-  bodyType: BodyType
+  bodyType:  'Sedan' | 'SUV' | 'Hatchback' | 'Coupe' | 'Truck' | 'Wagon' | 'Convertible'
   transmission: TransmissionType
   dealer: string
   badges?: string[]
 }
 
-export class Pagination<T> {
-  constructor(params: {
-    list: T[]
-    page: number
-    pageSize: number
-    pageCount: number
-    total: number
-    error?: string
-  }) {
-    this.list = params.list
-    this.page = params.page
-    this.pageSize = params.pageSize
-    this.pageCount = params.pageCount
-    this.total = params.total
-    this.error = params.error
-  }
 
-  static empty<U>(): Pagination<U> {
-    return new Pagination<U>({ list: [], page: 0, pageSize: 0, pageCount: 0, total: 0 })
-  }
+export const CAR_IMAGES = [
+  "https://images.unsplash.com/photo-1503376780353-7e6692767b70", // 0
+  "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d", // 1
+  "https://images2.autotrader.com/hn/c/0c42fbd4da54493bbca94c3efc1ee8c8.jpg?format=auto&width=408&height=306", // 2 ✅
+  "https://images.unsplash.com/photo-1493238792000-8113da705763", // 3
+  "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7", // 4
+  "https://images2.autotrader.com/hn/c/cb21b15ba4854a68aec864d270feef6f.jpg?format=auto&width=408&height=306", // 5 ✅
+  "https://images2.autotrader.com/hn/c/5e481a9a5ddb40d3bb40b1c1fa7a1b6f.jpg?format=auto&width=408&height=306",     // 6
+  "https://images2.autotrader.com/hn/c/f494480c3a824b67a0c6e4717d2222ce.jpg?format=auto&width=408&height=306", // 7 ✅
+  "https://images2.autotrader.com/hn/c/2bc0b8d34af44761b8b7e499fd6ba868.jpg?format=auto&width=408&height=306", // 8 ✅
+  "https://images2.autotrader.com/hn/c/ffa9e285737d447fa397aea5ed13d062.jpg?format=auto&width=408&height=306", // 9
+  "https://images2.autotrader.com/hn/c/e50aba058fab433b9e4d176cde4d7548.jpg?format=auto&width=408&height=306", // 10 ✅
+  "https://images2.autotrader.com/hn/c/0529463a672d4e68a373244eefb2c23a.jpg?format=auto&width=408&height=306", // 11 ✅
+  "https://images2.autotrader.com/hn/c/09bd2677b7a44eec8bfb353a4a064b0c.jpg?format=auto&width=408&height=306", // 12 ✅
+  "https://images2.autotrader.com/hn/c/9ecc0c1ef9844055852afa01f70364ed.jpg?format=auto&width=408&height=306", // 13 ✅
+  "https://images2.autotrader.com/hn/c/871b931df0f347d0bbe88ac1fb402e42.jpg?format=auto&width=408&height=306", // 14
+  "https://images2.autotrader.com/hn/c/9ecc0c1ef9844055852afa01f70364ed.jpg?format=auto&width=408&height=306", // 15 ✅
+  "https://images2.autotrader.com/hn/c/21c1ac47bfd940c6b96d55a931eecc77.jpg?format=auto&width=408&height=306", // 16 ✅
+  "https://images2.autotrader.com/hn/c/6797347887124fbe99ab5336cf1e0d4e.jpg?format=auto&width=408&height=306", // 17
+  "https://images2.autotrader.com/hn/c/5d2cf39c3b4d4acc81e9f91c130f841e.jpg?format=auto&width=408&height=306", // 18
+  "https://images2.autotrader.com/hn/c/b634662539504db0867f2546908950c5.jpg?format=auto&width=408&height=306", // 19 ✅
+  "https://images2.autotrader.com/hn/c/21c1ac47bfd940c6b96d55a931eecc77.jpg?format=auto&width=408&height=306", // 20 ✅
+  "https://images2.autotrader.com/hn/c/5e481a9a5ddb40d3bb40b1c1fa7a1b6f.jpg?format=auto&width=408&height=306",     // 21
+  "https://images.unsplash.com/photo-1552519507-da3b142c6e3d",     // 22
+  "https://images2.autotrader.com/hn/c/6a08e81dd9fc4547b06f413e402e7db5.jpg?format=auto&width=408&height=306", // 23 ✅
+  "https://images2.autotrader.com/hn/c/2289cccc880c4840908754b4458afaac.jpg?format=auto&width=408&height=306", // 24 ✅
+  "https://images2.autotrader.com/hn/c/c7e88f0fc98847fe9036d0082f2d92cc.jpg?format=auto&width=408&height=306", // 25 ✅
+  "https://images2.autotrader.com/hn/c/0177fb3ffb9f4b7b84080999df45800a.jpg?format=auto&width=408&height=306", // 26
+  "https://images2.autotrader.com/hn/c/49e8cf6304f2427cae63797bf57048a8.jpg?format=auto&width=408&height=306", // 27 ✅
+  "https://images.unsplash.com/photo-1502877338535-766e1452684a", // 28
+  "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf", // 29
+  "https://images2.autotrader.com/hn/c/22520209d8154804b245908a67a26b56.jpg?format=auto&width=408&height=306", // 30 ✅
+  "https://images.unsplash.com/photo-1563720223185-11003d516935", // 31
+  "https://images2.autotrader.com/hn/c/ebdebb78cc1041699f25aeaff64d4185.jpg?format=auto&width=408&height=306", // 32 ✅
+  "https://images.unsplash.com/photo-1503376780353-7e6692767b70", // 33
+  "https://images.unsplash.com/photo-1525609004556-c46c7d6cf023", // 34
+  "https://images2.autotrader.com/hn/c/cd9a7e66b0104e7986b3cd47f29ea504.jpg?format=auto&width=408&height=306", // 35 ✅
+  "https://images2.autotrader.com/hn/c/1181dfc8f989425396cd4748abea1283.jpg?format=auto&width=408&height=306", // 36
+  "https://images2.autotrader.com/hn/c/0eb941e863934141b9b2b12ae1da29df.jpg?format=auto&width=408&height=306", // 37 ✅
+  "https://images2.autotrader.com/hn/c/4177af881f294c8b81a7b92279111130.jpg?format=auto&width=408&height=306", // 38 ✅
+  "https://images2.autotrader.com/hn/c/ef573f1a63aa4048ac79368a67877516.jpg?format=auto&width=408&height=306", // 39 ✅
+  "https://images2.autotrader.com/ps-vehicle-media/0a8945d3-f97f-486c-8d1a-80c7cac63662.jpeg?format=auto&width=408&height=306", // 40 ✅
+  "https://images2.autotrader.com/ps-vehicle-media/fe5f349b-9474-44b3-af1b-23b0b89923dd.jpeg?format=auto&width=408&height=306", // 41 ✅
+  "https://images.unsplash.com/photo-1502877338535-766e1452684a", // 42
+  "https://images2.autotrader.com/hn/c/d44a320e9fd142e7944db8c716cdfb4b.jpg?format=auto&width=408&height=306", // 43 ✅
+  "https://images.unsplash.com/photo-1563720223185-11003d516935", // 44
+  "https://images2.autotrader.com/ps-vehicle-media/0ae1916e-c92b-4a8c-922b-f26ccd7e2f31.jpeg?format=auto&width=408&height=306", // 45 ✅
+  "https://images2.autotrader.com/hn/c/5e481a9a5ddb40d3bb40b1c1fa7a1b6f.jpg?format=auto&width=408&height=306",     // 46
+  "https://images2.autotrader.com/hn/c/2d62138cc2d84d2c82839faed1d8ab4c.jpg?format=auto&width=408&height=306", // 47 ✅
+  "https://images2.autotrader.com/hn/c/9601b35e82e84d81a8ed296c97cbe666.jpg?format=auto&width=408&height=306", // 48 ✅
+  "https://images2.autotrader.com/hn/c/c805bb771bc74bb598f4f7ab9435dd7d.jpg?format=auto&width=408&height=306", // 49 ✅
+  "https://images2.autotrader.com/hn/c/c4b6d824a9ed49d09c5584a4e96a85b1.jpg?format=auto&width=408&height=306", // 50
+  "https://images2.autotrader.com/hn/c/67304377137b4b5e9c70259219fd9d46.jpg?format=auto&width=408&height=306", // 51 ✅
+  "https://images2.autotrader.com/hn/c/0e884efe1c3845a7801959c7f716b1a9.jpg?format=auto&width=408&height=306", // 52 ✅
+  "https://images.unsplash.com/photo-1503376780353-7e6692767b70", // 53
+  "https://images2.autotrader.com/ps-vehicle-media/91f0bfb0-0ee6-4d40-8c7f-3cdd6e510c00.jpg?format=auto&width=408&height=306", // 54
+  "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf", // 55
+  "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7", // 56
+  "https://images2.autotrader.com/hn/c/df9f2159677b4a3ea5974290680f3074.jpg?format=auto&width=408&height=306", // 57 ✅
+  "https://images2.autotrader.com/ps-vehicle-media/91f0bfb0-0ee6-4d40-8c7f-3cdd6e510c00.jpg?format=auto&width=408&height=306",     // 58
+  "https://images2.autotrader.com/hn/c/4e8393c8fa0c4940b8fa4a7e6e6d8a54.jpg?format=auto&width=408&height=306", // 59 ✅
+];
 
-  list: T[]
-  page: number
-  pageSize: number
-  pageCount: number
-  total: number
-  get isLast(): boolean {
-    return this.page >= this.pageCount
-  }
-  error?: string
 
-  toString(): string {
-    return `Pagination(list: [${this.list.map((e) => String(e)).join(', ')}], page: ${this.page}, pageSize: ${this.pageSize}, pageCount: ${this.pageCount}, total: ${this.total})`
-  }
+export const IMG = (id: number) => CAR_IMAGES[(id - 1) % CAR_IMAGES.length];
 
-  copyWith(params: Partial<Pagination<T>> & { list?: T[] }): Pagination<T> {
-    return new Pagination<T>({
-      list: params.list ?? this.list,
-      page: params.page ?? this.page,
-      pageSize: params.pageSize ?? this.pageSize,
-      pageCount: params.pageCount ?? this.pageCount,
-      total: params.total ?? this.total,
-      error: params.error ?? this.error,
-    })
-  }
-}
-
-// ---------- Mock Cars (30 items => 5 pages x 6 each) ----------
-const IMG = (seed: number) => `https://picsum.photos/seed/car-${seed}/408/306`
 
 export const ALL_CARS: Car[] = [
   { id: '1', year: 2017, make: 'Hyundai', model: 'Santa Fe', trim: 'Sport', mileage: 76000, price: 13588, imageUrl: IMG(1), condition: 'Used', bodyType: 'SUV', transmission: 'Automatic', dealer: 'San Francisco Toyota', badges: ['Great Price', 'No Accidents'] },
@@ -133,22 +150,32 @@ export const ALL_CARS: Car[] = [
   { id: '58', year: 2024, make: 'Toyota', model: 'Corolla Cross', trim: 'LE', mileage: 3000, price: 26990, imageUrl: IMG(58), condition: 'Used', bodyType: 'SUV', transmission: 'Automatic', dealer: 'Livermore Toyota', badges: [] },
   { id: '59', year: 2018, make: 'Audi', model: 'A3', trim: 'Premium', mileage: 52000, price: 17990, imageUrl: IMG(59), condition: 'Used', bodyType: 'Sedan', transmission: 'Automatic', dealer: 'Euro Auto SF', badges: [] },
   { id: '60', year: 2022, make: 'Honda', model: 'HR-V', trim: 'EX', mileage: 11000, price: 22990, imageUrl: IMG(60), condition: 'Used', bodyType: 'SUV', transmission: 'Automatic', dealer: 'Livermore Honda', badges: [] },
-]
+];
 
 export const PAGE_SIZE = 20
 export const TOTAL = ALL_CARS.length
 export const PAGE_COUNT = Math.max(1, Math.ceil(TOTAL / PAGE_SIZE))
 
-export const MOCK_PAGES: Pagination<Car>[] = Array.from({ length: PAGE_COUNT }, (_, i) => {
-  const page = i + 1
-  const start = i * PAGE_SIZE
-  const end = start + PAGE_SIZE
-  const list = ALL_CARS.slice(start, end)
-  return new Pagination<Car>({ list, page, pageSize: PAGE_SIZE, pageCount: PAGE_COUNT, total: TOTAL })
-})
-
-export function getMockPage(page: number): Pagination<Car> {
-  if (page < 1 || page > PAGE_COUNT) return Pagination.empty<Car>()
-  return MOCK_PAGES[page - 1]
-}
-
+export const SUGGESTION: Car[] = [
+  { id: '101', year: 2024, make: 'Ferrari', model: 'SF90 Stradale', trim: 'Hybrid', mileage: 1200, price: 520000, imageUrl: IMG(101), condition: 'Used', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'Exotic Motors SF', badges: ['Hybrid', 'No Accidents'] },
+  { id: '102', year: 2023, make: 'Lamborghini', model: 'Aventador', trim: 'SVJ', mileage: 2000, price: 610000, imageUrl: IMG(102), condition: 'Used', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'Luxury Garage', badges: ['Great Price'] },
+  { id: '103', year: 2025, make: 'McLaren', model: 'Artura', trim: 'V6 Hybrid', mileage: 500, price: 310000, imageUrl: IMG(103), condition: 'New', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'McLaren San Jose', badges: ['Hybrid'] },
+  { id: '104', year: 2022, make: 'Bugatti', model: 'Chiron', trim: 'Super Sport', mileage: 1500, price: 3100000, imageUrl: IMG(104), condition: 'Used', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'Elite Auto', badges: ['No Accidents'] },
+  { id: '105', year: 2023, make: 'Aston Martin', model: 'DBS', trim: 'Superleggera', mileage: 2200, price: 350000, imageUrl: IMG(99), condition: 'Used', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'British Luxury Cars', badges: [] },
+  { id: '106', year: 2021, make: 'Porsche', model: '911 GT3', trim: 'Touring', mileage: 3000, price: 220000, imageUrl: IMG(106), condition: 'Used', bodyType: 'Coupe', transmission: 'Manual', dealer: 'Porsche San Francisco', badges: ['No Accidents'] },
+  { id: '107', year: 2023, make: 'Lamborghini', model: 'Huracán', trim: 'EVO RWD', mileage: 1800, price: 280000, imageUrl: IMG(107), condition: 'Used', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'Luxury Garage', badges: [] },
+  { id: '108', year: 2024, make: 'Ferrari', model: 'Roma', trim: 'Twin-Turbo V8', mileage: 1000, price: 260000, imageUrl: IMG(108), condition: 'Used', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'Ferrari Silicon Valley', badges: [] },
+  { id: '109', year: 2025, make: 'Tesla', model: 'Roadster', trim: 'Plaid', mileage: 50, price: 250000, imageUrl: IMG(109), condition: 'New', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'Tesla Store SF', badges: ['Electric'] },
+  { id: '110', year: 2022, make: 'Koenigsegg', model: 'Jesko', trim: 'Absolut', mileage: 900, price: 2800000, imageUrl: IMG(110), condition: 'Used', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'Supercar World', badges: [] },
+  
+  { id: '111', year: 2023, make: 'Porsche', model: 'Taycan Turbo S', trim: 'Performance', mileage: 5000, price: 195000, imageUrl: IMG(111), condition: 'Used', bodyType: 'Sedan', transmission: 'Automatic', dealer: 'Porsche San Francisco', badges: ['Electric'] },
+  { id: '112', year: 2024, make: 'Lamborghini', model: 'Revuelto', trim: 'Hybrid V12', mileage: 300, price: 670000, imageUrl: IMG(112), condition: 'New', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'Luxury Garage', badges: ['Hybrid'] },
+  { id: '113', year: 2022, make: 'McLaren', model: '765LT', trim: 'Spider', mileage: 2500, price: 420000, imageUrl: IMG(113), condition: 'Used', bodyType: 'Convertible', transmission: 'Automatic', dealer: 'McLaren San Jose', badges: [] },
+  { id: '114', year: 2021, make: 'Ferrari', model: '812 Superfast', trim: 'V12', mileage: 3500, price: 380000, imageUrl: IMG(114), condition: 'Used', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'Ferrari Silicon Valley', badges: [] },
+  { id: '115', year: 2024, make: 'Aston Martin', model: 'Vantage', trim: 'F1 Edition', mileage: 800, price: 230000, imageUrl: IMG(115), condition: 'Used', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'British Luxury Cars', badges: [] },
+  { id: '116', year: 2023, make: 'Pagani', model: 'Huayra', trim: 'BC Roadster', mileage: 1000, price: 2900000, imageUrl: IMG(116), condition: 'Used', bodyType: 'Convertible', transmission: 'Automatic', dealer: 'Supercar World', badges: [] },
+  { id: '117', year: 2025, make: 'Lotus', model: 'Emira', trim: 'First Edition', mileage: 400, price: 110000, imageUrl: IMG(117), condition: 'New', bodyType: 'Coupe', transmission: 'Manual', dealer: 'Lotus San Francisco', badges: [] },
+  { id: '118', year: 2023, make: 'BMW', model: 'M8 Competition', trim: 'Gran Coupe', mileage: 7000, price: 145000, imageUrl: IMG(118), condition: 'Used', bodyType: 'Sedan', transmission: 'Automatic', dealer: 'Euro Auto SF', badges: [] },
+  { id: '119', year: 2024, make: 'Porsche', model: '911 Turbo S', trim: 'Exclusive', mileage: 1500, price: 285000, imageUrl: IMG(119), condition: 'Used', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'Porsche San Francisco', badges: [] },
+  { id: '120', year: 2023, make: 'Bentley', model: 'Continental GT', trim: 'Speed', mileage: 3500, price: 290000, imageUrl: IMG(120), condition: 'Used', bodyType: 'Coupe', transmission: 'Automatic', dealer: 'British Luxury Cars', badges: [] },
+];
