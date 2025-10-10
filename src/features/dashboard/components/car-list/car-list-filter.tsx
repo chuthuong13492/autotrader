@@ -22,6 +22,8 @@ import { DashboardFilterSheet } from '../sheets/filter-sheet'
 import { cn } from '@/lib/utils'
 import type { Pagination } from '@/components/layout/data/pagination'
 import type { Car } from '../../data/mock-data'
+import { useStableLocation } from '@/hooks/use-stable-location'
+import isEqual from 'lodash/isEqual'
 
 
 interface CarListFilterProps {
@@ -32,12 +34,12 @@ interface CarListFilterProps {
 export function CarListFilter({ onResetFilters, onSortChange }: CarListFilterProps) {
     const states = useSelector((state: DashboardRootState) => state.dashboard);
 
-    const { sort, pagination } = states;
+    const { pagination } = states;
 
     const dispatch = useDispatch<DashboardDispatch>();
 
     const onSorted = async (value: SortForm) => {
-        const result =   await dispatch(setSortAsync(value.sort)).unwrap()
+        const result = await dispatch(setSortAsync(value.sort)).unwrap()
         onSortChange?.(value.sort, result.pagination)
     };
 
@@ -46,6 +48,17 @@ export function CarListFilter({ onResetFilters, onSortChange }: CarListFilterPro
         return `${formatted} Matches`
     }, [pagination.total]);
 
+    const { search } = useStableLocation();
+
+    const defaultValues: SortForm = useMemo(() => {
+        if (!search || !search.sort) {
+            return { sort: 'relevance' };
+        }
+        return {
+            sort: search.sort as SortKey
+        };
+    }, [search])
+
     return (
         <div className='lg:pl-4 pr-2 flex flex-col lg:flex-row items-start lg:items-center justify-start gap-2 lg:gap-0'>
             <Filter onResetFilters={onResetFilters} />
@@ -53,7 +66,7 @@ export function CarListFilter({ onResetFilters, onSortChange }: CarListFilterPro
                 <div className="text-base md:text-lg lg:text-xl font-bold text-black whitespace-nowrap">
                     {total}
                 </div>
-                <Sort defaultValues={{ sort: sort }} onChange={onSorted} />
+                <Sort defaultValues={defaultValues} onChange={onSorted} />
             </div>
         </div>
     )
@@ -137,6 +150,12 @@ export function Sort({ className, defaultValues = { sort: 'relevance' }, onChang
         resolver: zodResolver(formSchema),
         defaultValues: defaultValues,
     });
+
+    useUpdateEffect(()=> {
+        if (!isEqual(form.getValues(), defaultValues)) {
+            form.reset(defaultValues)
+        }
+    }, [defaultValues])
 
     const values = useWatch<SortForm>({
         control: form.control,

@@ -1,48 +1,36 @@
 import { SearchIcon, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useSearch } from '@/context/search-provider'
-import { useRouter } from '@tanstack/react-router'
 import { Button } from './ui/button'
-import { useDispatch, useSelector } from 'react-redux'
-import { type DashboardDispatch, type DashboardRootState } from '@/stores/dashboard-store'
-import { setSearch, filterPageAsync } from '@/stores/dashboard-slice'
+import { useSelector } from 'react-redux'
+import { type DashboardRootState } from '@/stores/dashboard-store'
+import { useUpdateEffect } from '@/hooks/use-update-effect'
+import { useCallback } from 'react'
 
 type SearchProps = {
   className?: string
   type?: React.HTMLInputTypeAttribute
   placeholder?: string
+  onSearch?: (search: string) => void
 }
 
 export function Search({
   className = '',
   placeholder = 'Search',
+  onSearch,
 }: SearchProps) {
-  const {  setOpen } = useSearch()
+  const { setSearch, setOpen, state } = useSearch()
 
   const search = useSelector((state: DashboardRootState) => state.dashboard.search)
 
-  const dispatch = useDispatch<DashboardDispatch>()
-
-  const router = useRouter()
-
-  const handleClear = (e: React.MouseEvent) => {
+  const handleClear = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
-    dispatch(setSearch(''))
-    dispatch(filterPageAsync({}))
+    setSearch('');
+  }, [setSearch]);
 
-    const currentSearch = new URLSearchParams(window.location.search)
-
-    if (currentSearch.has('value')) {
-      currentSearch.delete('value')
-  
-      const nextLocation = router.buildLocation({
-        from: '/search-result-page',
-        to: '.',  
-        search: Object.fromEntries(currentSearch.entries())
-      })
-      router.history.replace(nextLocation.href)
-    }
-  }
+  useUpdateEffect(() => {
+    onSearch?.(state.searchQuery);
+  }, [state.searchQuery])
 
   return (
     <Button

@@ -4,55 +4,14 @@ import {
   createAsyncThunk,
 } from "@reduxjs/toolkit";
 import { type FormData } from "@/features/dashboard/components/dashboard-filter";
-import { applyFilters } from "@/features/dashboard/data/filter-data";
-import { ALL_CARS, type Car } from "@/features/dashboard/data/mock-data";
+import { type Car } from "@/features/dashboard/data/mock-data";
 import {
   type Pagination,
   copyWithPagination,
   emptyPagination,
 } from "@/components/layout/data/pagination";
-import { updatePage, delay } from "@/lib/utils";
-
-export function getPagination(
-  cars: Car[],
-  filters: Partial<FormData>,
-  search: string,
-  sort: SortKey,
-  page: number = 1,
-  pageSize: number = 20
-) {
-  const filteredCars = applyFilters(cars, {
-    selectedMakes: filters.selectedMakes ?? "",
-    selectedModels: filters.selectedModels ?? "",
-    selectedTrims: filters.selectedTrims ?? "",
-    priceMin: filters.minPrice ? Number(filters.minPrice) : 0,
-    priceMax: filters.maxPrice
-      ? Number(filters.maxPrice)
-      : Number.MAX_SAFE_INTEGER,
-    selectedBodyTypes: filters.selectedBodyTypes ?? [],
-    selectedTransmission:
-      filters.selectedTransmission === "All"
-        ? null
-        : (filters.selectedTransmission ?? null),
-    searchQuery: search ?? "",
-    sortKey: sort,
-  });
-
-  const total = filteredCars.length;
-  const pageCount = Math.ceil(total / pageSize);
-  const safePage = Math.min(Math.max(page, 1), pageCount);
-  const start = (safePage - 1) * pageSize;
-  const end = start + pageSize;
-  const list = filteredCars.slice(start, end);
-
-  return {
-    list,
-    page: safePage,
-    pageSize,
-    pageCount,
-    total,
-  };
-}
+import { updatePage } from "@/lib/utils";
+import { mockApi } from "@/lib/mock-api";
 
 export type SortKey =
   | "relevance"
@@ -85,48 +44,66 @@ export const initialState: DashboardState = {
   pagination: emptyPagination(),
 };
 
-// Async thunk for setting sort
 export const setSortAsync = createAsyncThunk(
-  'dashboard/setSort',
+  "dashboard/setSort",
   async (sortKey: SortKey, { getState }) => {
     const state = getState() as { dashboard: DashboardState };
     const { values, search } = state.dashboard;
-    
-    const paginationResult = getPagination(
-      ALL_CARS,
-      values,
-      search ?? "",
-      sortKey,
-      1, // page
-      20 // pageSize
+
+    const result = await mockApi.filterCars(
+      {
+        searchQuery: search,
+        selectedMakes: values.selectedMakes,
+        selectedModels: values.selectedModels,
+        selectedTrims: values.selectedTrims,
+        selectedBodyTypes: values.selectedBodyTypes,
+        selectedTransmission:
+          values.selectedTransmission === "All"
+            ? undefined
+            : (values.selectedTransmission ?? undefined),
+        priceMin: values.minPrice ? Number(values.minPrice) : undefined,
+        priceMax: values.maxPrice ? Number(values.maxPrice) : undefined,
+        sortKey: sortKey,
+      },
+      1,
+      20
     );
 
     return {
       sort: sortKey,
-      pagination: paginationResult
+      pagination: result,
     };
   }
 );
 
-// Async thunk for filtering page
 export const filterPageAsync = createAsyncThunk(
-  'dashboard/filterPage',
+  "dashboard/filterPage",
   async (formData: Partial<FormData>, { getState }) => {
     const state = getState() as { dashboard: DashboardState };
     const { search, sort } = state.dashboard;
-    
-    const paginationResult = getPagination(
-      ALL_CARS,
-      formData,
-      search ?? "",
-      sort,
-      1, // page
-      20 // pageSize
+
+    const result = await mockApi.filterCars(
+      {
+        searchQuery: search,
+        selectedMakes: formData.selectedMakes,
+        selectedModels: formData.selectedModels,
+        selectedTrims: formData.selectedTrims,
+        selectedBodyTypes: formData.selectedBodyTypes,
+        selectedTransmission:
+          formData.selectedTransmission === "All"
+            ? undefined
+            : (formData.selectedTransmission ?? undefined),
+        priceMin: formData.minPrice ? Number(formData.minPrice) : undefined,
+        priceMax: formData.maxPrice ? Number(formData.maxPrice) : undefined,
+        sortKey: sort,
+      },
+      1,
+      20
     );
 
     return {
       values: formData,
-      pagination: paginationResult
+      pagination: result,
     };
   }
 );
@@ -135,9 +112,6 @@ export const dashboardSlice = createSlice({
   name: "dashboard",
   initialState,
   reducers: {
-    setSearch(state, action: PayloadAction<string>) {
-      state.search = action.payload;
-    },
     setState(state, action: PayloadAction<Partial<DashboardState>>) {
       // Update state với data từ action
       if (action.payload.search !== undefined) {
@@ -161,7 +135,7 @@ export const dashboardSlice = createSlice({
       // eslint-disable-next-line no-console
       console.log("fetchPage", action.payload);
     });
-    
+
     builder.addCase(setSortAsync.fulfilled, (state, action) => {
       state.sort = action.payload.sort;
       state.pagination = action.payload.pagination;
@@ -169,13 +143,13 @@ export const dashboardSlice = createSlice({
       // eslint-disable-next-line no-console
       console.log("setSortAsync", action.payload);
     });
-    
+
     builder.addCase(setSortAsync.rejected, (_, action) => {
       // Handle error if needed
       // eslint-disable-next-line no-console
       console.error("setSortAsync failed:", action.error);
     });
-    
+
     builder.addCase(filterPageAsync.fulfilled, (state, action) => {
       state.values = action.payload.values;
       state.pagination = action.payload.pagination;
@@ -183,13 +157,27 @@ export const dashboardSlice = createSlice({
       // eslint-disable-next-line no-console
       console.log("filterPageAsync", action.payload);
     });
-    
+
     builder.addCase(filterPageAsync.rejected, (_, action) => {
       // Handle error if needed
       // eslint-disable-next-line no-console
       console.error("filterPageAsync failed:", action.error);
     });
-    
+
+    builder.addCase(searchAsync.fulfilled, (state, action) => {
+      state.search = action.payload.search;
+      state.pagination = action.payload.pagination;
+
+      // eslint-disable-next-line no-console
+      console.log("searchAsync", action.payload);
+    });
+
+    builder.addCase(searchAsync.rejected, (_, action) => {
+      // Handle error if needed
+      // eslint-disable-next-line no-console
+      console.error("searchAsync failed:", action.error);
+    });
+
     builder.addCase(getSimilarCars.fulfilled, (_, action) => {
       // state.pagination = updatePage(state.pagination, action.payload);
 
@@ -199,56 +187,98 @@ export const dashboardSlice = createSlice({
   },
 });
 
+export const searchAsync = createAsyncThunk(
+  "dashboard/search",
+  async (searchQuery: string, { getState }) => {
+    const state = getState() as { dashboard: DashboardState };
+    const { values, sort } = state.dashboard;
+
+    const result = await mockApi.filterCars(
+      {
+        searchQuery: searchQuery,
+        selectedMakes: values.selectedMakes,
+        selectedModels: values.selectedModels,
+        selectedTrims: values.selectedTrims,
+        priceMin: values.minPrice ? Number(values.minPrice) : undefined,
+        priceMax: values.maxPrice ? Number(values.maxPrice) : undefined,
+        selectedBodyTypes: values.selectedBodyTypes,
+        selectedTransmission:
+          values.selectedTransmission === "All"
+            ? undefined
+            : (values.selectedTransmission ?? undefined),
+        sortKey: sort,
+      },
+      1,
+      20
+    );
+
+    return {
+      search: searchQuery,
+      pagination: result,
+    };
+  }
+);
+
 export const fetchPage = createAsyncThunk(
   "dashboard/fetchPage",
   async (page: number, { getState }) => {
-    await delay(2000);
-
     const state = getState() as { dashboard: DashboardState };
 
-    // Apply filters and pagination
-    const paginationResult = getPagination(
-      ALL_CARS,
-      state.dashboard.values,
-      state.dashboard.search ?? "",
-      state.dashboard.sort,
+    const result = await mockApi.filterCars(
+      {
+        sortKey: state.dashboard.sort,
+        selectedMakes: state.dashboard.values.selectedMakes,
+        selectedModels: state.dashboard.values.selectedModels,
+        selectedTrims: state.dashboard.values.selectedTrims,
+        selectedBodyTypes: state.dashboard.values.selectedBodyTypes,
+        selectedTransmission:
+          state.dashboard.values.selectedTransmission === "All"
+            ? undefined
+            : (state.dashboard.values.selectedTransmission ?? undefined),
+        priceMin: state.dashboard.values.minPrice
+          ? Number(state.dashboard.values.minPrice)
+          : undefined,
+        priceMax: state.dashboard.values.maxPrice
+          ? Number(state.dashboard.values.maxPrice)
+          : undefined,
+        searchQuery: state.dashboard.search,
+      },
       page,
-      20 // pageSize
+      20
     );
 
-    return updatePage(state.dashboard.pagination, paginationResult);
+    return updatePage(state.dashboard.pagination, result);
   }
 );
 
 export const getSimilarCars = createAsyncThunk(
   "dashboard/getSimilarCarsById",
   async ({ page, id }: { page: number; id?: string }, { getState }) => {
-    await delay(2000);
-
     const state = getState() as { dashboard: DashboardState };
 
-    const vehicle = ALL_CARS.find((car) => car.id === id);
+    // const vehicle = ALL_CARS.find((car) => car.id === id);
 
-    if(!vehicle){
-      return copyWithPagination(state.dashboard.pagination, { error: "Vehicle not found" })
+    const vehicle = await mockApi.getCarById(id);
+
+    if (!vehicle) {
+      return copyWithPagination(state.dashboard.pagination, {
+        error: "Vehicle not found",
+      });
     }
 
-    // Apply filters and pagination
-    const paginationResult = getPagination(
-      ALL_CARS,
+    const result = await mockApi.filterCars(
       {
+        sortKey: state.dashboard.sort,
         selectedMakes: vehicle?.make,
+        searchQuery: state.dashboard.search,
       },
-      state.dashboard.search ?? "",
-      state.dashboard.sort,
       page,
-      10 // pageSize
+      10
     );
 
-    return paginationResult;
+    return result;
   }
 );
 
-export const { setSearch, setState, setForm } =
-  dashboardSlice.actions;
+export const { setState, setForm } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

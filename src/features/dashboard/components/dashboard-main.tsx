@@ -7,7 +7,7 @@ import { Search } from "@/components/search"
 import { useRouter } from "@tanstack/react-router"
 import { type DashboardRootState, type DashboardDispatch } from "@/stores/dashboard-store"
 import { useDispatch, useSelector } from "react-redux"
-import { filterPageAsync, type SortKey } from "@/stores/dashboard-slice"
+import { filterPageAsync, searchAsync, type SortKey } from "@/stores/dashboard-slice"
 import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb"
 import type { Pagination } from "@/components/layout/data/pagination"
 import type { Car } from "../data/mock-data"
@@ -88,6 +88,21 @@ export function DashboardMain() {
         // Reset pagination when sort changes
     }
 
+    const onSearch = async (search: string) => {
+       const result = await dispatch(searchAsync(search)).unwrap();
+
+       carListRef.current?.updatePagination(result.pagination);
+
+       const { values, sort } = state
+        const nextSearch = buildSearchParams(values, search, sort)
+        const nextLocation = router.buildLocation({
+            from: '/search-result-page',
+            to: '.',
+            search: nextSearch,
+        })
+        router.history.replace(nextLocation.href)
+    }
+
     return (
         <Main className="px-2">
             <div className='pl-2 mb-4 flex items-center justify-between space-y-2'>
@@ -97,7 +112,7 @@ export function DashboardMain() {
                 <div className="space-y-2">
                     {/* Search */}
                     <div className='!w-full'>
-                        <Search className="hidden lg:block max-w-xs min-w-[16rem]" />
+                        <Search className="hidden lg:block max-w-xs min-w-[16rem]" onSearch={onSearch} />
                     </div>
                     {/* Filter */}
                     <DashboardFilter onFilterChange={onFilterChange} ref={dashboardFilterRef} />

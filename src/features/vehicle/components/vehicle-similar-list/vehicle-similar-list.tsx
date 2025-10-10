@@ -32,9 +32,9 @@ export function VehicleSimilarList() {
 
     return (
         <PagedList<Car>
-            className="pl-2 pb-2"
+            className="pl-2 pb-4"
             orientation="horizontal"
-            hasScrollBar={false}
+            hasScrollBar={true}
             itemKey={(item) => item.id}
             onInitial={() => fetchPage(1)}
             onRefresh={() => fetchPage(1)}

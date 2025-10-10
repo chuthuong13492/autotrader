@@ -1,6 +1,4 @@
-
 import { useState, useMemo, useCallback } from 'react'
-import { useRouter } from '@tanstack/react-router'
 import { ArrowRight, ChevronRight } from 'lucide-react'
 import { useSearch } from '@/context/search-provider'
 import { useDebouncedCallback } from 'use-debounce'
@@ -14,18 +12,14 @@ import {
   CommandList,
 } from '@/components/ui/command'
 import { ScrollArea } from './ui/scroll-area'
-import { type DashboardDispatch, type DashboardRootState } from '@/stores/dashboard-store'
-import { useSelector, useDispatch } from 'react-redux'
-import { setSearch, filterPageAsync } from '@/stores/dashboard-slice'
-import { type FilterTransmissionType } from '@/features/dashboard/components/dashboard-filter'
 
 // Optimized CommandItem component
-const CommandItemWithIcon = ({ 
-  value, 
-  onSelect, 
-  children, 
-  icon 
-}: { 
+const CommandItemWithIcon = ({
+  value,
+  onSelect,
+  children,
+  icon
+}: {
   value: string
   onSelect: (value: string) => void
   children: React.ReactNode
@@ -45,14 +39,7 @@ const CommandItemWithIcon = ({
 )
 
 export function CommandMenu() {
-  const router = useRouter()
-
-  const { state, setOpen } = useSearch()
-
-
-  const values = useSelector((state: DashboardRootState) => state.dashboard.values)
-
-  const dispatch = useDispatch<DashboardDispatch>()
+  const { state, setOpen, setSearch } = useSearch()
 
   // Local state for current input value
   const [inputValue, setInputValue] = useState('')
@@ -90,73 +77,24 @@ export function CommandMenu() {
     return { makes, models, years }
   }, [inputValue])
 
-  // Memoized check for search results
-  const hasSearchResults = useMemo(() => 
+  const hasSearchResults = useMemo(() =>
     searchResults.makes.length > 0 || searchResults.models.length > 0 || searchResults.years.length > 0,
     [searchResults]
   )
 
-
-  // Memoized callbacks
-  const setQuery = useCallback((query: string) => dispatch(setSearch(query)), [dispatch])
+  const setQuery = useCallback((query: string) => {
+    setSearch(query)
+  }, [setSearch])
 
   const onValueChange = useDebouncedCallback((query: string) => {
     setQuery(query)
-    dispatch(filterPageAsync({}))
   }, 500)
 
-  const buildSearchParams = useCallback((value: string) => {
-    const nextSearch: Partial<{
-      value: string
-      minPrice: number
-      maxPrice: number
-      selectedMakes: string
-      selectedModels: string
-      selectedTrims: string
-      selectedBodyTypes: string[]
-      selectedTransmission: FilterTransmissionType
-    }> = {}
-    
-    if (value) nextSearch.value = value
-    if (values.minPrice) nextSearch.minPrice = Number(values.minPrice)
-    if (values.maxPrice) nextSearch.maxPrice = Number(values.maxPrice)
-    if (values.selectedMakes) nextSearch.selectedMakes = values.selectedMakes
-    if (values.selectedModels) nextSearch.selectedModels = values.selectedModels
-    if (values.selectedTrims) nextSearch.selectedTrims = values.selectedTrims
-    if (values.selectedBodyTypes?.length) nextSearch.selectedBodyTypes = values.selectedBodyTypes
-    if (values.selectedTransmission && values.selectedTransmission !== 'All') {
-      nextSearch.selectedTransmission = values.selectedTransmission
-    }
-    
-    return nextSearch
-  }, [values])
-
-  const navigateToSearch = useCallback((searchParams: Partial<{
-    value: string
-    minPrice: number
-    maxPrice: number
-    selectedMakes: string
-    selectedModels: string
-    selectedTrims: string
-    selectedBodyTypes: string[]
-    selectedTransmission: FilterTransmissionType
-  }>) => {
-    const nextLocation = router.buildLocation({
-      from: '/search-result-page',
-      to: '.',
-      search: searchParams,
-    })
-    router.history.replace(nextLocation.href)
-  }, [router])
 
   const onSelect = useCallback((value: string) => {
     setQuery(value)
     setOpen(false)
-    dispatch(filterPageAsync({}))
-    
-    const searchParams = buildSearchParams(value)
-    navigateToSearch(searchParams)
-  }, [setQuery, setOpen, dispatch, buildSearchParams, navigateToSearch])
+  }, [setQuery, setOpen])
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
