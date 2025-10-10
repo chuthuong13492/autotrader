@@ -94,7 +94,16 @@ export function usePagination<T>({
     renderSubsequentPageError,
     renderEnd,
 }: UsePaginationOptions<T>) {
-    const resetTriggerRef = useRef<(() => void)[]>([]);
+    const resetTriggerRef = useRef<Set<() => void>>(new Set());
+    const safeRequestIdle = typeof requestIdleCallback !== 'undefined'
+        ? requestIdleCallback
+        : (cb: IdleRequestCallback) => setTimeout(cb, 0);
+
+    const resetTrigger = useCallback((resetCallback: () => void) => {
+        resetTriggerRef.current.add(resetCallback);
+        return () => resetTriggerRef.current.delete(resetCallback);
+    }, []);
+
     type State = {
         pagination: Pagination<T>;
         status: PaginationStatus;
@@ -171,7 +180,7 @@ export function usePagination<T>({
 
     useEffect(() => {
         return () => cancelLoadMore();
-      }, [cancelLoadMore]);
+    }, [cancelLoadMore]);
 
     useUpdateEffect(() => {
         if (initialPagination) {
@@ -180,24 +189,14 @@ export function usePagination<T>({
     }, [initialPagination]);
 
 
-    // Register reset callback từ PagedItem
-    const resetTrigger = useCallback((resetCallback: () => void) => {
-        resetTriggerRef.current.push(resetCallback);
-        // Return cleanup function
-        return () => {
-            const index = resetTriggerRef.current.indexOf(resetCallback);
-            if (index > -1) {
-                resetTriggerRef.current.splice(index, 1);
-            }
-        };
-    }, []);
 
     function updatePagination(newPagination: Pagination<T>) {
         cancelLoadMore();
-        
-        const resetCallbacks = [...resetTriggerRef.current];
-        requestIdleCallback(() => resetCallbacks.forEach(reset => reset()));
-        
+
+        safeRequestIdle(() => {
+            for (const reset of resetTriggerRef.current) reset();
+        });
+
         dispatch({ type: "SET_PAGINATION", payload: newPagination });
         updateStatus(getStatus(newPagination), true);
     }
@@ -220,26 +219,22 @@ export function usePagination<T>({
     }, [status, hasRequestedNextPage, dispatch]);
 
 
-    async function handleInitial() {
+    const handleInitial = useCallback(async () => {
         dispatch({ type: "INIT_REQUEST" });
         const result = await onInitial();
         dispatch({ type: "INIT_SUCCESS", payload: result });
-    }
+    }, [onInitial]);
 
-    async function handleRefresh() {
+    const handleRefresh = useCallback(async () => {
         const result = await onRefresh();
         dispatch({ type: "REFRESH_SUCCESS", payload: result });
-    }
+    }, [onRefresh]);
 
-    async function handleLoadMore() {
+    const handleLoadMore = useCallback(async () => {
         dispatch({ type: "LOAD_MORE_REQUEST" });
-        const result = await fetchDedup(async (_) => {
-            const res = await onLoadMore(pagination.page + 1);
-            return res;
-        });
-
+        const result = await fetchDedup(async () => onLoadMore(pagination.page + 1));
         dispatch({ type: "LOAD_MORE_SUCCESS", payload: result });
-    }
+    }, [fetchDedup, onLoadMore, pagination.page]);
 
     // Trigger load more when scroll near end
     const checkLoadMore = useCallback(
@@ -247,9 +242,9 @@ export function usePagination<T>({
             if (status === PaginationStatus.ONGOING && !hasRequestedNextPage) {
                 const triggerIndex = Math.max(0, pagination.list.length - invisibleItemsThreshold);
                 if (!isLastPage(pagination) && index === triggerIndex) {
-        
+
                     dispatch({ type: "SET_HAS_REQUESTED_NEXT_PAGE", payload: true });
-                    setTimeout(() => handleLoadMore(), 0);
+                    queueMicrotask(() => handleLoadMore());
                 }
             }
         },
@@ -260,8 +255,8 @@ export function usePagination<T>({
     // -------------------
     // BUILDER: render item theo trạng thái
     // -------------------
-    function renderPagedItem(index: number): React.ReactNode {
-        return (
+    const renderPagedItem = useCallback(
+        (index: number): React.ReactNode => (
             <PagedItem
                 index={index}
                 pagination={pagination}
@@ -271,10 +266,13 @@ export function usePagination<T>({
                 onCheckLoadMore={checkLoadMore}
                 onRegisterReset={resetTrigger}
             />
-        );
-    }
+        ),
+        [pagination, itemKey, renderItem, renderSeparator, checkLoadMore, resetTrigger]
+    );
 
-    function renderPagedStatus(index: number): React.ReactNode {
+    const renderPagedStatus = useCallback((
+        index: number
+    ): React.ReactNode => {
         const isLastItem = index === pagination.list.length - 1;
         const itemData = pagination.list[index];
         return (
@@ -296,8 +294,8 @@ export function usePagination<T>({
                     }
                 })()}
             </React.Fragment>
-        )
-    }
+        );
+    }, [pagination.list, pagination.error, status, renderSeparator, renderLoadingMore, renderSubsequentPageError, renderEnd, handleLoadMore]);
     // Kết quả trả về cho component sử dụng
     return {
         pagination,
@@ -333,15 +331,17 @@ const PagedItem = React.memo(function PagedItem<T>({
 }: PagedItemProps<T>) {
     const itemData = pagination.list[index];
 
-    const { ref, setIndex, reset } = useItemVisibility((index) => {
-        onCheckLoadMore(index);
-    });
+    const handleVisible = useCallback(
+        (idx: number) => onCheckLoadMore(idx),
+        [onCheckLoadMore]
+    );
+
+    const { ref, setIndex, reset } = useItemVisibility(handleVisible);
 
     useEffect(() => {
         setIndex(index);
     }, [index, setIndex]);
 
-    // Register reset function một lần khi mount
     useEffect(() => {
         const cleanup = onRegisterReset(reset);
         return cleanup;
@@ -358,15 +358,15 @@ const PagedItem = React.memo(function PagedItem<T>({
             {item}
         </div>
     );
-}, (prevProps, nextProps) => {
+}, (prev, next) => {
+    const prevKey = prev.itemKey(prev.pagination.list[prev.index]);
+    const nextKey = next.itemKey(next.pagination.list[next.index]);
     return (
-        prevProps.index === nextProps.index &&
-        prevProps.pagination.page === nextProps.pagination.page &&
-        prevProps.pagination.total === nextProps.pagination.total &&
-        prevProps.pagination.list.length === nextProps.pagination.list.length &&
-        prevProps.itemKey === nextProps.itemKey &&
-        prevProps.renderItem === nextProps.renderItem &&
-        prevProps.onCheckLoadMore === nextProps.onCheckLoadMore &&
-        prevProps.onRegisterReset === nextProps.onRegisterReset
+        prevKey === nextKey &&
+        prev.index === next.index &&
+        prev.renderItem === next.renderItem &&
+        prev.onCheckLoadMore === next.onCheckLoadMore &&
+        prev.onRegisterReset === next.onRegisterReset
     );
-});
+}
+);

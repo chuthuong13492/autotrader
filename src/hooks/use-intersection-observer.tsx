@@ -4,80 +4,98 @@ interface UseIntersectionObserverOptions {
   threshold?: number | number[];
   root?: Element | null;
   rootMargin?: string;
-  triggerOnce?: boolean;
 }
 
 interface UseIntersectionObserverReturn {
   ref: React.RefObject<HTMLDivElement | null>;
+  setIndex: (index: number) => void;
+  reset: () => void;
   isIntersecting: boolean;
-  entry: IntersectionObserverEntry | null;
 }
 
-export function useIntersectionObserver(
-  deps: unknown[] = [],
-  callback?: (entry: IntersectionObserverEntry) => void,
+// =====================================
+// 🔁 Shared Intersection Observer Manager
+// =====================================
+
+// Map quản lý observer + danh sách phần tử được observe
+const observerMap = new Map<
+  string,
+  { observer: IntersectionObserver; elements: Set<Element> }
+>();
+
+// Map quản lý callback cho từng element
+const elementCallbacks = new WeakMap<Element, (entry: IntersectionObserverEntry) => void>();
+
+function getObserverKey(options: UseIntersectionObserverOptions) {
+  const { threshold = 0, root = null, rootMargin = '0px' } = options;
+  return `${Array.isArray(threshold) ? threshold.join(',') : threshold}-${rootMargin}-${root ? 'customRoot' : 'nullRoot'}`;
+}
+
+function getSharedObserver(options: UseIntersectionObserverOptions) {
+  const key = getObserverKey(options);
+  const existing = observerMap.get(key);
+  if (existing) return existing;
+
+  const elements = new Set<Element>();
+  const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      const cb = elementCallbacks.get(entry.target);
+      if (cb) cb(entry);
+    }
+  }, options);
+
+  const record = { observer, elements };
+  observerMap.set(key, record);
+  return record;
+}
+
+// =====================================
+// 🌟 Hook useItemVisibility (shared observer)
+// =====================================
+export function useItemVisibility(
+  onVisible?: (index: number) => void,
   options: UseIntersectionObserverOptions = {}
 ): UseIntersectionObserverReturn {
-  const { threshold = 0, root = null, rootMargin = '0px', triggerOnce = false } = options;
-
   const ref = useRef<HTMLDivElement>(null);
-  const [isIntersecting, setIsIntersecting] = useState(false);
-  const [entry, setEntry] = useState<IntersectionObserverEntry | null>(null);
+  const indexRef = useRef<number>(-1);
   const hasTriggered = useRef(false);
+  const [isIntersecting, setIsIntersecting] = useState(false);
+
+  const callback = useCallback(
+    (entry: IntersectionObserverEntry) => {
+      setIsIntersecting(entry.isIntersecting);
+
+      if (entry.isIntersecting && onVisible && indexRef.current >= 0 && !hasTriggered.current) {
+        onVisible(indexRef.current);
+        hasTriggered.current = true;
+      }
+    },
+    [onVisible]
+  );
 
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
 
-    const observer = new IntersectionObserver((entries) => {
-      const [entry] = entries;
-      if (!entry) return;
+    const { observer, elements } = getSharedObserver(options);
 
-      setEntry(entry);
-      setIsIntersecting(entry.isIntersecting);
-
-      if (entry.isIntersecting && callback && (!triggerOnce || !hasTriggered.current)) {
-        callback(entry);
-        hasTriggered.current = true;
-
-        if (triggerOnce) {
-          observer.unobserve(entry.target);
-          observer.disconnect();
-        }
-      }
-    }, { threshold, root, rootMargin });
-
+    // Lưu callback cho element
+    elementCallbacks.set(element, callback);
+    elements.add(element);
     observer.observe(element);
 
     return () => {
       observer.unobserve(element);
-      observer.disconnect();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [threshold, root, rootMargin, triggerOnce, ...deps]); // 👈 thêm deps để khi resetCount thay đổi thì remount observer
+      elementCallbacks.delete(element);
+      elements.delete(element);
 
-  return { ref, isIntersecting, entry };
-}
-
-export function useItemVisibility(
-  onVisible?: (index: number) => void,
-  options: UseIntersectionObserverOptions = {}
-) {
-  const resetToken = useRef({});
-  const indexRef = useRef<number>(-1);
-  const hasTriggered = useRef(false);
-
-  const { ref, isIntersecting } = useIntersectionObserver(
-    [resetToken.current],
-    useCallback((entry: IntersectionObserverEntry) => {
-      if (entry.isIntersecting && onVisible && indexRef.current >= 0 && !hasTriggered.current) {
-        onVisible(indexRef.current);
-        hasTriggered.current = true;
+      // Tự động cleanup observer khi không còn element nào
+      if (elements.size === 0) {
+        observer.disconnect();
+        observerMap.delete(getObserverKey(options));
       }
-    }, [onVisible]),
-    options,
-
-  );
+    };
+  }, [callback, options]);
 
   const setIndex = useCallback((index: number) => {
     indexRef.current = index;
@@ -85,8 +103,7 @@ export function useItemVisibility(
 
   const reset = useCallback(() => {
     hasTriggered.current = false;
-    resetToken.current = {};
   }, []);
 
-  return { ref, setIndex, isIntersecting, reset };
+  return { ref, setIndex, reset, isIntersecting };
 }
