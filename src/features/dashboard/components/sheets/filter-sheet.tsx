@@ -18,7 +18,6 @@ type DashboardFilterSheetProps = {
 export function DashboardFilterSheet({ onSortChange, onFilterChange }: DashboardFilterSheetProps  ) {
     const dashboardFilterRef = useRef<FilterRef>(null);
 
-
     const [isOpen, setIsOpen] = useState(false);
 
 
