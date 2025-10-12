@@ -55,6 +55,7 @@ export const BaseImage = ({ className, alt = "Image", src, ...props }: BaseImage
       src={loadedSrc}
       alt={alt}
       className={cn("w-full h-full object-cover rounded-xl", className)}
+      loading="lazy"
       {...props}
     />
   );
