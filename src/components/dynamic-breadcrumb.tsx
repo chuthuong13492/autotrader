@@ -4,12 +4,14 @@ import { ChevronRight } from 'lucide-react'
 import { useSelector } from 'react-redux'
 import { type DashboardRootState } from '@/stores/dashboard-store'
 import { type BreadcrumbItem, buildFilterUrl } from '@/lib/breadcrumb-utils'
+import type { FormData } from '@/features/dashboard/components/dashboard-filter'
 
 type DynamicBreadcrumbProps = {
   lastItem?: BreadcrumbItem
+  onChange?: (formData: Partial<FormData>) => void
 }
 
-export function DynamicBreadcrumb({ lastItem }: DynamicBreadcrumbProps) {
+export function DynamicBreadcrumb({ lastItem, onChange }: DynamicBreadcrumbProps) {
 
   const state = useSelector((state: DashboardRootState) => state.dashboard)
   const { values } = state
@@ -82,6 +84,28 @@ export function DynamicBreadcrumb({ lastItem }: DynamicBreadcrumbProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [values])
 
+  const parseHrefToFormData = (href: string): Partial<FormData> => {
+    const url = new URL(href, window.location.origin)
+      const params = url.searchParams
+      const fd: Partial<FormData> = {}
+      const minPrice = params.get('minPrice')
+      const maxPrice = params.get('maxPrice')
+      const selectedMakes = params.get('selectedMakes')
+      const selectedModels = params.get('selectedModels')
+      const selectedTrims = params.get('selectedTrims')
+      const selectedBodyTypes = params.getAll('selectedBodyTypes')
+      const selectedTransmission = params.get('selectedTransmission')
+
+      fd.minPrice = minPrice ?? ''
+      fd.maxPrice = maxPrice ?? ''
+      fd.selectedMakes = selectedMakes ?? ''
+      fd.selectedModels = selectedModels ?? ''
+      fd.selectedTrims = selectedTrims ?? ''
+      fd.selectedBodyTypes = selectedBodyTypes ?? []
+      fd.selectedTransmission = selectedTransmission ? selectedTransmission as FormData['selectedTransmission'] : "All"
+      return fd
+  }
+
 
   return (
     <nav className="flex items-center space-x-2 text-sm">
@@ -91,7 +115,7 @@ export function DynamicBreadcrumb({ lastItem }: DynamicBreadcrumbProps) {
           {item.href ? (
             <Link
               to={item.href}
-              // onClick={async () => await dispatch(filterPageAsync(parseHrefToFormData(item.href!)))}
+              onClick={async () => onChange?.(parseHrefToFormData(item.href!))}
               className={`relative ${item.isActive ? "text-foreground font-medium" : "text-muted-foreground "}
                 hover:text-foreground transition-colors 
                 after:transition-all after:duration-300 after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[1px] after:w-0 
