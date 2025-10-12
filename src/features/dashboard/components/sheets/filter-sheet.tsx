@@ -58,12 +58,13 @@ export function DashboardFilterSheet({ onSortChange, onFilterChange }: Dashboard
                     <SheetTitle>Filters</SheetTitle>
                 </SheetHeader>
                 <ScrollArea type="hover" className="h-full">
-                    <div className="flex flex-col items-center space-y-4 pb-4">
+                    <div className="flex flex-col items-center space-y-4 pb-4  mb-20">
                         <YourSearch onResetFilters={onResetFilters}/>
                         <Sort
                             className="min-w-[17rem]"
                             defaultValues={defaultValues}
                             onChange={onChange} />
+                            
                         <DashboardFilter
                             className="block w-full min-w-[17rem]"
                             onFilterChange={handlerFilterChange}
