@@ -221,33 +221,45 @@ export const searchAsync = createAsyncThunk(
 
 export const fetchPage = createAsyncThunk(
   "dashboard/fetchPage",
-  async (page: number, { getState }) => {
-    const state = getState() as { dashboard: DashboardState };
-
+  async (
+    {
+      page,
+      values,
+      sort,
+      search,
+      pagination,
+    }: {
+      page: number;
+      values: Partial<FormData>;
+      sort: SortKey;
+      search: string;
+      pagination: Pagination<Car>;
+    }
+  ) => {
     const result = await mockApi.filterCars(
       {
-        sortKey: state.dashboard.sort,
-        selectedMakes: state.dashboard.values.selectedMakes,
-        selectedModels: state.dashboard.values.selectedModels,
-        selectedTrims: state.dashboard.values.selectedTrims,
-        selectedBodyTypes: state.dashboard.values.selectedBodyTypes,
+        sortKey: sort,
+        selectedMakes: values.selectedMakes,
+        selectedModels: values.selectedModels,
+        selectedTrims: values.selectedTrims,
+        selectedBodyTypes: values.selectedBodyTypes,
         selectedTransmission:
-          state.dashboard.values.selectedTransmission === "All"
+          values.selectedTransmission === "All"
             ? undefined
-            : (state.dashboard.values.selectedTransmission ?? undefined),
-        priceMin: state.dashboard.values.minPrice
-          ? Number(state.dashboard.values.minPrice)
+            : (values.selectedTransmission ?? undefined),
+        priceMin: values.minPrice
+          ? Number(values.minPrice)
           : undefined,
-        priceMax: state.dashboard.values.maxPrice
-          ? Number(state.dashboard.values.maxPrice)
+        priceMax: values.maxPrice
+          ? Number(values.maxPrice)
           : undefined,
-        searchQuery: state.dashboard.search,
+        searchQuery: search,
       },
       page,
       20
     );
 
-    return updatePage(state.dashboard.pagination, result);
+    return updatePage(pagination, result);
   }
 );
 

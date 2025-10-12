@@ -2,14 +2,16 @@
 import { type Car } from '@/features/dashboard/data/mock-data'
 import { CarCard } from '../car-card/car-card'
 import { CarCardLoading } from '../car-card/car-card-loading'
-import { useDispatch } from 'react-redux'
-import { type DashboardDispatch } from '@/stores/dashboard-store'
+import { useDispatch, useSelector } from 'react-redux'
+import { type DashboardRootState, type DashboardDispatch } from '@/stores/dashboard-store'
 import { fetchPage } from '@/stores/dashboard-slice'
 import { PagedGrid, type PagedGridRef } from '@/components/layout/pagination/paged-grid'
 import { Loader } from 'lucide-react'
 import { SuggestionList } from './suggestion-list'
-import { forwardRef, useImperativeHandle, useRef, useCallback } from 'react'
+import { forwardRef, useImperativeHandle, useRef, useCallback, useMemo } from 'react'
 import type { Pagination } from '@/components/layout/data/pagination'
+import { useStableLocation } from '@/hooks/use-stable-location'
+import type { FilterTransmissionType } from '../dashboard-filter'
 export interface CarListRef {
     updatePagination: (pagination: Pagination<Car>) => void;
 }
@@ -18,16 +20,49 @@ export const CarList = forwardRef<CarListRef>((_, ref) => {
     const dispatch = useDispatch<DashboardDispatch>();
     const pagedRef = useRef<PagedGridRef<Car>>(null);
 
+    const state = useSelector((state: DashboardRootState) => state.dashboard.pagination);
+
+    const {  search } = useStableLocation()
+
+    const stateUpdate = useMemo(() => {
+        return {
+            search: search.value ?? '',
+            values: {
+                minPrice: search.minPrice ?? '',
+                maxPrice: search.maxPrice ?? '',
+                selectedMakes: search.selectedMakes ?? '',
+                selectedModels: search.selectedModels ?? '',
+                selectedTrims: search.selectedTrims ?? '',
+                selectedBodyTypes: search.selectedBodyTypes ?? [],
+                selectedTransmission: (search.selectedTransmission as FilterTransmissionType) ?? 'All',
+            },
+            sort: (search.sort) ?? 'relevance',
+        }
+    }, [search])
+
     const handlePagination = useCallback(async (page: number) => {
-        const result = await dispatch(fetchPage(page)).unwrap();
+        const result = await dispatch(fetchPage({
+            page,
+            values: {
+                minPrice: String(stateUpdate.values.minPrice),
+                maxPrice: String(stateUpdate.values.maxPrice),
+                selectedMakes: stateUpdate.values.selectedMakes,
+                selectedModels: stateUpdate.values.selectedModels,
+                selectedTrims: stateUpdate.values.selectedTrims,
+                selectedBodyTypes: stateUpdate.values.selectedBodyTypes,
+                selectedTransmission: stateUpdate.values.selectedTransmission,
+            },
+            sort: stateUpdate.sort,
+            search: stateUpdate.search,
+            pagination: state,
+        })).unwrap();
         return result;
-    }, [dispatch]);
+    }, [dispatch, state, stateUpdate]);
 
     const handleUpdatePagination = useCallback((pagination: Pagination<Car>) => {
         pagedRef.current?.updatePagination(pagination);
     }, []);
 
-    // Memoized builders
     const renderLoadingFirstPage = useCallback(() => (
         <>
             {Array.from({ length: 12 }).map((_, idx) => (

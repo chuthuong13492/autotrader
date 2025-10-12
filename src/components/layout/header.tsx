@@ -2,9 +2,6 @@ import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { MobileNavigation } from './mobile-navigation'
 import { Link } from '@tanstack/react-router'
-import { type DashboardDispatch } from '@/stores/dashboard-store'
-import { useDispatch } from 'react-redux'
-import { filterPageAsync } from '@/stores/dashboard-slice'
 
 type HeaderProps = React.HTMLAttributes<HTMLElement> & {
   fixed?: boolean
@@ -59,15 +56,12 @@ export function Header({ className, fixed, children, ...props }: HeaderProps) {
 
 
 function Prefix() {
-  const dispatch = useDispatch<DashboardDispatch>()
-
-  const onClick = async () => await dispatch(filterPageAsync({}));
   return (
     <>
       {/* HAMBURGER MENU*/}
       <MobileNavigation />
       {/* LOGO */}
-      <Link className="header-brand" onClick={onClick} to="/" aria-label="Find Cars for Sale at Autotrader">
+      <Link className="header-brand" to="/" aria-label="Find Cars for Sale at Autotrader">
         <img
           src="https://www.autotrader.com/cm-api/content/static/img/icon/logos/atc-logo-blue.svg"
           width="139"

@@ -1,74 +1,46 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FilterIcon } from "lucide-react";
-import { DashboardFilter, type FilterRef, type FilterTransmissionType, type FormData } from "../dashboard-filter";
 import { useMemo, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import type { DashboardDispatch, DashboardRootState } from "@/stores/dashboard-store";
-import { useRouter } from "@tanstack/react-router";
-import { filterPageAsync, setSortAsync } from "@/stores/dashboard-slice";
+import { useSelector } from "react-redux";
+import type { DashboardRootState } from "@/stores/dashboard-store";
 import { Sort, type SortForm } from "../car-list/car-list-filter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import isEqual from "lodash/isEqual";
+import { useStableLocation } from "@/hooks/use-stable-location";
+import { DashboardFilter, type FilterRef, type FormData } from "../dashboard-filter";
 
-type SearchParams = {
-    value?: string
-    minPrice?: number
-    maxPrice?: number
-    selectedMakes?: string
-    selectedModels?: string
-    selectedTrims?: string
-    selectedBodyTypes?: string[]
-    selectedTransmission?: FilterTransmissionType
+type DashboardFilterSheetProps = {
+    onSortChange?: (sort: SortForm) => void,
+    onFilterChange?: (formData: Partial<FormData>) => void
 }
 
-function buildSearchParams(
-    formData: Partial<FormData>,
-    search?: string
-): SearchParams {
-    const nextSearch: SearchParams = {}
-
-    if (search) nextSearch.value = search
-    if (formData.minPrice) nextSearch.minPrice = Number(formData.minPrice)
-    if (formData.maxPrice) nextSearch.maxPrice = Number(formData.maxPrice)
-    if (formData.selectedMakes) nextSearch.selectedMakes = formData.selectedMakes
-    if (formData.selectedModels) nextSearch.selectedModels = formData.selectedModels
-    if (formData.selectedTrims) nextSearch.selectedTrims = formData.selectedTrims
-    if (formData.selectedBodyTypes?.length) nextSearch.selectedBodyTypes = formData.selectedBodyTypes
-    if (formData.selectedTransmission && formData.selectedTransmission !== 'All') {
-        nextSearch.selectedTransmission = formData.selectedTransmission
-    }
-
-    return nextSearch
-}
-
-export function DashboardFilterSheet() {
+export function DashboardFilterSheet({ onSortChange, onFilterChange }: DashboardFilterSheetProps  ) {
     const dashboardFilterRef = useRef<FilterRef>(null);
 
 
     const [isOpen, setIsOpen] = useState(false);
 
-    const dispatch = useDispatch<DashboardDispatch>();
-    const state = useSelector((state: DashboardRootState) => state.dashboard);
 
-    const { sort } = state;
+    const { search } = useStableLocation();
 
-    const router = useRouter();
+    const defaultValues: SortForm = useMemo(() => {
+        if (!search || !search.sort) {
+            return { sort: 'relevance' };
+        }
+        return {
+            sort: search.sort
+        };
+    }, [search])
 
-    const onFilterChange = async (formData: Partial<FormData>) => {
-        const { search } = state;
-        await dispatch(filterPageAsync(formData));
 
-        const nextSearch = buildSearchParams(formData, search);
-        const nextLocation = router.buildLocation({
-            from: '/search-result-page',
-            to: '.',
-            search: nextSearch,
-        });
-        router.history.replace(nextLocation.href);
+    const handlerFilterChange = async (formData: Partial<FormData>) => {
+        onFilterChange?.(formData)
     };
 
-    const onChange = (value: SortForm) => dispatch(setSortAsync(value.sort));
+    const onChange = async (value: SortForm) => {
+        onSortChange?.(value)
+    };  
 
     const onResetFilters =() => dashboardFilterRef.current?.reset();
 
@@ -91,11 +63,11 @@ export function DashboardFilterSheet() {
                         <YourSearch onResetFilters={onResetFilters}/>
                         <Sort
                             className="min-w-[17rem]"
-                            defaultValues={{ sort: sort }}
+                            defaultValues={defaultValues}
                             onChange={onChange} />
                         <DashboardFilter
                             className="block w-full min-w-[17rem]"
-                            onFilterChange={onFilterChange}
+                            onFilterChange={handlerFilterChange}
                             ref={dashboardFilterRef}
                         />
                     </div>

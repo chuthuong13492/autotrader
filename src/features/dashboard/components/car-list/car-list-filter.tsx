@@ -24,14 +24,16 @@ import type { Pagination } from '@/components/layout/data/pagination'
 import type { Car } from '../../data/mock-data'
 import { useStableLocation } from '@/hooks/use-stable-location'
 import isEqual from 'lodash/isEqual'
+import type { FormData } from '../dashboard-filter'
 
 
 interface CarListFilterProps {
     onResetFilters?: () => void
     onSortChange?: (sort: SortKey, pagination: Pagination<Car>) => void
+    onFilterChange?: (formData: Partial<FormData>) => void
 }
 
-export function CarListFilter({ onResetFilters, onSortChange }: CarListFilterProps) {
+export function CarListFilter({ onResetFilters, onSortChange, onFilterChange }: CarListFilterProps) {
     const states = useSelector((state: DashboardRootState) => state.dashboard);
 
     const { pagination } = states;
@@ -61,7 +63,7 @@ export function CarListFilter({ onResetFilters, onSortChange }: CarListFilterPro
 
     return (
         <div className='lg:pl-4 pr-2 flex flex-col lg:flex-row items-start lg:items-center justify-start gap-2 lg:gap-0'>
-            <Filter onResetFilters={onResetFilters} />
+            <Filter onResetFilters={onResetFilters} onSortChange={onSorted} onFilterChange={onFilterChange}/>
             <div className='w-full flex items-center justify-between'>
                 <div className="text-base md:text-lg lg:text-xl font-bold text-black whitespace-nowrap">
                     {total}
@@ -72,7 +74,13 @@ export function CarListFilter({ onResetFilters, onSortChange }: CarListFilterPro
     )
 }
 
-function Filter({ onResetFilters }: { onResetFilters?: () => void }) {
+type FilterProps = {
+    onResetFilters?: () => void,
+    onSortChange?: (sort: SortForm) => void,
+    onFilterChange?: (formData: Partial<FormData>) => void
+}
+
+function Filter({ onResetFilters, onSortChange, onFilterChange }: FilterProps) {
     const values = useSelector((state: DashboardRootState) => state.dashboard.values)
 
     const { setOpen } = useSearch();
@@ -107,7 +115,7 @@ function Filter({ onResetFilters }: { onResetFilters?: () => void }) {
                     orientation="vertical"
                 />
 
-                <DashboardFilterSheet />
+                <DashboardFilterSheet onSortChange={onSortChange} onFilterChange={onFilterChange} />
             </div>
 
             {isClear && (

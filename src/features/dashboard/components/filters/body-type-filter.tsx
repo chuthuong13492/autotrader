@@ -36,15 +36,13 @@ export function BodyTypeFilter({ control, className }: BodyTypeFilterProps) {
                                                         id={item.value}
                                                         checked={(field.value ?? []).includes(item.value)}
                                                         onCheckedChange={(checked) => {
-                                                            const current: string[] = field.value ?? []
-                                                            const isChecked = Boolean(checked)
-                                                            const exists = current.includes(item.value)
-
+                                                            const current: string[] = field.value ?? [];
+                                                            const isChecked = Boolean(checked);
+                                                            const exists = current.includes(item.value);
                                                             const next = isChecked
-                                                                ? (exists ? current : [...current, item.value])
-                                                                : current.filter((type: string) => type !== item.value)
-
-                                                            field.onChange(next)
+                                                                ? exists ? current : [...current, item.value]
+                                                                : current.filter((type: string) => type !== item.value);
+                                                            field.onChange(next);
                                                         }}
                                                     />
                                                     <Label htmlFor={item.value} className="flex items-center gap-2 text-sm">

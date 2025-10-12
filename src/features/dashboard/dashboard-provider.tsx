@@ -51,7 +51,8 @@ export function DashboardDataLoader({ children }: DashboardDataLoaderProps) {
                 }
             }))
         }
-    }, [stateUpdate, isSearchResultPage, dispatch])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     return children
 }
@@ -67,3 +68,4 @@ export function DashboardProvider({ children }: DashboardProviderProps) {
         </Provider>
     )
 }
+

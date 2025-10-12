@@ -12,7 +12,7 @@ import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb"
 import type { Pagination } from "@/components/layout/data/pagination"
 import type { Car } from "../data/mock-data"
 
-type SearchParams = {
+export type SearchParams = {
     value?: string
     minPrice?: number
     maxPrice?: number
@@ -118,7 +118,9 @@ export function DashboardMain() {
                     <DashboardFilter onFilterChange={onFilterChange} ref={dashboardFilterRef} />
                 </div>
                 <section className="min-w-0 grow">
-                    <CarListFilter onResetFilters={onResetFilters} onSortChange={onSortChange} />
+                    <CarListFilter onResetFilters={onResetFilters} onSortChange={onSortChange} onFilterChange={(formData) => {
+                        dashboardFilterRef.current?.reset(formData)
+                    }} />
                     <CarList ref={carListRef} />
                 </section>
             </div>

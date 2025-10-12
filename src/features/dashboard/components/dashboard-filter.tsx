@@ -18,7 +18,6 @@ import type { TransmissionType } from '../data/mock-data'
 import { useUpdateEffect } from '@/hooks/use-update-effect'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import isEqual from "lodash/isEqual"
 import { cn } from '@/lib/utils'
 import { useStableLocation } from '@/hooks/use-stable-location'
 interface DashboardFilterProps {
@@ -28,7 +27,7 @@ interface DashboardFilterProps {
 
 export type FilterTransmissionType = TransmissionType | 'All'
 
-const filterFormSchema = z.object({
+ const filterFormSchema = z.object({
     minPrice: z.string(),
     maxPrice: z.string(),
     selectedMakes: z.string(),
@@ -62,7 +61,7 @@ const initialValues: FormData = {
     selectedTransmission: 'All',
 }
 export interface FilterRef {
-    reset: () => void
+    reset: (formData?: Partial<FormData>) => void
     submit: () => void
 }
 
@@ -113,16 +112,9 @@ export const Filter = forwardRef<FilterRef, InnerFilterProps>(
             mode: "onChange",
         })
 
-        useUpdateEffect(() => {
-            const currentValues = form.getValues();
-            if (!isEqual(currentValues, defaultValues)) {
-                form.reset(defaultValues)
-            }
-        }, [defaultValues])
-
         useImperativeHandle(ref, () => ({
-            reset: () => {
-                form.reset(initialValues)
+            reset: (formData?: Partial<FormData>) => {
+                form.reset(formData || initialValues)
             },
             submit: () => {
                 form.handleSubmit((_) => {
