@@ -23,6 +23,8 @@ export function createDashboardStore(preloadedState?: DashboardPreloadedInput) {
 
 export const dashboardStore = createDashboardStore()
 
-export type DashboardRootState = ReturnType<typeof dashboardStore.getState>
+export type DashboardRootState = {
+  dashboard: DashboardState
+}
 export type DashboardDispatch = typeof dashboardStore.dispatch
 

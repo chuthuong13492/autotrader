@@ -2,16 +2,16 @@ import {
   createSlice,
   type PayloadAction,
   createAsyncThunk,
-} from "@reduxjs/toolkit";
-import { type FormData } from "@/features/dashboard/components/dashboard-filter";
-import { type Car } from "@/features/dashboard/data/mock-data";
+} from "@reduxjs/toolkit"
+import { type FormData } from "@/features/dashboard/components/dashboard-filter"
+import { type Car } from "@/features/dashboard/data/mock-data"
 import {
   type Pagination,
   copyWithPagination,
   emptyPagination,
-} from "@/components/layout/data/pagination";
-import { updatePage } from "@/lib/utils";
-import { mockApi } from "@/lib/mock-api";
+} from "@/components/layout/data/pagination"
+import { updatePage } from "@/lib/utils"
+import { mockApi } from "@/lib/mock-api"
 
 export type SortKey =
   | "relevance"
@@ -23,10 +23,10 @@ export type SortKey =
   | "mileage-desc";
 
 export interface DashboardState {
-  values: Partial<FormData>;
-  search?: string;
-  sort: SortKey;
-  pagination: Pagination<Car>;
+  values: Partial<FormData>
+  search?: string
+  sort: SortKey
+  pagination: Pagination<Car>
 }
 
 export const initialState: DashboardState = {
@@ -42,13 +42,13 @@ export const initialState: DashboardState = {
     selectedTransmission: "All",
   },
   pagination: emptyPagination(),
-};
+}
 
 export const setSortAsync = createAsyncThunk(
   "dashboard/setSort",
   async (sortKey: SortKey, { getState }) => {
-    const state = getState() as { dashboard: DashboardState };
-    const { values, search } = state.dashboard;
+    const state = getState() as { dashboard: DashboardState }
+    const { values, search } = state.dashboard
 
     const result = await mockApi.filterCars(
       {
@@ -67,20 +67,20 @@ export const setSortAsync = createAsyncThunk(
       },
       1,
       20
-    );
+    )
 
     return {
       sort: sortKey,
       pagination: result,
-    };
+    }
   }
-);
+)
 
 export const filterPageAsync = createAsyncThunk(
   "dashboard/filterPage",
   async (formData: Partial<FormData>, { getState }) => {
-    const state = getState() as { dashboard: DashboardState };
-    const { search, sort } = state.dashboard;
+    const state = getState() as { dashboard: DashboardState }
+    const { search, sort } = state.dashboard
 
     const result = await mockApi.filterCars(
       {
@@ -99,99 +99,89 @@ export const filterPageAsync = createAsyncThunk(
       },
       1,
       20
-    );
+    )
 
     return {
       values: formData,
       pagination: result,
-    };
+    }
   }
-);
+)
 
 export const dashboardSlice = createSlice({
   name: "dashboard",
   initialState,
   reducers: {
     setState(state, action: PayloadAction<Partial<DashboardState>>) {
-      // Update state với data từ action
       if (action.payload.search !== undefined) {
-        state.search = action.payload.search;
+        state.search = action.payload.search
       }
       if (action.payload.values !== undefined) {
-        state.values = action.payload.values;
+        state.values = action.payload.values
       }
       if (action.payload.sort !== undefined) {
-        state.sort = action.payload.sort;
+        state.sort = action.payload.sort
       }
     },
     setForm(state, action: PayloadAction<Partial<FormData>>) {
-      state.values = action.payload;
+      state.values = action.payload
     },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchPage.fulfilled, (state, action) => {
-      state.pagination = action.payload;
-
+      state.pagination = action.payload
       // eslint-disable-next-line no-console
-      console.log("fetchPage", action.payload);
-    });
+      console.log("fetchPage", action.payload)
+    })
 
     builder.addCase(setSortAsync.fulfilled, (state, action) => {
-      state.sort = action.payload.sort;
-      state.pagination = action.payload.pagination;
-
+      state.sort = action.payload.sort
+      state.pagination = action.payload.pagination
       // eslint-disable-next-line no-console
-      console.log("setSortAsync", action.payload);
-    });
+      console.log("setSortAsync", action.payload)
+    })
 
     builder.addCase(setSortAsync.rejected, (_, action) => {
-      // Handle error if needed
       // eslint-disable-next-line no-console
-      console.error("setSortAsync failed:", action.error);
-    });
+      console.error("setSortAsync failed:", action.error)
+    })
 
     builder.addCase(filterPageAsync.fulfilled, (state, action) => {
-      state.values = action.payload.values;
-      state.pagination = action.payload.pagination;
-
+      state.values = action.payload.values
+      state.pagination = action.payload.pagination
       // eslint-disable-next-line no-console
-      console.log("filterPageAsync", action.payload);
-    });
+      console.log("filterPageAsync", action.payload)
+    })
 
     builder.addCase(filterPageAsync.rejected, (_, action) => {
-      // Handle error if needed
       // eslint-disable-next-line no-console
-      console.error("filterPageAsync failed:", action.error);
-    });
+      console.error("filterPageAsync failed:", action.error)
+    })
 
     builder.addCase(searchAsync.fulfilled, (state, action) => {
-      state.search = action.payload.search;
-      state.pagination = action.payload.pagination;
-
+      state.search = action.payload.search
+      state.pagination = action.payload.pagination
       // eslint-disable-next-line no-console
-      console.log("searchAsync", action.payload);
-    });
+      console.log("searchAsync", action.payload)
+    })
 
     builder.addCase(searchAsync.rejected, (_, action) => {
-      // Handle error if needed
       // eslint-disable-next-line no-console
-      console.error("searchAsync failed:", action.error);
-    });
+      console.error("searchAsync failed:", action.error)
+    })
 
     builder.addCase(getSimilarCars.fulfilled, (_, action) => {
-      // state.pagination = updatePage(state.pagination, action.payload);
-
       // eslint-disable-next-line no-console
-      console.log("getSimilarCars", action.payload);
-    });
+      console.log("getSimilarCars", action.payload)
+    })
   },
 });
 
 export const searchAsync = createAsyncThunk(
   "dashboard/search",
   async (searchQuery: string, { getState }) => {
-    const state = getState() as { dashboard: DashboardState };
-    const { values, sort } = state.dashboard;
+    const state = getState() as { dashboard: DashboardState }
+    const { values, sort } = state.dashboard
 
     const result = await mockApi.filterCars(
       {
@@ -210,32 +200,30 @@ export const searchAsync = createAsyncThunk(
       },
       1,
       20
-    );
+    )
 
     return {
       search: searchQuery,
       pagination: result,
-    };
+    }
   }
-);
+)
 
 export const fetchPage = createAsyncThunk(
   "dashboard/fetchPage",
-  async (
-    {
-      page,
-      values,
-      sort,
-      search,
-      pagination,
-    }: {
-      page: number;
-      values: Partial<FormData>;
-      sort: SortKey;
-      search: string;
-      pagination: Pagination<Car>;
-    }
-  ) => {
+  async ({
+    page,
+    values,
+    sort,
+    search,
+    pagination,
+  }: {
+    page: number
+    values: Partial<FormData>
+    sort: SortKey
+    search: string
+    pagination: Pagination<Car>
+  }) => {
     const result = await mockApi.filterCars(
       {
         sortKey: sort,
@@ -247,35 +235,29 @@ export const fetchPage = createAsyncThunk(
           values.selectedTransmission === "All"
             ? undefined
             : (values.selectedTransmission ?? undefined),
-        priceMin: values.minPrice
-          ? Number(values.minPrice)
-          : undefined,
-        priceMax: values.maxPrice
-          ? Number(values.maxPrice)
-          : undefined,
+        priceMin: values.minPrice ? Number(values.minPrice) : undefined,
+        priceMax: values.maxPrice ? Number(values.maxPrice) : undefined,
         searchQuery: search,
       },
       page,
       20
-    );
+    )
 
-    return updatePage(pagination, result);
+    return updatePage(pagination, result)
   }
-);
+)
 
 export const getSimilarCars = createAsyncThunk(
   "dashboard/getSimilarCarsById",
   async ({ page, id }: { page: number; id?: string }, { getState }) => {
-    const state = getState() as { dashboard: DashboardState };
+    const state = getState() as { dashboard: DashboardState }
 
-    // const vehicle = ALL_CARS.find((car) => car.id === id);
-
-    const vehicle = await mockApi.getCarById(id);
+    const vehicle = await mockApi.getCarById(id)
 
     if (!vehicle) {
       return copyWithPagination(state.dashboard.pagination, {
         error: "Vehicle not found",
-      });
+      })
     }
 
     const result = await mockApi.filterCars(
@@ -286,11 +268,11 @@ export const getSimilarCars = createAsyncThunk(
       },
       page,
       10
-    );
+    )
 
-    return result;
+    return result
   }
-);
+)
 
-export const { setState, setForm } = dashboardSlice.actions;
-export default dashboardSlice.reducer;
+export const { setState, setForm } = dashboardSlice.actions
+export default dashboardSlice.reducer

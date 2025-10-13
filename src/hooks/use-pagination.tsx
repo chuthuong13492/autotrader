@@ -1,8 +1,9 @@
-import React, { useEffect, useCallback, useReducer, useRef } from "react";
+import React, { useEffect, useCallback, useReducer } from "react";
 import { emptyPagination, isLastPage, type Pagination } from "@/components/layout/data/pagination";
 import { useItemVisibility } from "./use-intersection-observer";
 import { useUpdateEffect } from "./use-update-effect";
 import { useAsyncDeduplicator } from "./use-async-deduplicate";
+import { useResetTrigger } from "./use-reset-trigger";
 
 export enum PaginationStatus {
     INITIAL = "initial",
@@ -94,15 +95,10 @@ export function usePagination<T>({
     renderSubsequentPageError,
     renderEnd,
 }: UsePaginationOptions<T>) {
-    const resetTriggerRef = useRef<Set<() => void>>(new Set());
+    const { resetTrigger, triggerAllResets } = useResetTrigger();
     const safeRequestIdle = typeof requestIdleCallback !== 'undefined'
         ? requestIdleCallback
         : (cb: IdleRequestCallback) => setTimeout(cb, 0);
-
-    const resetTrigger = useCallback((resetCallback: () => void) => {
-        resetTriggerRef.current.add(resetCallback);
-        return () => resetTriggerRef.current.delete(resetCallback);
-    }, []);
 
     type State = {
         pagination: Pagination<T>;
@@ -194,7 +190,7 @@ export function usePagination<T>({
         cancelLoadMore();
 
         safeRequestIdle(() => {
-            for (const reset of resetTriggerRef.current) reset();
+            triggerAllResets();
         });
 
         dispatch({ type: "SET_PAGINATION", payload: newPagination });
@@ -296,7 +292,7 @@ export function usePagination<T>({
             </React.Fragment>
         );
     }, [pagination.list, pagination.error, status, renderSeparator, renderLoadingMore, renderSubsequentPageError, renderEnd, handleLoadMore]);
-    // Kết quả trả về cho component sử dụng
+
     return {
         pagination,
         status,
