@@ -184,8 +184,6 @@ export function usePagination<T>({
         }
     }, [initialPagination]);
 
-
-
     function updatePagination(newPagination: Pagination<T>) {
         cancelLoadMore();
 
@@ -213,7 +211,6 @@ export function usePagination<T>({
             });
         }
     }, [status, hasRequestedNextPage, dispatch]);
-
 
     const handleInitial = useCallback(async () => {
         dispatch({ type: "INIT_REQUEST" });

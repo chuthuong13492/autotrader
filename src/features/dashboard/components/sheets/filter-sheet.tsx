@@ -1,7 +1,7 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FilterIcon } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import { useSelector } from "react-redux";
 import type { DashboardRootState } from "@/stores/dashboard-store";
 import { Sort, type SortForm } from "../car-list/car-list-filter";
@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import isEqual from "lodash/isEqual";
 import { useStableLocation } from "@/hooks/use-stable-location";
 import { DashboardFilter, type FilterRef, type FormData } from "../dashboard-filter";
+import useDialogState from "@/hooks/use-dialog-state";
 
 type DashboardFilterSheetProps = {
     onSortChange?: (sort: SortForm) => void,
@@ -18,7 +19,7 @@ type DashboardFilterSheetProps = {
 export function DashboardFilterSheet({ onSortChange, onFilterChange }: DashboardFilterSheetProps  ) {
     const dashboardFilterRef = useRef<FilterRef>(null);
 
-    const [isOpen, setIsOpen] = useState(false);
+    const [open, setOpen] = useDialogState()
 
 
     const { search } = useStableLocation();
@@ -43,9 +44,8 @@ export function DashboardFilterSheet({ onSortChange, onFilterChange }: Dashboard
 
     const onResetFilters =() => dashboardFilterRef.current?.reset();
 
-
     return (
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        <Sheet open={open === true} onOpenChange={setOpen}>
             <SheetTrigger asChild>
                 <button className="flex items-center gap-1">
                     <FilterIcon color="#ff821c" aria-hidden="true" size={18} />

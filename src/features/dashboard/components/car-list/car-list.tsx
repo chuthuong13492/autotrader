@@ -10,8 +10,8 @@ import { Loader } from 'lucide-react'
 import { SuggestionList } from './suggestion-list'
 import { forwardRef, useImperativeHandle, useRef, useCallback, useMemo } from 'react'
 import type { Pagination } from '@/components/layout/data/pagination'
-import { useStableLocation } from '@/hooks/use-stable-location'
 import type { FilterTransmissionType } from '../dashboard-filter'
+import { useRouterState } from '@tanstack/react-router'
 export interface CarListRef {
     updatePagination: (pagination: Pagination<Car>) => void;
 }
@@ -22,7 +22,13 @@ export const CarList = forwardRef<CarListRef>((_, ref) => {
 
     const state = useSelector((state: DashboardRootState) => state.dashboard.pagination);
 
-    const {  search } = useStableLocation()
+    const { search } = useRouterState({
+        select: state => ({ 
+            isLoading: state.isLoading, 
+            pathname: state.location.pathname,
+            search: state.location.search
+        })
+    });
 
     const stateUpdate = useMemo(() => {
         return {

@@ -14,7 +14,7 @@ interface UseIntersectionObserverReturn {
 }
 
 // =====================================
-// 🔁 Shared Intersection Observer Manager
+// Shared Intersection Observer Manager
 // =====================================
 
 // Map quản lý observer + danh sách phần tử được observe
@@ -50,7 +50,7 @@ function getSharedObserver(options: UseIntersectionObserverOptions) {
 }
 
 // =====================================
-// 🌟 Hook useItemVisibility (shared observer)
+// Hook useItemVisibility (shared observer)
 // =====================================
 export function useItemVisibility(
   onVisible?: (index: number) => void,
@@ -79,7 +79,7 @@ export function useItemVisibility(
 
     const { observer, elements } = getSharedObserver(options);
 
-    // Lưu callback cho element
+    // Save callback for element
     elementCallbacks.set(element, callback);
     elements.add(element);
     observer.observe(element);
@@ -89,7 +89,7 @@ export function useItemVisibility(
       elementCallbacks.delete(element);
       elements.delete(element);
 
-      // Tự động cleanup observer khi không còn element nào
+      // Automatically cleanup observer when no elements are left
       if (elements.size === 0) {
         observer.disconnect();
         observerMap.delete(getObserverKey(options));
