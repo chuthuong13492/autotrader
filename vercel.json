@@ -55,7 +55,8 @@
     }
   ],
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "VITE_APP_VERSION": "$(npm pkg get version | tr -d '\"')"
   },
   "buildCommand": "npm run build",
   "outputDirectory": "dist",

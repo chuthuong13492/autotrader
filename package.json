@@ -13,7 +13,11 @@
     "knip": "knip",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "version:patch": "npm version patch && git push --follow-tags",
+    "version:minor": "npm version minor && git push --follow-tags",
+    "version:major": "npm version major && git push --follow-tags",
+    "build:versioned": "npm run version:patch && npm run build"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.42.1",
