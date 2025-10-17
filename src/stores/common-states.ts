@@ -1,10 +1,6 @@
 // Common state interfaces for feature stores
 
-export interface Failure {
-  message: string
-  code?: string | number
-  cause?: unknown
-}
+import type { Failure } from "@/components/layout/data/failure"
 
 export interface ErrorState {
   error: Failure
