@@ -1,8 +1,8 @@
 import { PagedList } from "@/components/layout/pagination/paged-list";
 import { type Car } from "@/features/dashboard/data/mock-data";
 import { VehicleCard } from "../card/vehicle-card";
-import { getSimilarCars } from "@/stores/dashboard-slice";
-import type { DashboardDispatch } from "@/stores/dashboard-store";
+import { getSimilarCars } from "@/stores/dashboard/dashboard-slice";
+import type { DashboardDispatch } from "@/stores/dashboard/dashboard-store";
 import { useDispatch } from "react-redux";
 import { VehicleCardLoading } from "../card/vehicle-card-loading";
 import { useParams } from "@tanstack/react-router";

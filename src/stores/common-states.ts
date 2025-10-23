@@ -1,16 +1,16 @@
 // Common state interfaces for feature stores
+import type { FailureType } from "@/components/layout/data/failure"
 
-import type { Failure } from "@/components/layout/data/failure"
-
-export interface ErrorState {
-  error: Failure
+export interface BaseState<Type extends string = string> {
+  type: Type;
 }
-
-export type LoadingState = object
+export interface ErrorState {
+  error: FailureType;
+}
 
 export type EmptyState = object
 
-export interface ActionState {
+export interface ActionState  {
   callTime: Date
 }
 

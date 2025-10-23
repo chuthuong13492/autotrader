@@ -1,8 +1,8 @@
 import { Provider, useDispatch } from 'react-redux'
 import {  useEffect, useMemo } from 'react'
-import {  dashboardStore, type DashboardDispatch } from '@/stores/dashboard-store'
+import {  dashboardStore, type DashboardDispatch } from '@/stores/dashboard/dashboard-store'
 import { type FilterTransmissionType } from '@/features/dashboard/components/dashboard-filter'
-import { setState, type SortKey } from '@/stores/dashboard-slice'
+import { setState, type SortKey } from '@/stores/dashboard/dashboard-slice'
 import { useStableLocation } from '@/hooks/use-stable-location'
 
 type DashboardDataLoaderProps = {

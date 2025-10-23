@@ -1,5 +1,5 @@
 import { type Car, type TransmissionType, ALL_CARS } from './mock-data'
-import { type SortKey } from '@/stores/dashboard-slice'
+import { type SortKey } from '@/stores/dashboard/dashboard-slice'
 
 // Filter State Interface
 export interface FilterState {
