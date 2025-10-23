@@ -4,7 +4,7 @@ import {
   getTicketsAsync,
   refresh,
   clear,
-  dispose,
+  unmount,
   subscribeItem,
   subscribeRefresh,
   subscribeClear,
@@ -32,14 +32,14 @@ export const useTicketRepository = () => {
     [dispatch]
   );
   const doClear = useCallback(() => dispatch(clear()), [dispatch]);
-  const doDispose = useCallback(() => dispatch(dispose()), [dispatch]);
+  const doUnmount = useCallback(() => dispatch(unmount()), [dispatch]);
 
   return {
     getItem,
     getTickets,
     refresh: doRefresh,
     clear: doClear,
-    dispose: doDispose,
+    unmọunt: doUnmount,
     subscribeItem,
     subscribeRefresh,
     subscribeClear,
