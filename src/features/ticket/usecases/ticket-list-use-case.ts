@@ -2,7 +2,7 @@ import type { Pagination } from "@/components/layout/data/pagination";
 import { type Either, Right } from "@/components/layout/data/either";
 import type { FailureType } from "@/components/layout/data/failure";
 import { execute } from "@/lib/execute";
-import type { Ticket } from "@/features/ticket/data/models/ticket";
+import type { Ticket } from "@/features/ticket/models/ticket";
 
 export const TicketListUseCase = {
   loadTickets: async (): Promise<Either<FailureType, Pagination<Ticket>>> => {

@@ -8,7 +8,7 @@ import { TicketListUseCase } from "../../../domain/usecases/ticket-list-use-case
 import type { Pagination } from "@/components/layout/data/pagination";
 import { type Either } from "@/components/layout/data/either";
 import type { FailureType } from "@/components/layout/data/failure";
-import type { Ticket } from "@/features/ticket/data/models/ticket";
+import type { Ticket } from "@/features/ticket/models/ticket";
 
 const initialState = (id: number): TicketListState => TicketListInitialState(id);
 

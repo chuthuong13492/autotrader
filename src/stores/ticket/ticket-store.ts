@@ -1,6 +1,6 @@
 // stores/ticket/ticket-store.ts
 import { configureStore } from "@reduxjs/toolkit";
-import { ticketApi } from "@/features/ticket/data/apis/ticket-api";
+import { ticketApi } from "@/stores/ticket/ticket-api";
 
 export const ticketStore = configureStore({
   reducer: {

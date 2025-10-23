@@ -1,14 +1,14 @@
-import { useGetTicketQuery } from "../../data/apis/ticket-api";
-import type { Ticket } from "../../data/models/ticket";
+import { useGetTicketQuery } from "../../../../../stores/ticket/ticket-api";
+import type { Ticket } from "../../../models/ticket";
 
-interface TicketComponentProps {
+interface TicketSubscriberProps {
   id: number;
   initialItem?: Ticket;
   builder: (item: Ticket) => React.ReactNode;
   emptyBuilder?: () => React.ReactNode;
 }
 
-export const TicketComponent: React.FC<TicketComponentProps> = ({
+export const TicketSubscriber: React.FC<TicketSubscriberProps> = ({
   id,
   initialItem,
   builder,

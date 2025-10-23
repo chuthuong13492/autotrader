@@ -1,6 +1,6 @@
 // features/ticket/ticketApi.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { Ticket } from "../models/ticket";
+import type { Ticket } from "../../features/ticket/models/ticket";
 import type { Pagination } from "@/components/layout/data/pagination";
 
 export const ticketApi = createApi({

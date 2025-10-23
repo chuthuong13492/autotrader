@@ -2,7 +2,7 @@ import {
   emptyPagination,
   type Pagination,
 } from "@/components/layout/data/pagination";
-import type { Ticket } from "@/features/ticket/data/models/ticket";
+import type { Ticket } from "@/features/ticket/models/ticket";
 import type { BaseState } from "@/stores/common-states";
 
 export enum TicketListType {
