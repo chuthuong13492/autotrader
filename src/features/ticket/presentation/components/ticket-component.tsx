@@ -1,8 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { selectItem } from '@/stores/ticket/ticket-slice'
-import type { Ticket } from "@/features/ticket/data/ticket";
-import { useSelector } from 'react-redux';
-import { useTicketRepository } from '@/features/ticket/hooks/use-ticket-repository';
+import { useGetTicketQuery } from "../../data/apis/ticket-api";
+import type { Ticket } from "../../data/models/ticket";
 
 interface TicketComponentProps {
   id: number;
@@ -17,26 +14,14 @@ export const TicketComponent: React.FC<TicketComponentProps> = ({
   builder,
   emptyBuilder,
 }) => {
-  const repository = useTicketRepository();
-  const ticket = useSelector(selectItem(id));
+  const { data: ticket } = useGetTicketQuery(id, {
+    skip: !id,
+    selectFromResult: ({ data }) => ({
+      data: data ?? initialItem,
+    }),
+  });
 
-  const [item, setItem] = useState<Ticket | undefined>(initialItem || ticket);
-
-  useEffect(() => {
-    if (!item) {
-      repository.getItem(id);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
-
-  useEffect(() => {
-    const unsubscribe = repository.subscribeItem(id, (ticket) => {
-      setItem(ticket);
-    });
-    return unsubscribe;
-  }, [id, repository]);
-
-  if (item) return <>{builder(item)}</>;
+  if (ticket) return <>{builder(ticket)}</>;
 
   return <>{emptyBuilder?.() ?? null}</>;
 };

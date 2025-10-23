@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import type { RootState } from "../store/ticket-list-store";
+import type { RootState } from "../stores/ticket-list/ticket-list-store";
 import type { BaseState, ErrorState } from "@/stores/common-states";
 
 function isLoadingState(state: BaseState) {
